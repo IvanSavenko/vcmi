@@ -83,21 +83,101 @@ void BonusList::stackBonuses()
 	}
 }
 
+template<typename N, N D>
+class FixedPoint
+{
+	using Numeric = N;
+	static constexpr Numeric denominator = D;
+
+	Numeric numerator = 0;
+
+public:
+	FixedPoint() = default;
+
+	FixedPoint(Numeric value)
+		:numerator(value)
+	{}
+
+	explicit operator int() const
+	{
+		return numerator / denominator;
+	}
+
+	explicit operator float() const
+	{
+		return static_cast<float>(numerator) / denominator;
+	}
+
+	FixedPoint operator+=(FixedPoint value)
+	{
+		numerator += value.numerator;
+		return *this;
+	}
+
+	FixedPoint operator-=(FixedPoint value)
+	{
+		numerator -= value.numerator;
+		return *this;
+	}
+
+	FixedPoint operator*=(FixedPoint value)
+	{
+		// multiplication: 200.00 * 400.00 = 800.0000
+		// divide by denominator: 800.0000 -> 800.00
+		numerator *= value.numerator;
+		numerator /= denominator;
+		return *this;
+	}
+
+	FixedPoint operator/=(FixedPoint value)
+	{
+		// multiply by denominator: 200.00 -> 200.0000
+		// division: 200.0000 / 400.00 -> 0.50
+		numerator *= denominator;
+		numerator /= value.numerator;
+		return *this;
+	}
+
+	bool operator < (const FixedPoint & other) const { return denominator < other.denominator; }
+	bool operator > (const FixedPoint & other) const { return denominator > other.denominator; }
+	bool operator == (const FixedPoint & other) const { return denominator == other.denominator; }
+	bool operator != (const FixedPoint & other) const { return denominator != other.denominator; }
+	bool operator <= (const FixedPoint & other) const { return denominator <= other.denominator; }
+	bool operator >= (const FixedPoint & other) const { return denominator >= other.denominator; }
+};
+
+template<typename F, F D> FixedPoint<F,D> operator +(FixedPoint<F,D> fp1, FixedPoint<F,D> fp2) { fp1 += fp2; return fp1; }
+template<typename F, F D> FixedPoint<F,D> operator -(FixedPoint<F,D> fp1, FixedPoint<F,D> fp2) { fp1 -= fp2; return fp1; }
+template<typename F, F D> FixedPoint<F,D> operator *(FixedPoint<F,D> fp1, FixedPoint<F,D> fp2) { fp1 *= fp2; return fp1; }
+template<typename F, F D> FixedPoint<F,D> operator /(FixedPoint<F,D> fp1, FixedPoint<F,D> fp2) { fp1 /= fp2; return fp1; }
+
+template<typename N, typename F, F D, typename = std::enable_if_t<std::is_integral_v<N>>> FixedPoint<F,D> operator +(FixedPoint<F,D> fp, N i) { fp += FixedPoint<F,D>(i); return fp; }
+template<typename N, typename F, F D, typename = std::enable_if_t<std::is_integral_v<N>>> FixedPoint<F,D> operator -(FixedPoint<F,D> fp, N i) { fp -= FixedPoint<F,D>(i); return fp; }
+template<typename N, typename F, F D, typename = std::enable_if_t<std::is_integral_v<N>>> FixedPoint<F,D> operator *(FixedPoint<F,D> fp, N i) { fp *= FixedPoint<F,D>(i); return fp; }
+template<typename N, typename F, F D, typename = std::enable_if_t<std::is_integral_v<N>>> FixedPoint<F,D> operator /(FixedPoint<F,D> fp, N i) { fp /= FixedPoint<F,D>(i); return fp; }
+
+template<typename N, typename F, F D, typename = std::enable_if_t<std::is_integral_v<N>>> FixedPoint<F,D> operator +(N i, FixedPoint<F,D> fp) { FixedPoint<F,D> tmp(i); tmp += fp; return tmp; }
+template<typename N, typename F, F D, typename = std::enable_if_t<std::is_integral_v<N>>> FixedPoint<F,D> operator -(N i, FixedPoint<F,D> fp) { FixedPoint<F,D> tmp(i); tmp -= fp; return tmp; }
+template<typename N, typename F, F D, typename = std::enable_if_t<std::is_integral_v<N>>> FixedPoint<F,D> operator *(N i, FixedPoint<F,D> fp) { FixedPoint<F,D> tmp(i); tmp *= fp; return tmp; }
+template<typename N, typename F, F D, typename = std::enable_if_t<std::is_integral_v<N>>> FixedPoint<F,D> operator /(N i, FixedPoint<F,D> fp) { FixedPoint<F,D> tmp(i); tmp /= fp; return tmp; }
+
+using FixedPointBonus = FixedPoint<int64_t, 10000>;
+
 int BonusList::totalValue() const
 {
 	struct BonusCollection
 	{
-		int base = 0;
-		int percentToBase = 0;
-		int percentToAll = 0;
-		int additive = 0;
-		int percentToSource = 0;
-		int indepMin = std::numeric_limits<int>::max();
-		int indepMax = std::numeric_limits<int>::min();
+		FixedPointBonus base = 0;
+		FixedPointBonus percentToBase = 0;
+		FixedPointBonus percentToAll = 0;
+		FixedPointBonus additive = 0;
+		FixedPointBonus percentToSource = 0;
+		FixedPointBonus indepMin = std::numeric_limits<int>::max();
+		FixedPointBonus indepMax = std::numeric_limits<int>::min();
 	};
 
-	auto percent = [](int64_t base, int64_t percent) -> int {
-		return static_cast<int>(std::clamp<int64_t>((base * (100 + percent)) / 100, std::numeric_limits<int>::min(), std::numeric_limits<int>::max()));
+	auto percent = [](FixedPointBonus base, FixedPointBonus percent) -> FixedPointBonus {
+		return (base * (100 + percent)) / 100;
 	};
 	std::array <BonusCollection, vstd::to_underlying(BonusSource::NUM_BONUS_SOURCE)> sources = {};
 	BonusCollection any;
@@ -160,9 +240,9 @@ int BonusList::totalValue() const
 	}));
 
 	if(notIndepBonuses)
-		return std::clamp(valFirst, any.indepMax, any.indepMin);
+		return static_cast<int>(std::clamp(valFirst, any.indepMax, any.indepMin));
 
-	return hasIndepMin ? any.indepMin : hasIndepMax ? any.indepMax : 0;
+	return static_cast<int>(hasIndepMin ? any.indepMin : hasIndepMax ? any.indepMax : 0);
 }
 
 std::shared_ptr<Bonus> BonusList::getFirst(const CSelector &select)
