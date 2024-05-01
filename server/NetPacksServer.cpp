@@ -32,7 +32,6 @@
 void ApplyGhNetPackVisitor::visitSaveGame(SaveGame & pack)
 {
 	gh.save(pack.fname);
-	logGlobal->info("Game has been saved as %s", pack.fname);
 	result = true;
 }
 

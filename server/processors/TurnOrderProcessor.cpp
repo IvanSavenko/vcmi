@@ -9,7 +9,9 @@
  */
 #include "StdInc.h"
 #include "TurnOrderProcessor.h"
+
 #include "PlayerMessageProcessor.h"
+#include "GameSaveProcessor.h"
 
 #include "../queries/QueriesProcessor.h"
 #include "../queries/MapQueries.h"
@@ -241,6 +243,7 @@ void TurnOrderProcessor::doStartNewDay()
 
 	gameHandler->onNewTurn();
 	updateAndNotifyContactStatus();
+	gameHandler->gameSaves->onNewDay();
 	tryStartTurnsForPlayers();
 }
 
@@ -326,6 +329,7 @@ bool TurnOrderProcessor::onPlayerEndsTurn(PlayerColor which)
 		return false;
 	}
 
+	gameHandler->gameSaves->onPlayerEndsTurn(which);
 	gameHandler->onPlayerTurnEnded(which);
 
 	// it is possible that player have lost - e.g. spent 7 days without town

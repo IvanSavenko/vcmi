@@ -143,7 +143,6 @@ CPlayerInterface::CPlayerInterface(PlayerColor Player):
 	showingDialog = new CondSh<bool>(false);
 	cingconsole = new CInGameConsole();
 	firstCall = 1; //if loading will be overwritten in serialize
-	autosaveCount = 0;
 	isAutoFightOn = false;
 	isAutoFightEndBattle = false;
 	ignoreEvents = false;
@@ -227,49 +226,6 @@ void CPlayerInterface::playerStartsTurn(PlayerColor player)
 	}
 }
 
-void CPlayerInterface::performAutosave()
-{
-	int frequency = static_cast<int>(settings["general"]["saveFrequency"].Integer());
-	if(frequency > 0 && cb->getDate() % frequency == 0)
-	{
-		bool usePrefix = settings["general"]["useSavePrefix"].Bool();
-		std::string prefix = std::string();
-
-		if(usePrefix)
-		{
-			prefix = settings["general"]["savePrefix"].String();
-			if(prefix.empty())
-			{
-				std::string name = cb->getMapHeader()->name.toString();
-				int txtlen = TextOperations::getUnicodeCharactersCount(name);
-
-				TextOperations::trimRightUnicode(name, std::max(0, txtlen - 15));
-				std::string forbiddenChars("\\/:?\"<>| ");
-				std::replace_if(name.begin(), name.end(), [&](char c) { return std::string::npos != forbiddenChars.find(c); }, '_' );
-
-				prefix = name + "_" + cb->getStartInfo()->startTimeIso8601 + "/";
-			}
-		}
-
-		autosaveCount++;
-
-		int autosaveCountLimit = settings["general"]["autosaveCountLimit"].Integer();
-		if(autosaveCountLimit > 0)
-		{
-			cb->save("Saves/Autosave/" + prefix + std::to_string(autosaveCount));
-			autosaveCount %= autosaveCountLimit;
-		}
-		else
-		{
-			std::string stringifiedDate = std::to_string(cb->getDate(Date::MONTH))
-					+ std::to_string(cb->getDate(Date::WEEK))
-					+ std::to_string(cb->getDate(Date::DAY_OF_WEEK));
-
-			cb->save("Saves/Autosave/" + prefix + stringifiedDate);
-		}
-	}
-}
-
 void CPlayerInterface::gamePause(bool pause)
 {
 	cb->gamePause(pause);
@@ -292,10 +248,6 @@ void CPlayerInterface::yourTurn(QueryID queryID)
 		GH.curInt = this;
 
 		NotificationHandler::notify("Your turn");
-		if(settings["general"]["startTurnAutosave"].Bool())
-		{
-			performAutosave();
-		}
 
 		if (hotseatWait) //hot seat or MP message
 		{

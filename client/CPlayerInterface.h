@@ -63,7 +63,6 @@ class CPlayerInterface : public CGameInterface, public IUpdateable
 
 	// -1 - just loaded game; 1 - just started game; 0 otherwise
 	int firstCall;
-	int autosaveCount;
 
 	std::list<std::shared_ptr<CInfoWindow>> dialogs; //queue of dialogs awaiting to be shown (not currently shown!)
 
@@ -200,7 +199,6 @@ public: // public interface for use by client via LOCPLINT access
 	void tryDigging(const CGHeroInstance *h);
 	void showShipyardDialogOrProblemPopup(const IShipyard *obj); //obj may be town or shipyard;
 	void proposeLoadingGame();
-	void performAutosave();
 	void gamePause(bool pause);
 
 	///returns true if all events are processed internally

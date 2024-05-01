@@ -18,6 +18,7 @@
 #include "processors/HeroPoolProcessor.h"
 #include "processors/PlayerMessageProcessor.h"
 #include "processors/TurnOrderProcessor.h"
+#include "processors/GameSaveProcessor.h"
 #include "queries/QueriesProcessor.h"
 #include "queries/MapQueries.h"
 
@@ -510,6 +511,7 @@ CGameHandler::CGameHandler(CVCMIServer * lobby)
 	, heroPool(std::make_unique<HeroPoolProcessor>(this))
 	, battles(std::make_unique<BattleProcessor>(this))
 	, turnOrder(std::make_unique<TurnOrderProcessor>(this))
+	, gameSaves(std::make_unique<GameSaveProcessor>(this))
 	, queries(std::make_unique<QueriesProcessor>())
 	, playerMessages(std::make_unique<PlayerMessageProcessor>(this))
 	, complainNoCreatures("No creatures to split")
@@ -1782,20 +1784,26 @@ void CGameHandler::save(const std::string & filename)
 	ResourcePath savePath(stem.to_string(), EResType::SAVEGAME);
 	CResourceHandler::get("local")->createResource(savefname);
 
+	if (!queries->allQueries().empty())
+	{
+		logGlobal->error("Failed to save game: active queries present");
+		return;
+	}
+
 	try
 	{
-		{
-			CSaveFile save(*CResourceHandler::get("local")->getResourceName(savePath));
-			saveCommonState(save);
-			logGlobal->info("Saving server state");
-			save << *this;
-		}
-		logGlobal->info("Game has been successfully saved!");
+		CSaveFile save(*CResourceHandler::get("local")->getResourceName(savePath));
+		saveCommonState(save);
+		logGlobal->info("Saving server state");
+		save << *this;
 	}
 	catch(std::exception &e)
 	{
 		logGlobal->error("Failed to save game: %s", e.what());
+		return;
 	}
+
+	logGlobal->info("Game has been successfully saved!");
 }
 
 bool CGameHandler::load(const std::string & filename)

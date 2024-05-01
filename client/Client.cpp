@@ -336,12 +336,6 @@ void CClient::serialize(BinaryDeserializer & h)
 
 void CClient::save(const std::string & fname)
 {
-	if(!gs->currentBattles.empty())
-	{
-		logNetwork->error("Game cannot be saved during battle!");
-		return;
-	}
-
 	SaveGame save_game(fname);
 	sendRequest(&save_game, PlayerColor::NEUTRAL);
 }

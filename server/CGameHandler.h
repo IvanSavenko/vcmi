@@ -42,6 +42,7 @@ template<typename T> class CApplier;
 
 VCMI_LIB_NAMESPACE_END
 
+class GameSaveProcessor;
 class HeroPoolProcessor;
 class CVCMIServer;
 class CBaseForGHApply;
@@ -63,6 +64,7 @@ public:
 	std::unique_ptr<QueriesProcessor> queries;
 	std::unique_ptr<TurnOrderProcessor> turnOrder;
 	std::unique_ptr<TurnTimerHandler> turnTimerHandler;
+	std::unique_ptr<GameSaveProcessor> gameSaves;
 
 	//use enums as parameters, because doMove(sth, true, false, true) is not readable
 	enum EGuardLook {CHECK_FOR_GUARDS, IGNORE_GUARDS};

@@ -11,6 +11,7 @@ set(vcmiservercommon_SRCS
 		queries/MapQueries.cpp
 		queries/QueriesProcessor.cpp
 
+		processors/GameSaveProcessor.cpp
 		processors/HeroPoolProcessor.cpp
 		processors/PlayerMessageProcessor.cpp
 		processors/TurnOrderProcessor.cpp
@@ -37,6 +38,7 @@ set(vcmiservercommon_HEADERS
 		queries/MapQueries.h
 		queries/QueriesProcessor.h
 
+		processors/GameSaveProcessor.h
 		processors/HeroPoolProcessor.h
 		processors/PlayerMessageProcessor.h
 		processors/TurnOrderProcessor.h

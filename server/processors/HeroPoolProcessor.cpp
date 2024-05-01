@@ -23,7 +23,6 @@
 #include "../../lib/gameState/CGameState.h"
 #include "../../lib/gameState/TavernHeroesPool.h"
 #include "../../lib/gameState/TavernSlot.h"
-#include "../../lib/GameSettings.h"
 
 HeroPoolProcessor::HeroPoolProcessor(CGameHandler * gameHandler)
 	: gameHandler(gameHandler)

@@ -472,11 +472,6 @@ void AdventureMapInterface::hotkeyEndingTurn()
 	if(settings["session"]["spectate"].Bool())
 		return;
 
-	if(!settings["general"]["startTurnAutosave"].Bool())
-	{
-		LOCPLINT->performAutosave();
-	}
-
 	LOCPLINT->makingTurn = false;
 	LOCPLINT->cb->endTurn();
 
