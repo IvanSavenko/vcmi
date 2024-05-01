@@ -279,3 +279,8 @@ const CMapInfo * CLobbyScreen::getMapInfo()
 {
 	return CSH->mi.get();
 }
+
+void CLobbyScreen::processMapList(std::vector<std::shared_ptr<CMapInfo>> mapList)
+{
+	tabSel->processMapList(mapList);
+}

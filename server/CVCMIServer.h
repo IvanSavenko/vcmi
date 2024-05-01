@@ -33,6 +33,7 @@ class CGameHandler;
 class CBaseForServerApply;
 class CBaseForGHApply;
 class GlobalLobbyProcessor;
+class MapListProcessor;
 
 enum class EServerState : ui8
 {
@@ -46,6 +47,7 @@ class CVCMIServer : public LobbyInfo, public INetworkServerListener, public INet
 	/// Network server instance that receives and processes incoming connections on active socket
 	std::unique_ptr<INetworkServer> networkServer;
 	std::unique_ptr<GlobalLobbyProcessor> lobbyProcessor;
+	std::unique_ptr<MapListProcessor> mapListProcessor;
 
 	std::chrono::steady_clock::time_point gameplayStartTime;
 	std::chrono::steady_clock::time_point lastTimerUpdateTime;
@@ -92,6 +94,8 @@ public:
 
 	void announceTxt(MetaString txt, const std::string & playerName = "system");
 	void announceTxt(const std::string & txt, const std::string & playerName = "system");
+	void selectInitialMap(const std::string & filename);
+	void sendMapListToHost();
 
 	void setPlayerConnectedId(PlayerSettings & pset, ui8 player) const;
 	void updateStartInfoOnMapChange(std::shared_ptr<CMapInfo> mapInfo, std::shared_ptr<CMapGenOptions> mapGenOpt = {});

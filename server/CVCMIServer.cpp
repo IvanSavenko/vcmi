@@ -14,6 +14,7 @@
 #include "GlobalLobbyProcessor.h"
 #include "LobbyNetPackVisitors.h"
 #include "processors/PlayerMessageProcessor.h"
+#include "processors/MapListProcessor.h"
 
 #include "../lib/CHeroHandler.h"
 #include "../lib/CPlayerState.h"
@@ -1017,4 +1018,18 @@ void CVCMIServer::multiplayerWelcomeMessage()
 INetworkHandler & CVCMIServer::getNetworkHandler()
 {
 	return *networkHandler;
+}
+
+void CVCMIServer::sendMapListToHost()
+{
+	auto pack = std::make_unique<LobbyMapList>();
+	pack->mapList = mapListProcessor->getAllMaps();
+	announcePack(std::move(pack));
+}
+
+void CVCMIServer::selectInitialMap(const std::string & filename)
+{
+	assert(mi == nullptr);
+	mi = mapListProcessor->tryLoadMap(filename);
+	assert(mi != nullptr);
 }

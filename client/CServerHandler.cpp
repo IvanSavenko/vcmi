@@ -394,6 +394,19 @@ void CServerHandler::sendClientConnecting() const
 	lcc.uuid = uuid;
 	lcc.names = localPlayerNames;
 	lcc.mode = si->mode;
+
+	switch(si->mode)
+	{
+		case EStartMode::NEW_GAME:
+			lcc.desiredMapOrSave = settings["general"]["lastMap"].String();
+			break;
+		case EStartMode::CAMPAIGN:
+			lcc.desiredMapOrSave = settings["general"]["lastCampaign"].String();
+			break;
+		case EStartMode::LOAD_GAME:
+			lcc.desiredMapOrSave = settings["general"]["lastSave"].String();
+	}
+
 	sendLobbyPack(lcc);
 }
 

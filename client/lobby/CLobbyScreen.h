@@ -27,6 +27,7 @@ public:
 	void toggleChat();
 
 	void updateAfterStateChange();
+	void processMapList(std::vector<std::shared_ptr<CMapInfo>> mapList);
 
 	const CMapInfo * getMapInfo() final;
 	const StartInfo * getStartInfo() final;

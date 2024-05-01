@@ -214,6 +214,11 @@ void ApplyOnLobbyScreenNetPackVisitor::visitLobbyUpdateState(LobbyUpdateState & 
 		lobby->toggleMode(handler.isHost());
 }
 
+void ApplyOnLobbyScreenNetPackVisitor::visitLobbyMapList(LobbyMapList & pack)
+{
+	lobby->processMapList(pack.mapList);
+}
+
 void ApplyOnLobbyScreenNetPackVisitor::visitLobbyShowMessage(LobbyShowMessage & pack)
 {
 	if(!lobby) //stub: ignore message for game mode

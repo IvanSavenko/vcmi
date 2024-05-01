@@ -37,6 +37,7 @@ struct DLL_LINKAGE LobbyClientConnected : public CLobbyPackToPropagate
 {
 	// Set by client before sending pack to server
 	std::string uuid;
+	std::string desiredMapOrSave;
 	std::vector<std::string> names;
 	EStartMode mode = EStartMode::INVALID;
 	// Changed by server before announcing pack
@@ -50,6 +51,7 @@ struct DLL_LINKAGE LobbyClientConnected : public CLobbyPackToPropagate
 		h & uuid;
 		h & names;
 		h & mode;
+		h & desiredMapOrSave;
 
 		h & clientId;
 		h & hostClientId;
@@ -358,6 +360,18 @@ struct DLL_LINKAGE LobbyPvPAction : public CLobbyPackToServer
 	{
 		h & action;
 		h & bannedTowns;
+	}
+};
+
+struct DLL_LINKAGE LobbyMapList : public CLobbyPackToPropagate
+{
+	std::vector<std::shared_ptr<CMapInfo>> mapList;
+
+	void visitTyped(ICPackVisitor & visitor) override;
+
+	template <typename Handler> void serialize(Handler & h)
+	{
+		h & mapList;
 	}
 };
 

@@ -12,9 +12,8 @@
 #include "CSelectionBase.h"
 VCMI_LIB_NAMESPACE_BEGIN
 class CMap;
+class CMapInfo;
 VCMI_LIB_NAMESPACE_END
-#include "../../lib/mapping/CMapInfo.h"
-#include "../../lib/filesystem/ResourcePath.h"
 
 class CSlider;
 class CLabel;
@@ -26,11 +25,14 @@ enum ESortBy
 	_playerAm, _size, _format, _name, _viccon, _loscon, _numOfMaps, _fileName, _changeDate
 }; //_numOfMaps is for campaigns
 
-class ElementInfo : public CMapInfo
+struct ElementInfo
 {
-public:
-	ElementInfo() : CMapInfo() { }
-	~ElementInfo() { }
+	ElementInfo() = default;
+	ElementInfo(std::shared_ptr<CMapInfo> map)
+		: map(map)
+	{
+	}
+	std::shared_ptr<CMapInfo> map;
 	std::string folderName = "";
 	bool isFolder = false;
 };
@@ -40,7 +42,7 @@ class mapSorter
 {
 public:
 	ESortBy sortBy;
-	bool operator()(const std::shared_ptr<ElementInfo> aaa, const std::shared_ptr<ElementInfo> bbb);
+	bool operator()(const ElementInfo & aaa, const ElementInfo & bbb);
 	mapSorter(ESortBy es) : sortBy(es){};
 };
 
@@ -59,7 +61,7 @@ class SelectionTab : public CIntObject
 		std::shared_ptr<CLabel> labelName;
 
 		ListItem(Point position, std::shared_ptr<CAnimation> iconsFormats, std::shared_ptr<CAnimation> iconsVictory, std::shared_ptr<CAnimation> iconsLoss);
-		void updateItem(std::shared_ptr<ElementInfo> info = {}, bool selected = false);
+		void updateItem(const ElementInfo & info = {}, bool selected = false);
 	};
 	std::vector<std::shared_ptr<ListItem>> listItems;
 
@@ -68,11 +70,11 @@ class SelectionTab : public CIntObject
 	std::shared_ptr<CAnimation> iconsVictoryCondition;
 	std::shared_ptr<CAnimation> iconsLossCondition;
 public:
-	std::vector<std::shared_ptr<ElementInfo>> allItems;
-	std::vector<std::shared_ptr<ElementInfo>> curItems;
+	std::vector<ElementInfo> allItems;
+	std::vector<ElementInfo> curItems;
 	std::string curFolder;
 	size_t selectionPos;
-	std::function<void(std::shared_ptr<ElementInfo>)> callOnSelect;
+	std::function<void(std::shared_ptr<CMapInfo>)> callOnSelect;
 
 	ESortBy sortingBy;
 	ESortBy generalSortingBy;
@@ -101,9 +103,9 @@ public:
 	int getLine() const;
 	int getLine(const Point & position) const;
 	void selectFileName(std::string fname);
-	std::shared_ptr<ElementInfo> getSelectedMapInfo() const;
+	std::shared_ptr<CMapInfo> getSelectedMapInfo() const;
 	void rememberCurrentSelection();
-	void restoreLastSelection();
+	void processMapList(std::vector<std::shared_ptr<CMapInfo>> mapList);
 
 private:
 	std::shared_ptr<CPicture> background;
@@ -115,10 +117,4 @@ private:
 	Rect inputNameRect;
 
 	auto checkSubfolder(std::string path);
-
-	bool isMapSupported(const CMapInfo & info);
-	void parseMaps(const std::unordered_set<ResourcePath> & files);
-	void parseSaves(const std::unordered_set<ResourcePath> & files);
-	void parseCampaigns(const std::unordered_set<ResourcePath> & files);
-	std::unordered_set<ResourcePath> getFiles(std::string dirURI, EResType resType);
 };

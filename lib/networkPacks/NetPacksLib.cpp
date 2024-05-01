@@ -817,6 +817,10 @@ void LobbyPvPAction::visitTyped(ICPackVisitor & visitor)
 {
 	visitor.visitLobbyPvPAction(*this);
 }
+void LobbyMapList::visitTyped(ICPackVisitor & visitor)
+{
+	visitor.visitLobbyMapList(*this);
+}
 
 void SetResources::applyGs(CGameState * gs) const
 {

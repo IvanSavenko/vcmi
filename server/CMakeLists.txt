@@ -13,6 +13,7 @@ set(vcmiservercommon_SRCS
 
 		processors/GameSaveProcessor.cpp
 		processors/HeroPoolProcessor.cpp
+		processors/MapListProcessor.cpp
 		processors/PlayerMessageProcessor.cpp
 		processors/TurnOrderProcessor.cpp
 
@@ -40,6 +41,7 @@ set(vcmiservercommon_HEADERS
 
 		processors/GameSaveProcessor.h
 		processors/HeroPoolProcessor.h
+		processors/MapListProcessor.h
 		processors/PlayerMessageProcessor.h
 		processors/TurnOrderProcessor.h
 

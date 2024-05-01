@@ -45,22 +45,22 @@
 #include "../../lib/mapping/MapFormat.h"
 #include "../../lib/TerrainHandler.h"
 
-bool mapSorter::operator()(const std::shared_ptr<ElementInfo> aaa, const std::shared_ptr<ElementInfo> bbb)
+bool mapSorter::operator()(const ElementInfo & aaa, const ElementInfo & bbb)
 {
-	if(aaa->isFolder || bbb->isFolder)
+	if(aaa.isFolder || bbb.isFolder)
 	{
-		if(aaa->isFolder != bbb->isFolder)
-			return (aaa->isFolder > bbb->isFolder);
+		if(aaa.isFolder != bbb.isFolder)
+			return (aaa.isFolder > bbb.isFolder);
 		else
 		{
-			if(boost::algorithm::starts_with(aaa->folderName, "..") || boost::algorithm::starts_with(bbb->folderName, ".."))
-				return boost::algorithm::starts_with(aaa->folderName, "..");
-			return boost::ilexicographical_compare(aaa->folderName, bbb->folderName);
+			if(boost::algorithm::starts_with(aaa.folderName, "..") || boost::algorithm::starts_with(bbb.folderName, ".."))
+				return boost::algorithm::starts_with(aaa.folderName, "..");
+			return boost::ilexicographical_compare(aaa.folderName, bbb.folderName);
 		}
 	}
 
-	auto a = aaa->mapHeader.get();
-	auto b = bbb->mapHeader.get();
+	auto a = aaa.map->mapHeader.get();
+	auto b = bbb.map->mapHeader.get();
 	if(a && b) //if we are sorting scenarios
 	{
 		switch(sortBy)
@@ -112,9 +112,9 @@ bool mapSorter::operator()(const std::shared_ptr<ElementInfo> aaa, const std::sh
 		case _name: //by name
 			return boost::ilexicographical_compare(a->name.toString(), b->name.toString());
 		case _fileName: //by filename
-			return boost::ilexicographical_compare(aaa->fileURI, bbb->fileURI);
+			return boost::ilexicographical_compare(aaa.map->fileURI, bbb.map->fileURI);
 		case _changeDate: //by changedate
-			return aaa->lastWrite < bbb->lastWrite;
+			return aaa.map->lastWrite < bbb.map->lastWrite;
 		default:
 			return boost::ilexicographical_compare(a->name.toString(), b->name.toString());
 		}
@@ -124,11 +124,11 @@ bool mapSorter::operator()(const std::shared_ptr<ElementInfo> aaa, const std::sh
 		switch(sortBy)
 		{
 		case _numOfMaps: //by number of maps in campaign
-			return aaa->campaign->scenariosCount() < bbb->campaign->scenariosCount();
+			return aaa.map->campaign->scenariosCount() < bbb.map->campaign->scenariosCount();
 		case _name: //by name
-			return boost::ilexicographical_compare(aaa->campaign->getNameTranslated(), bbb->campaign->getNameTranslated());
+			return boost::ilexicographical_compare(aaa.map->campaign->getNameTranslated(), bbb.map->campaign->getNameTranslated());
 		default:
-			return boost::ilexicographical_compare(aaa->campaign->getNameTranslated(), bbb->campaign->getNameTranslated());
+			return boost::ilexicographical_compare(aaa.map->campaign->getNameTranslated(), bbb.map->campaign->getNameTranslated());
 		}
 	}
 }
@@ -245,40 +245,26 @@ SelectionTab::SelectionTab(ESelectionScreen Type)
 
 void SelectionTab::toggleMode()
 {
-	if(CSH->isGuest())
-	{
-		allItems.clear();
-		curItems.clear();
-		if(slider)
-			slider->block(true);
-	}
-	else
+	allItems.clear();
+	curItems.clear();
+	if(slider)
+		slider->block(true);
+
+	if(CSH->isHost())
 	{
 		switch(tabType)
 		{
 		case ESelectionScreen::newGame:
-			{
-				inputName->disable();
-				auto files = getFiles("Maps/", EResType::MAP);
-				files.erase(ResourcePath("Maps/Tutorial.tut", EResType::MAP));
-				parseMaps(files);
-				break;
-			}
-
 		case ESelectionScreen::loadGame:
 			inputName->disable();
-			parseSaves(getFiles("Saves/", EResType::SAVEGAME));
 			break;
 
 		case ESelectionScreen::saveGame:
-			parseSaves(getFiles("Saves/", EResType::SAVEGAME));
 			inputName->enable();
 			inputName->activate();
-			restoreLastSelection();
 			break;
 
 		case ESelectionScreen::campaignList:
-			parseCampaigns(getFiles("Maps/", EResType::CAMPAIGN));
 			break;
 
 		default:
@@ -295,10 +281,6 @@ void SelectionTab::toggleMode()
 		{
 			CSH->setCampaignState(CSH->campaignStateToSend);
 			CSH->campaignStateToSend.reset();
-		}
-		else
-		{
-			restoreLastSelection();
 		}
 	}
 	slider->setAmount((int)curItems.size());
@@ -359,10 +341,7 @@ void SelectionTab::clickDouble(const Point & cursorPosition)
 	if(itemIndex >= curItems.size())
 		return;
 
-	auto clickedItem = curItems[itemIndex];
-	auto selectedItem = getSelectedMapInfo();
-
-	if (clickedItem != selectedItem)
+	if (itemIndex != selectionPos)
 	{
 		// double-click BUT player hit different item than he had selected
 		// ignore - clickReleased would still trigger and update selection.
@@ -370,7 +349,7 @@ void SelectionTab::clickDouble(const Point & cursorPosition)
 		return;
 	}
 
-	if(itemIndex >= 0 && curItems[itemIndex]->isFolder)
+	if(itemIndex >= 0 && curItems[itemIndex].isFolder)
 	{
 		select(position);
 		return;
@@ -391,10 +370,10 @@ void SelectionTab::showPopupWindow(const Point & cursorPosition)
 	if(py >= curItems.size())
 		return;
 
-	if(!curItems[py]->isFolder)
-		GH.windows().createAndPushWindow<CMapOverview>(curItems[py]->getNameTranslated(), curItems[py]->fullFileURI, curItems[py]->date, ResourcePath(curItems[py]->fileURI), tabType);
+	if(!curItems[py].isFolder)
+		GH.windows().createAndPushWindow<CMapOverview>(curItems[py].map->getNameTranslated(), curItems[py].map->fullFileURI, curItems[py].map->date, ResourcePath(curItems[py].map->fileURI), tabType);
 	else
-		CRClickPopup::createAndPush(curItems[py]->folderName);
+		CRClickPopup::createAndPush(curItems[py].folderName);
 }
 
 auto SelectionTab::checkSubfolder(std::string path)
@@ -454,31 +433,31 @@ void SelectionTab::filter(int size, bool selectFirst)
 
 	for(auto elem : allItems)
 	{
-		if((elem->mapHeader && (!size || elem->mapHeader->width == size)) || tabType == ESelectionScreen::campaignList)
+		if((elem.map->mapHeader && (!size || elem.map->mapHeader->width == size)) || tabType == ESelectionScreen::campaignList)
 		{
 			if(showRandom)
 				curFolder = "RANDOMMAPS/";
 
-			auto [folderName, baseFolder, parentExists, fileInFolder] = checkSubfolder(elem->originalFileURI);
+			auto [folderName, baseFolder, parentExists, fileInFolder] = checkSubfolder(elem.map->originalFileURI);
 
 			if((showRandom && baseFolder != "RANDOMMAPS") || (!showRandom && baseFolder == "RANDOMMAPS"))
 				continue;
 
 			if(parentExists && !showRandom)
 			{
-				auto folder = std::make_shared<ElementInfo>();
-				folder->isFolder = true;
-				folder->folderName = "..     (" + curFolder + ")";
-				auto itemIt = boost::range::find_if(curItems, [](std::shared_ptr<ElementInfo> e) { return boost::starts_with(e->folderName, ".."); });
+				ElementInfo folder;
+				folder.isFolder = true;
+				folder.folderName = "..     (" + curFolder + ")";
+				auto itemIt = boost::range::find_if(curItems, [](const ElementInfo & e) { return boost::starts_with(e.folderName, ".."); });
 				if (itemIt == curItems.end()) {
 					curItems.push_back(folder);
 				}			
 			}
 
-			auto folder = std::make_shared<ElementInfo>();
-			folder->isFolder = true;
-			folder->folderName = folderName;
-			auto itemIt = boost::range::find_if(curItems, [folder](std::shared_ptr<ElementInfo> e) { return e->folderName == folder->folderName; });
+			ElementInfo folder;
+			folder.isFolder = true;
+			folder.folderName = folderName;
+			auto itemIt = boost::range::find_if(curItems, [folder](const ElementInfo & e) { return e.folderName == folder.folderName; });
 			if (itemIt == curItems.end() && folderName != "") {
 				curItems.push_back(folder);
 			}
@@ -495,11 +474,11 @@ void SelectionTab::filter(int size, bool selectFirst)
 		sort();
 		if(selectFirst)
 		{
-			int firstPos = boost::range::find_if(curItems, [](std::shared_ptr<ElementInfo> e) { return !e->isFolder; }) - curItems.begin();
+			int firstPos = boost::range::find_if(curItems, [](const ElementInfo & e) { return !e.isFolder; }) - curItems.begin();
 			if(firstPos < curItems.size())
 			{
 				slider->scrollTo(firstPos);
-				callOnSelect(curItems[firstPos]);
+				callOnSelect(curItems[firstPos].map);
 				selectAbs(firstPos);
 			}
 		}
@@ -536,7 +515,7 @@ void SelectionTab::sort()
 		std::stable_sort(curItems.begin(), curItems.end(), mapSorter(generalSortingBy));
 	std::stable_sort(curItems.begin(), curItems.end(), mapSorter(sortingBy));
 
-	int firstMapIndex = boost::range::find_if(curItems, [](std::shared_ptr<ElementInfo> e) { return !e->isFolder; }) - curItems.begin();
+	int firstMapIndex = boost::range::find_if(curItems, [](const ElementInfo & e) { return !e.isFolder; }) - curItems.begin();
 	if(!sortModeAscending)
 		std::reverse(std::next(curItems.begin(), firstMapIndex), curItems.end());
 
@@ -561,8 +540,8 @@ void SelectionTab::select(int position)
 	else if(position >= listItems.size())
 		slider->scrollBy(position - (int)listItems.size() + 1);
 
-	if(curItems[py]->isFolder) {
-		if(boost::starts_with(curItems[py]->folderName, ".."))
+	if(curItems[py].isFolder) {
+		if(boost::starts_with(curItems[py].folderName, ".."))
 		{
 			std::vector<std::string> filetree;
 			boost::split(filetree, curFolder, boost::is_any_of("/"));
@@ -571,11 +550,11 @@ void SelectionTab::select(int position)
 			curFolder = filetree.size() > 0 ? boost::algorithm::join(filetree, "/") + "/" : "";
 		}
 		else
-			curFolder += curItems[py]->folderName + "/";
+			curFolder += curItems[py].folderName + "/";
 		filter(-1);
 		slider->scrollTo(0);
 
-		int firstPos = boost::range::find_if(curItems, [](std::shared_ptr<ElementInfo> e) { return !e->isFolder; }) - curItems.begin();
+		int firstPos = boost::range::find_if(curItems, [](const ElementInfo & e) { return !e.isFolder; }) - curItems.begin();
 		if(firstPos < curItems.size())
 		{
 			selectAbs(firstPos);
@@ -588,20 +567,20 @@ void SelectionTab::select(int position)
 
 	if(inputName && inputName->isActive())
 	{
-		auto filename = *CResourceHandler::get()->getResourceName(ResourcePath(curItems[py]->fileURI, EResType::SAVEGAME));
+		auto filename = *CResourceHandler::get()->getResourceName(ResourcePath(curItems[py].map->fileURI, EResType::SAVEGAME));
 		inputName->setText(filename.stem().string());
 	}
 
 	updateListItems();
 	redraw();
 	if(callOnSelect)
-		callOnSelect(curItems[py]);
+		callOnSelect(curItems[py].map);
 }
 
 void SelectionTab::selectAbs(int position)
 {
 	if(position == -1)
-		position = boost::range::find_if(curItems, [](std::shared_ptr<ElementInfo> e) { return !e->isFolder; }) - curItems.begin();
+		position = boost::range::find_if(curItems, [](const ElementInfo & e) { return !e.isFolder; }) - curItems.begin();
 	select(position - slider->getValue());
 }
 
@@ -670,16 +649,16 @@ void SelectionTab::selectFileName(std::string fname)
 
 	for(int i = (int)allItems.size() - 1; i >= 0; i--)
 	{
-		if(allItems[i]->fileURI == fname)
+		if(allItems[i].map->fileURI == fname)
 		{
-			auto [folderName, baseFolder, parentExists, fileInFolder] = checkSubfolder(allItems[i]->originalFileURI);
+			auto [folderName, baseFolder, parentExists, fileInFolder] = checkSubfolder(allItems[i].map->originalFileURI);
 			curFolder = baseFolder != "" ? baseFolder + "/" : "";
 		}
 	}
 
 	for(int i = (int)curItems.size() - 1; i >= 0; i--)
 	{
-		if(curItems[i]->fileURI == fname)
+		if(curItems[i].map->fileURI == fname)
 		{
 			slider->scrollTo(i);
 			selectAbs(i);
@@ -694,16 +673,16 @@ void SelectionTab::selectFileName(std::string fname)
 		inputName->setText("NEWGAME");
 }
 
-std::shared_ptr<ElementInfo> SelectionTab::getSelectedMapInfo() const
+std::shared_ptr<CMapInfo> SelectionTab::getSelectedMapInfo() const
 {
-	return curItems.empty() || curItems[selectionPos]->isFolder ? nullptr : curItems[selectionPos];
+	return curItems.empty() || curItems[selectionPos].isFolder ? nullptr : curItems[selectionPos].map;
 }
 
 void SelectionTab::rememberCurrentSelection()
 {
-	if(getSelectedMapInfo()->isFolder)
+	if(getSelectedMapInfo() == nullptr)
 		return;
-		
+
 	// TODO: this can be more elegant
 	if(tabType == ESelectionScreen::newGame)
 	{
@@ -720,135 +699,6 @@ void SelectionTab::rememberCurrentSelection()
 		Settings lastCampaign = settings.write["general"]["lastCampaign"];
 		lastCampaign->String() = getSelectedMapInfo()->fileURI;
 	}
-}
-
-void SelectionTab::restoreLastSelection()
-{
-	switch(tabType)
-	{
-	case ESelectionScreen::newGame:
-		selectFileName(settings["general"]["lastMap"].String());
-		break;
-	case ESelectionScreen::campaignList:
-		selectFileName(settings["general"]["lastCampaign"].String());
-		break;
-	case ESelectionScreen::loadGame:
-	case ESelectionScreen::saveGame:
-		selectFileName(settings["general"]["lastSave"].String());
-	}
-}
-
-bool SelectionTab::isMapSupported(const CMapInfo & info)
-{
-	switch (info.mapHeader->version)
-	{
-		case EMapFormat::ROE:
-			return CGI->settings()->getValue(EGameSettings::MAP_FORMAT_RESTORATION_OF_ERATHIA)["supported"].Bool();
-		case EMapFormat::AB:
-			return CGI->settings()->getValue(EGameSettings::MAP_FORMAT_ARMAGEDDONS_BLADE)["supported"].Bool();
-		case EMapFormat::SOD:
-			return CGI->settings()->getValue(EGameSettings::MAP_FORMAT_SHADOW_OF_DEATH)["supported"].Bool();
-		case EMapFormat::WOG:
-			return CGI->settings()->getValue(EGameSettings::MAP_FORMAT_IN_THE_WAKE_OF_GODS)["supported"].Bool();
-		case EMapFormat::HOTA:
-			return CGI->settings()->getValue(EGameSettings::MAP_FORMAT_HORN_OF_THE_ABYSS)["supported"].Bool();
-		case EMapFormat::VCMI:
-			return CGI->settings()->getValue(EGameSettings::MAP_FORMAT_JSON_VCMI)["supported"].Bool();
-	}
-	return false;
-}
-
-void SelectionTab::parseMaps(const std::unordered_set<ResourcePath> & files)
-{
-	logGlobal->debug("Parsing %d maps", files.size());
-	allItems.clear();
-	for(auto & file : files)
-	{
-		try
-		{
-			auto mapInfo = std::make_shared<ElementInfo>();
-			mapInfo->mapInit(file.getName());
-
-			if (isMapSupported(*mapInfo))
-				allItems.push_back(mapInfo);
-		}
-		catch(std::exception & e)
-		{
-			logGlobal->error("Map %s is invalid. Message: %s", file.getName(), e.what());
-		}
-	}
-}
-
-void SelectionTab::parseSaves(const std::unordered_set<ResourcePath> & files)
-{
-	for(auto & file : files)
-	{
-		try
-		{
-			auto mapInfo = std::make_shared<ElementInfo>();
-			mapInfo->saveInit(file);
-
-			// Filter out other game modes
-			bool isCampaign = mapInfo->scenarioOptionsOfSave->mode == EStartMode::CAMPAIGN;
-			bool isMultiplayer = mapInfo->amountOfHumanPlayersInSave > 1;
-			bool isTutorial = boost::to_upper_copy(mapInfo->scenarioOptionsOfSave->mapname) == "MAPS/TUTORIAL";
-			switch(CSH->getLoadMode())
-			{
-			case ELoadMode::SINGLE:
-				if(isMultiplayer || isCampaign || isTutorial)
-					mapInfo->mapHeader.reset();
-				break;
-			case ELoadMode::CAMPAIGN:
-				if(!isCampaign)
-					mapInfo->mapHeader.reset();
-				break;
-			case ELoadMode::TUTORIAL:
-				if(!isTutorial)
-					mapInfo->mapHeader.reset();
-				break;
-			default:
-				if(!isMultiplayer)
-					mapInfo->mapHeader.reset();
-				break;
-			}
-
-			allItems.push_back(mapInfo);
-		}
-		catch(const std::exception & e)
-		{
-			logGlobal->error("Error: Failed to process %s: %s", file.getName(), e.what());
-		}
-	}
-}
-
-void SelectionTab::parseCampaigns(const std::unordered_set<ResourcePath> & files)
-{
-	allItems.reserve(files.size());
-	for(auto & file : files)
-	{
-		auto info = std::make_shared<ElementInfo>();
-		//allItems[i].date = std::asctime(std::localtime(&files[i].date));
-		info->fileURI = file.getName();
-		info->campaignInit();
-		if(info->campaign)
-			allItems.push_back(info);
-	}
-}
-
-std::unordered_set<ResourcePath> SelectionTab::getFiles(std::string dirURI, EResType resType)
-{
-	boost::to_upper(dirURI);
-	CResourceHandler::get()->updateFilteredFiles([&](const std::string & mount)
-	{
-		return boost::algorithm::starts_with(mount, dirURI);
-	});
-
-	std::unordered_set<ResourcePath> ret = CResourceHandler::get()->getFilteredFiles([&](const ResourcePath & ident)
-	{
-		return ident.getType() == resType && boost::algorithm::starts_with(ident.getName(), dirURI);
-	});
-
-	return ret;
 }
 
 SelectionTab::ListItem::ListItem(Point position, std::shared_ptr<CAnimation> iconsFormats, std::shared_ptr<CAnimation> iconsVictory, std::shared_ptr<CAnimation> iconsLoss)
@@ -871,9 +721,27 @@ SelectionTab::ListItem::ListItem(Point position, std::shared_ptr<CAnimation> ico
 	iconLossCondition = std::make_shared<CAnimImage>(iconsLoss, 0, 0, 310, -12);
 }
 
-void SelectionTab::ListItem::updateItem(std::shared_ptr<ElementInfo> info, bool selected)
+void SelectionTab::ListItem::updateItem(const ElementInfo & info, bool selected)
 {
-	if(!info)
+	auto color = selected ? Colors::YELLOW : Colors::WHITE;
+	if(info.isFolder)
+	{
+		labelAmountOfPlayers->disable();
+		labelMapSizeLetter->disable();
+		iconFolder->enable();
+		pictureEmptyLine->enable();
+		iconFormat->disable();
+		iconVictoryCondition->disable();
+		iconLossCondition->disable();
+		labelNumberOfCampaignMaps->disable();
+		labelName->enable();
+		labelName->setMaxWidth(316);
+		labelName->setText(info.folderName);
+		labelName->setColor(color);
+		return;
+	}
+
+	if(!info.map)
 	{
 		labelAmountOfPlayers->disable();
 		labelMapSizeLetter->disable();
@@ -887,26 +755,8 @@ void SelectionTab::ListItem::updateItem(std::shared_ptr<ElementInfo> info, bool 
 		return;
 	}
 
-	auto color = selected ? Colors::YELLOW : Colors::WHITE;
-	if(info->isFolder)
-	{
-		labelAmountOfPlayers->disable();
-		labelMapSizeLetter->disable();
-		iconFolder->enable();
-		pictureEmptyLine->enable();
-		iconFormat->disable();
-		iconVictoryCondition->disable();
-		iconLossCondition->disable();
-		labelNumberOfCampaignMaps->disable();
-		labelName->enable();
-		labelName->setMaxWidth(316);
-		labelName->setText(info->folderName);
-		labelName->setColor(color);
-		return;
-	}
-
 	labelName->enable();
-	if(info->campaign)
+	if(info.map->campaign)
 	{
 		labelAmountOfPlayers->disable();
 		labelMapSizeLetter->disable();
@@ -917,7 +767,7 @@ void SelectionTab::ListItem::updateItem(std::shared_ptr<ElementInfo> info, bool 
 		iconLossCondition->disable();
 		labelNumberOfCampaignMaps->enable();
 		std::ostringstream ostr(std::ostringstream::out);
-		ostr << info->campaign->scenariosCount();
+		ostr << info.map->campaign->scenariosCount();
 		labelNumberOfCampaignMaps->setText(ostr.str());
 		labelNumberOfCampaignMaps->setColor(color);
 		labelName->setMaxWidth(316);
@@ -926,23 +776,31 @@ void SelectionTab::ListItem::updateItem(std::shared_ptr<ElementInfo> info, bool 
 	{
 		labelNumberOfCampaignMaps->disable();
 		std::ostringstream ostr(std::ostringstream::out);
-		ostr << info->amountOfPlayersOnMap << "/" << info->amountOfHumanControllablePlayers;
+		ostr << info.map->amountOfPlayersOnMap << "/" << info.map->amountOfHumanControllablePlayers;
 		labelAmountOfPlayers->enable();
 		labelAmountOfPlayers->setText(ostr.str());
 		labelAmountOfPlayers->setColor(color);
 		labelMapSizeLetter->enable();
-		labelMapSizeLetter->setText(info->getMapSizeName());
+		labelMapSizeLetter->setText(info.map->getMapSizeName());
 		labelMapSizeLetter->setColor(color);
 		iconFolder->disable();
 		pictureEmptyLine->disable();
 		iconFormat->enable();
-		iconFormat->setFrame(info->getMapSizeFormatIconId());
+		iconFormat->setFrame(info.map->getMapSizeFormatIconId());
 		iconVictoryCondition->enable();
-		iconVictoryCondition->setFrame(info->mapHeader->victoryIconIndex, 0);
+		iconVictoryCondition->setFrame(info.map->mapHeader->victoryIconIndex, 0);
 		iconLossCondition->enable();
-		iconLossCondition->setFrame(info->mapHeader->defeatIconIndex, 0);
+		iconLossCondition->setFrame(info.map->mapHeader->defeatIconIndex, 0);
 		labelName->setMaxWidth(185);
 	}
-	labelName->setText(info->getNameForList());
+	labelName->setText(info.map->getNameForList());
 	labelName->setColor(color);
+}
+
+void SelectionTab::processMapList(std::vector<std::shared_ptr<CMapInfo>> mapList)
+{
+	for(const auto & item : mapList)
+		allItems.emplace_back(item);
+
+	filter(-1, true);
 }

@@ -60,7 +60,10 @@ void ApplyOnServerAfterAnnounceNetPackVisitor::visitLobbyClientConnected(LobbyCl
 	// FIXME: we need to avoid senting something to client that not yet get answer for LobbyClientConnected
 	// Until UUID set we only pass LobbyClientConnected to this client
 	pack.c->uuid = pack.uuid;
+	if(pack.c->connectionID == srv.hostClientId)
+		srv.selectInitialMap(pack.desiredMapOrSave);
 	srv.updateAndPropagateLobbyState();
+	srv.sendMapListToHost();
 
 // FIXME: what is this??? We do NOT support reconnection into ongoing game - at the very least queries and battles are NOT serialized
 //	if(srv.getState() == EServerState::GAMEPLAY)
