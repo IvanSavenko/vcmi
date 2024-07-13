@@ -1122,7 +1122,7 @@ void MainWindow::on_actionUpdate_appearance_triggered()
 			continue;
 		}
 		
-		auto * terrain = controller.map()->getTile(obj->visitablePos()).terType;
+		auto * terrain = controller.map()->getTile(obj->visitablePos()).getTerrain();
 		
 		if(handler->isStaticObject())
 		{
