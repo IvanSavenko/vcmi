@@ -38,7 +38,6 @@ class VCMI(ConanFile):
 
         "boost/*:shared": True,
         "minizip/*:shared": True,
-        "onetbb/*:shared": True,
     }
 
     def configure(self):
@@ -237,8 +236,8 @@ class VCMI(ConanFile):
         # launcher
         if self.settings.os == "Android":
             self.requires("qt/[~5.15.14]")
-        else:
-            self.requires("qt/[~5.15.2]")
+ #       else:
+ #           self.requires("qt/[~5.15.2]")
         # TODO: version range doesn't work in Conan v1
         if self.options["qt"].openssl:
             self.requires("openssl/1.1.1s")
