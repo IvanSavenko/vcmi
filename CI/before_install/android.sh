@@ -1,4 +1,4 @@
 #!/bin/sh
 
 sudo apt-get update
-sudo apt-get install ninja-build
+sudo apt-get install ninja-build pipx
