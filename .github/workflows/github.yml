@@ -7,6 +7,7 @@ on:
       - beta
       - master
       - develop
+      - msvc-package
   pull_request:
   workflow_dispatch:
 
@@ -20,88 +21,96 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: linux-qt6
-            os: ubuntu-24.04
-            test: 0
-            preset: linux-clang-test
-          - platform: linux
-            os: ubuntu-24.04
-            test: 1
-            preset: linux-gcc-test
-          - platform: linux
-            os: ubuntu-20.04
-            test: 0
-            preset: linux-gcc-debug
-          - platform: mac-intel
-            os: macos-13
+#          - platform: linux-qt6
+#            os: ubuntu-24.04
+#            test: 0
+#            preset: linux-clang-test
+#          - platform: linux
+#            os: ubuntu-24.04
+#            test: 1
+#            preset: linux-gcc-test
+#          - platform: linux
+#            os: ubuntu-20.04
+#            test: 0
+#            preset: linux-gcc-debug
+#          - platform: mac-intel
+#            os: macos-13
+#            test: 0
+#            pack: 1
+#            pack_type: Release
+#            extension: dmg
+#            preset: macos-conan-ninja-release
+#            conan_profile: macos-intel
+#            conan_options: --options with_apple_system_libs=True
+#            artifact_platform: intel
+#          - platform: mac-arm
+#            os: macos-13
+#            test: 0
+#            pack: 1
+#            pack_type: Release
+#            extension: dmg
+#            preset: macos-arm-conan-ninja-release
+#            conan_profile: macos-arm
+#            conan_options: --options with_apple_system_libs=True
+#            artifact_platform: arm
+#          - platform: ios
+#            os: macos-13
+#            test: 0
+#            pack: 1
+#            pack_type: Release
+#            extension: ipa
+#            preset: ios-release-conan-ccache
+#            conan_profile: ios-arm64
+#            conan_options: --options with_apple_system_libs=True
+          - platform: msvc-x86
+            os: windows-latest
             test: 0
             pack: 1
-            pack_type: Release
-            extension: dmg
-            preset: macos-conan-ninja-release
-            conan_profile: macos-intel
-            conan_options: --options with_apple_system_libs=True
-            artifact_platform: intel
-          - platform: mac-arm
-            os: macos-13
-            test: 0
-            pack: 1
-            pack_type: Release
-            extension: dmg
-            preset: macos-arm-conan-ninja-release
-            conan_profile: macos-arm
-            conan_options: --options with_apple_system_libs=True
-            artifact_platform: arm
-          - platform: ios
-            os: macos-13
-            test: 0
-            pack: 1
-            pack_type: Release
-            extension: ipa
-            preset: ios-release-conan-ccache
-            conan_profile: ios-arm64
-            conan_options: --options with_apple_system_libs=True
-          - platform: msvc
+            pack_type: RelWithDebInfo
+            extension: exe
+            preset: windows-msvc-release-x86
+            
+          - platform: msvc-x64
             os: windows-latest
             test: 0
             pack: 1
             pack_type: RelWithDebInfo
             extension: exe
             preset: windows-msvc-release
-          - platform: mingw
-            os: ubuntu-22.04
-            test: 0
-            pack: 1
-            pack_type: Release
-            extension: exe
-            cpack_args: -D CPACK_NSIS_EXECUTABLE=`which makensis`
-            cmake_args: -G Ninja
-            preset: windows-mingw-conan-linux
-            conan_profile: mingw64-linux.jinja
-          - platform: mingw-32
-            os: ubuntu-22.04
-            test: 0
-            pack: 1
-            pack_type: Release
-            extension: exe
-            cpack_args: -D CPACK_NSIS_EXECUTABLE=`which makensis`
-            cmake_args: -G Ninja
-            preset: windows-mingw-conan-linux
-            conan_profile: mingw32-linux.jinja
-          - platform: android-32
-            os: macos-14
-            extension: apk
-            preset: android-conan-ninja-release
-            conan_profile: android-32
-            conan_options: --conf tools.android:ndk_path=$ANDROID_NDK_ROOT
-            artifact_platform: armeabi-v7a
-          - platform: android-64
-            os: macos-14
-            extension: apk
-            preset: android-conan-ninja-release
-            conan_profile: android-64
-            conan_options: --conf tools.android:ndk_path=$ANDROID_NDK_ROOT
-            artifact_platform: arm64-v8a
+#          - platform: mingw
+#            os: ubuntu-22.04
+#            test: 0
+#            pack: 1
+#            pack_type: Release
+#            extension: exe
+#            cpack_args: -D CPACK_NSIS_EXECUTABLE=`which makensis`
+#            cmake_args: -G Ninja
+#            preset: windows-mingw-conan-linux
+#            conan_profile: mingw64-linux.jinja
+#          - platform: mingw-32
+#            os: ubuntu-22.04
+#            test: 0
+#            pack: 1
+#            pack_type: Release
+#            extension: exe
+#            cpack_args: -D CPACK_NSIS_EXECUTABLE=`which makensis`
+#            cmake_args: -G Ninja
+#            preset: windows-mingw-conan-linux
+#            conan_profile: mingw32-linux.jinja
+#          - platform: android-32
+#            os: macos-14
+#            extension: apk
+#            preset: android-conan-ninja-release
+#            conan_profile: android-32
+#            conan_options: --conf tools.android:ndk_path=$ANDROID_NDK_ROOT
+#            artifact_platform: armeabi-v7a
+#          - platform: android-64
+#            os: macos-14
+#            extension: apk
+#            preset: android-conan-ninja-release
+#            conan_profile: android-64
+#            conan_options: --conf tools.android:ndk_path=$ANDROID_NDK_ROOT
+#            artifact_platform: arm64-v8a
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -116,6 +125,12 @@ jobs:
       run: source '${{github.workspace}}/CI/${{matrix.platform}}/before_install.sh'
       env:
         VCMI_BUILD_PLATFORM: x64
+
+    - name: MSVC package
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.VCMI_PACKAGE_FILE_NAME }} - ${{ matrix.platform }}
+        path: ${{github.workspace}}/dependencies-${{matrix.platform}}.txz
 
     # ensure the ccache for each PR is separate so they don't interfere with each other
     # fall back to ccache of the vcmi/vcmi repo if no PR-specific ccache is found
@@ -209,7 +224,7 @@ jobs:
         elif [[ (${{matrix.preset}} == android-conan-ninja-release) && (${{github.ref}} != 'refs/heads/master') ]]
         then
             cmake -DENABLE_CCACHE:BOOL=ON -DANDROID_GRADLE_PROPERTIES="applicationIdSuffix=.daily;signingConfig=dailySigning;applicationLabel=VCMI daily" --preset ${{ matrix.preset }}
-        elif [[ ${{matrix.platform}} != msvc ]]
+        elif [[ (${{matrix.platform}} != msvc-x64) && (${{matrix.platform}} != msvc-x86) ]]
         then
             cmake -DENABLE_CCACHE:BOOL=ON --preset ${{ matrix.preset }}
         else
@@ -286,7 +301,7 @@ jobs:
           ${{ env.ANDROID_AAB_PATH }}
 
     - name: Symbols
-      if: ${{ matrix.platform == 'msvc' }}
+      if: ${{ matrix.platform == 'msvc-x64' }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.VCMI_PACKAGE_FILE_NAME }} - ${{ matrix.platform }} - symbols
@@ -294,7 +309,7 @@ jobs:
             ${{github.workspace}}/**/*.pdb
 
     - name: Upload build
-      if: ${{ (matrix.pack == 1 || startsWith(matrix.platform, 'android')) && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/features/')) && matrix.platform != 'msvc' && matrix.platform != 'mingw-32' }}
+      if: ${{ (matrix.pack == 1 || startsWith(matrix.platform, 'android')) && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/features/')) && matrix.platform != 'msvc-x64' && matrix.platform != 'msvc-x86' && matrix.platform != 'mingw-32' }}
       continue-on-error: true
       run: |
         if [ -z '${{ env.ANDROID_APK_PATH }}' ] ; then
