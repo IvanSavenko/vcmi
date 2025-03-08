@@ -18,7 +18,7 @@
 #include "../widgets/TextControls.h"
 #include "../widgets/VideoWidget.h"
 #include "../widgets/Images.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../lib/CConfigHandler.h"
 
 CPrologEpilogVideo::CPrologEpilogVideo(CampaignScenarioPrologEpilog _spe, std::function<void()> callback)
@@ -84,7 +84,7 @@ void CPrologEpilogVideo::tick(uint32_t msPassed)
 		clickPressed(ENGINE->getCursorPosition());
 }
 
-void CPrologEpilogVideo::show(Canvas & to)
+void CPrologEpilogVideo::show(ICanvas & to)
 {
 	to.drawColor(pos, Colors::BLACK);
 

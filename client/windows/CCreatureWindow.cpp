@@ -14,7 +14,7 @@
 #include <vcmi/spells/Service.h>
 
 #include "../CPlayerInterface.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../widgets/Buttons.h"
 #include "../widgets/CComponent.h"
 #include "../widgets/CComponentHolder.h"
@@ -142,7 +142,7 @@ bool CCommanderSkillIcon::getIsMasterAbility()
 	return isMasterAbility;
 }
 
-void CCommanderSkillIcon::show(Canvas &to)
+void CCommanderSkillIcon::show(ICanvas &to)
 {
 	CIntObject::show(to);
 

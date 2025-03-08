@@ -26,7 +26,7 @@
 #include "../widgets/VideoWidget.h"
 #include "../windows/InfoWindows.h"
 #include "../widgets/TextControls.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IRenderHandler.h"
 
 #include "../../lib/texts/CGeneralTextHandler.h"
@@ -173,7 +173,7 @@ void CHighScoreScreen::buttonExitClick()
 	GAME->mainmenu()->playMusic();
 }
 
-void CHighScoreScreen::showAll(Canvas & to)
+void CHighScoreScreen::showAll(ICanvas & to)
 {
 	to.fillTexture(ENGINE->renderHandler().loadImage(ImagePath::builtin("DiBoxBck"), EImageBlitMode::OPAQUE));
 	CWindowObject::showAll(to);
@@ -271,12 +271,12 @@ int CHighScoreInputScreen::addEntry(std::string text) {
 	return pos;
 }
 
-void CHighScoreInputScreen::show(Canvas & to)
+void CHighScoreInputScreen::show(ICanvas & to)
 {
 	CWindowObject::showAll(to);
 }
 
-void CHighScoreInputScreen::showAll(Canvas & to)
+void CHighScoreInputScreen::showAll(ICanvas & to)
 {
 	to.fillTexture(ENGINE->renderHandler().loadImage(ImagePath::builtin("DiBoxBck"), EImageBlitMode::OPAQUE));
 	CWindowObject::showAll(to);

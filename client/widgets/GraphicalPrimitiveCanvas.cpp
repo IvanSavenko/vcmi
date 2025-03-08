@@ -10,14 +10,14 @@
 #include "StdInc.h"
 #include "GraphicalPrimitiveCanvas.h"
 
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 
 GraphicalPrimitiveCanvas::GraphicalPrimitiveCanvas(Rect dimensions)
 {
 	pos = dimensions + pos.topLeft();
 }
 
-void GraphicalPrimitiveCanvas::showAll(Canvas & to)
+void GraphicalPrimitiveCanvas::showAll(ICanvas & to)
 {
 	auto const & translatePoint = [this](const Point & input){
 		int x = input.x < 0 ? pos.w + input.x : input.x;

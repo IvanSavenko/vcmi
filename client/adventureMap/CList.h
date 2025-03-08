@@ -97,7 +97,7 @@ public:
 	void selectNext();
 	void selectPrev();
 
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 };
 
 /// List of heroes which is shown at the right of the adventure map screen

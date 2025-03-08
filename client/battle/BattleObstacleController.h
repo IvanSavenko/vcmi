@@ -22,7 +22,7 @@ class Point;
 VCMI_LIB_NAMESPACE_END
 
 class IImage;
-class Canvas;
+class ICanvas;
 class CAnimation;
 class BattleInterface;
 class BattleRenderer;
@@ -61,7 +61,7 @@ public:
 	void obstacleRemoved(const std::vector<ObstacleChanges> & obstacles);
 
 	/// renders all "absolute" obstacles
-	void showAbsoluteObstacles(Canvas & canvas);
+	void showAbsoluteObstacles(ICanvas & canvas);
 
 	/// adds all non-"absolute" visible obstacles for rendering
 	void collectRenderableObjects(BattleRenderer & renderer);

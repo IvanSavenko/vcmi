@@ -50,7 +50,7 @@ public:
 	std::vector<std::shared_ptr<CButton>> buttons;
 
 	void close() override;
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 
 	void sliderMoved(int to);
 

@@ -140,5 +140,5 @@ public:
 
 	void keyPressed(EShortcut key) override;
 
-	void show(Canvas & to) override;
+	void show(ICanvas & to) override;
 };

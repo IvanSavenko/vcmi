@@ -18,7 +18,7 @@
 #include "../GameEngine.h"
 #include "../gui/Shortcut.h"
 #include "../media/IMusicPlayer.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../widgets/CComponent.h"
 #include "../widgets/Buttons.h"
 #include "../widgets/MiscWidgets.h"

@@ -33,8 +33,8 @@ private:
 	ui8 currentAlpha;
 
 public:
-	void showAll(Canvas & to) override;
-	void show(Canvas & to) override;
+	void showAll(ICanvas & to) override;
+	void show(ICanvas & to) override;
 
 	CPuzzleWindow(const int3 & grailPos, double discoveredRatio);
 };

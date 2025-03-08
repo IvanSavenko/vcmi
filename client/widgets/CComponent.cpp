@@ -16,7 +16,7 @@
 #include "../gui/CursorHandler.h"
 #include "../gui/TextAlignment.h"
 #include "../gui/Shortcut.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IFont.h"
 #include "../render/IRenderHandler.h"
 #include "../render/Graphics.h"
@@ -387,7 +387,7 @@ void CSelectableComponent::select(bool on)
 	}
 }
 
-void CSelectableComponent::showAll(Canvas & to)
+void CSelectableComponent::showAll(ICanvas & to)
 {
 	CComponent::showAll(to);
 	if(selected)

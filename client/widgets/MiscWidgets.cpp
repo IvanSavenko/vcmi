@@ -27,7 +27,7 @@
 #include "../widgets/TextControls.h"
 #include "../windows/CCastleInterface.h"
 #include "../windows/InfoWindows.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 
 #include "../../CCallback.h"
 
@@ -207,7 +207,7 @@ LRClickableArea::LRClickableArea(const Rect & Pos, std::function<void()> onClick
 	pos = Pos + pos.topLeft();
 }
 
-void CMinorResDataBar::show(Canvas & to)
+void CMinorResDataBar::show(ICanvas & to)
 {
 }
 
@@ -223,7 +223,7 @@ std::string CMinorResDataBar::buildDateString()
 	return boost::str(formatted);
 }
 
-void CMinorResDataBar::showAll(Canvas & to)
+void CMinorResDataBar::showAll(ICanvas & to)
 {
 	CIntObject::showAll(to);
 
@@ -550,7 +550,7 @@ CreatureTooltip::CreatureTooltip(Point pos, const CGCreature * creature)
 	tooltipTextbox = std::make_shared<CTextBox>(textContent, Rect(15, 95, 230, 150), 0, FONT_SMALL, ETextAlignment::TOPCENTER, Colors::WHITE);
 }
 
-void CreatureTooltip::show(Canvas & to)
+void CreatureTooltip::show(ICanvas & to)
 {
 	// fixes scrolling of textbox (#5076)
 	setRedrawParent(true);
@@ -669,7 +669,7 @@ CCreaturePic::CCreaturePic(int x, int y, const CCreature * cre, bool Big, bool A
 	pos.h = bg->pos.h;
 }
 
-void CCreaturePic::show(Canvas & to)
+void CCreaturePic::show(ICanvas & to)
 {
 	// redraw everything in a proper order
 	bg->showAll(to);

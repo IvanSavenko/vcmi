@@ -39,7 +39,7 @@ private:
 	void buttonExitClick();
 
 	void showPopupWindow(const Point & cursorPosition) override;
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 
 	HighScorePage highscorepage;
 
@@ -93,6 +93,6 @@ public:
 
 	void clickPressed(const Point & cursorPosition) override;
 	void keyPressed(EShortcut key) override;
-	void show(Canvas & to) override;
-	void showAll(Canvas & to) override;
+	void show(ICanvas & to) override;
+	void showAll(ICanvas & to) override;
 };

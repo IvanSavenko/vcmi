@@ -32,7 +32,6 @@ class Unit;
 VCMI_LIB_NAMESPACE_END
 
 class CAnimation;
-class Canvas;
 class BattleInterface;
 class CPicture;
 class CFilledTexture;
@@ -78,7 +77,7 @@ private:
 public:
 	BattleConsole(const BattleInterface & owner, std::shared_ptr<CPicture> backgroundSource, const Point & objectPos, const Point & imagePos, const Point &size);
 
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 	void deactivate() override;
 
 	void clickPressed(const Point & cursorPosition) override;
@@ -128,7 +127,7 @@ class BattleHero : public CIntObject
 
 	void switchToNextPhase();
 
-	void render(Canvas & canvas); //prints next frame of animation to to
+	void render(ICanvas & canvas); //prints next frame of animation to to
 public:
 	const CGHeroInstance * instance();
 
@@ -171,7 +170,7 @@ public:
 
 	std::vector<std::tuple<SpellID, bool>> getSpells() const;
 
-	void show(Canvas & to) override;
+	void show(ICanvas & to) override;
 	void inputModeChanged(InputMode modi) override;
 };
 
@@ -184,7 +183,7 @@ private:
 public:
 	HeroInfoBasicPanel(const InfoAboutHero & hero, Point * position, bool initializeBackground = true);
 
-	void show(Canvas & to) override;
+	void show(ICanvas & to) override;
 
 	void initializeData(const InfoAboutHero & hero);
 	void update(const InfoAboutHero & updatedInfo);
@@ -201,7 +200,7 @@ private:
 public:
 	StackInfoBasicPanel(const CStack * stack, bool initializeBackground = true);
 
-	void show(Canvas & to) override;
+	void show(ICanvas & to) override;
 
 	void initializeData(const CStack * stack);
 	void update(const CStack * updatedInfo);
@@ -265,8 +264,8 @@ class StackQueue : public CIntObject
 		std::shared_ptr<CLabel> round;
 		std::shared_ptr<TransparentFilledRectangle> roundRect;
 
-		void show(Canvas & to) override;
-		void showAll(Canvas & to) override;
+		void show(ICanvas & to) override;
+		void showAll(ICanvas & to) override;
 		void showPopupWindow(const Point & cursorPosition) override;
 
 		bool isBoundUnitHighlighted() const;
@@ -289,5 +288,5 @@ public:
 	void update();
 	std::optional<uint32_t> getHoveredUnitIdIfAny() const;
 
-	void show(Canvas & to) override;
+	void show(ICanvas & to) override;
 };

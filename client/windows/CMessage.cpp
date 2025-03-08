@@ -13,7 +13,7 @@
 
 #include "../GameEngine.h"
 #include "../render/CAnimation.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/Graphics.h"
 #include "../render/IFont.h"
 #include "../render/IImage.h"
@@ -324,7 +324,7 @@ void CMessage::drawIWindow(CInfoWindow * ret, std::string text, PlayerColor play
 	ret->center();
 }
 
-void CMessage::drawBorder(PlayerColor playerColor, Canvas & to, int w, int h, int x, int y)
+void CMessage::drawBorder(PlayerColor playerColor, ICanvas & to, int w, int h, int x, int y)
 {
 	if(playerColor.isSpectator())
 		playerColor = PlayerColor(1);

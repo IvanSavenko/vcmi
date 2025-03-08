@@ -27,13 +27,13 @@ struct StackAttackedInfo;
 struct StackAttackInfo;
 
 class ColorFilter;
-class Canvas;
 class BattleInterface;
 class BattleAnimation;
 class CreatureAnimation;
 class BattleAnimation;
 class BattleRenderer;
 class IImage;
+class ICanvas;
 
 struct BattleStackFilterEffect
 {
@@ -85,7 +85,7 @@ class BattleStacksController
 	ui32 animIDhelper;
 
 	bool stackNeedsAmountBox(const CStack * stack) const;
-	void showStackAmountBox(Canvas & canvas, const CStack * stack);
+	void showStackAmountBox(ICanvas & canvas, const CStack * stack);
 	BattleHex getStackCurrentPosition(const CStack * stack) const;
 
 	std::shared_ptr<IImage> getStackAmountBox(const CStack * stack);
@@ -125,8 +125,8 @@ public:
 
 	void setActiveStack(const CStack *stack);
 
-	void showAliveStack(Canvas & canvas, const CStack * stack);
-	void showStack(Canvas & canvas, const CStack * stack);
+	void showAliveStack(ICanvas & canvas, const CStack * stack);
+	void showStack(ICanvas & canvas, const CStack * stack);
 
 	void updateHoveredStacks();
 

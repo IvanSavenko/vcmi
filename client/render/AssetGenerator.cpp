@@ -13,7 +13,7 @@
 #include "../GameEngine.h"
 #include "../render/IImage.h"
 #include "../render/IImageLoader.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/CanvasImage.h"
 #include "../render/ColorFilter.h"
 #include "../render/IRenderHandler.h"
@@ -84,7 +84,7 @@ AssetGenerator::CanvasPtr AssetGenerator::createAdventureOptionsCleanBackground(
 	std::shared_ptr<IImage> img = ENGINE->renderHandler().loadImage(locator);
 
 	auto image = ENGINE->renderHandler().createImage(Point(575, 585), CanvasScalingPolicy::IGNORE);
-	Canvas canvas = image->getCanvas();
+	CanvasSoftware canvas = image->getCanvas();
 
 	canvas.draw(img, Point(0, 0), Rect(0, 0, 575, 585));
 	canvas.draw(img, Point(54, 121), Rect(54, 123, 335, 1));
@@ -103,43 +103,43 @@ AssetGenerator::CanvasPtr AssetGenerator::createBigSpellBook() const
 
 	std::shared_ptr<IImage> img = ENGINE->renderHandler().loadImage(locator);
 	auto image = ENGINE->renderHandler().createImage(Point(800, 600), CanvasScalingPolicy::IGNORE);
-	Canvas canvas = image->getCanvas();
+	CanvasSoftware canvas = image->getCanvas();
 	// edges
 	canvas.draw(img, Point(0, 0), Rect(15, 38, 90, 45));
 	canvas.draw(img, Point(0, 460), Rect(15, 400, 90, 141));
 	canvas.draw(img, Point(705, 0), Rect(509, 38, 95, 45));
 	canvas.draw(img, Point(705, 460), Rect(509, 400, 95, 141));
 	// left / right
-	Canvas tmp1 = Canvas(Point(90, 355 - 45), CanvasScalingPolicy::IGNORE);
+	CanvasSoftware tmp1(Point(90, 355 - 45), CanvasScalingPolicy::IGNORE);
 	tmp1.draw(img, Point(0, 0), Rect(15, 38 + 45, 90, 355 - 45));
 	canvas.drawScaled(tmp1, Point(0, 45), Point(90, 415));
-	Canvas tmp2 = Canvas(Point(95, 355 - 45), CanvasScalingPolicy::IGNORE);
+	CanvasSoftware tmp2(Point(95, 355 - 45), CanvasScalingPolicy::IGNORE);
 	tmp2.draw(img, Point(0, 0), Rect(509, 38 + 45, 95, 355 - 45));
 	canvas.drawScaled(tmp2, Point(705, 45), Point(95, 415));
 	// top / bottom
-	Canvas tmp3 = Canvas(Point(409, 45), CanvasScalingPolicy::IGNORE);
+	CanvasSoftware tmp3(Point(409, 45), CanvasScalingPolicy::IGNORE);
 	tmp3.draw(img, Point(0, 0), Rect(100, 38, 409, 45));
 	canvas.drawScaled(tmp3, Point(90, 0), Point(615, 45));
-	Canvas tmp4 = Canvas(Point(409, 141), CanvasScalingPolicy::IGNORE);
+	CanvasSoftware tmp4(Point(409, 141), CanvasScalingPolicy::IGNORE);
 	tmp4.draw(img, Point(0, 0), Rect(100, 400, 409, 141));
 	canvas.drawScaled(tmp4, Point(90, 460), Point(615, 141));
 	// middle
-	Canvas tmp5 = Canvas(Point(409, 141), CanvasScalingPolicy::IGNORE);
+	CanvasSoftware tmp5(Point(409, 141), CanvasScalingPolicy::IGNORE);
 	tmp5.draw(img, Point(0, 0), Rect(100, 38 + 45, 509 - 15, 400 - 38));
 	canvas.drawScaled(tmp5, Point(90, 45), Point(615, 415));
 	// carpet
-	Canvas tmp6 = Canvas(Point(590, 59), CanvasScalingPolicy::IGNORE);
+	CanvasSoftware tmp6(Point(590, 59), CanvasScalingPolicy::IGNORE);
 	tmp6.draw(img, Point(0, 0), Rect(15, 484, 590, 59));
 	canvas.drawScaled(tmp6, Point(0, 545), Point(800, 59));
-	// remove bookmarks
-	for (int i = 0; i < 56; i++)
-		canvas.draw(Canvas(canvas, Rect(i < 30 ? 268 : 327, 464, 1, 46)), Point(269 + i, 464));
-	for (int i = 0; i < 56; i++)
-		canvas.draw(Canvas(canvas, Rect(469, 464, 1, 42)), Point(470 + i, 464));
-	for (int i = 0; i < 57; i++)
-		canvas.draw(Canvas(canvas, Rect(i < 30 ? 564 : 630, 464, 1, 44)), Point(565 + i, 464));
-	for (int i = 0; i < 56; i++)
-		canvas.draw(Canvas(canvas, Rect(656, 464, 1, 47)), Point(657 + i, 464));
+//	// remove bookmarks
+//	for (int i = 0; i < 56; i++)
+//		canvas.draw(CanvasSoftware(canvas, Rect(i < 30 ? 268 : 327, 464, 1, 46)), Point(269 + i, 464));
+//	for (int i = 0; i < 56; i++)
+//		canvas.draw(CanvasSoftware(canvas, Rect(469, 464, 1, 42)), Point(470 + i, 464));
+//	for (int i = 0; i < 57; i++)
+//		canvas.draw(CanvasSoftware(canvas, Rect(i < 30 ? 564 : 630, 464, 1, 44)), Point(565 + i, 464));
+//	for (int i = 0; i < 56; i++)
+//		canvas.draw(CanvasSoftware(canvas, Rect(656, 464, 1, 47)), Point(657 + i, 464));
 	// draw bookmarks
 	canvas.draw(img, Point(278, 464), Rect(220, 405, 37, 47));
 	canvas.draw(img, Point(481, 465), Rect(354, 406, 37, 41));
@@ -175,7 +175,7 @@ AssetGenerator::CanvasPtr AssetGenerator::createPlayerColoredBackground(const Pl
 	texture->adjustPalette(filters[player.getNum()], 0);
 
 	auto image = ENGINE->renderHandler().createImage(texture->dimensions(), CanvasScalingPolicy::IGNORE);
-	Canvas canvas = image->getCanvas();
+	CanvasSoftware canvas = image->getCanvas();
 	canvas.draw(texture, Point(0,0));
 
 	return image;
@@ -196,7 +196,7 @@ AssetGenerator::CanvasPtr AssetGenerator::createCombatUnitNumberWindow(float mul
 	texture->adjustPalette(shifter, ignoredMask);
 
 	auto image = ENGINE->renderHandler().createImage(texture->dimensions(), CanvasScalingPolicy::IGNORE);
-	Canvas canvas = image->getCanvas();
+	CanvasSoftware canvas = image->getCanvas();
 	canvas.draw(texture, Point(0,0));
 
 	return image;
@@ -208,7 +208,7 @@ AssetGenerator::CanvasPtr AssetGenerator::createCampaignBackground() const
 
 	std::shared_ptr<IImage> img = ENGINE->renderHandler().loadImage(locator);
 	auto image = ENGINE->renderHandler().createImage(Point(800, 600), CanvasScalingPolicy::IGNORE);
-	Canvas canvas = image->getCanvas();
+	CanvasSoftware canvas = image->getCanvas();
 
 	canvas.draw(img, Point(0, 0), Rect(0, 0, 800, 600));
 
@@ -248,7 +248,7 @@ AssetGenerator::CanvasPtr AssetGenerator::createChroniclesCampaignImages(int chr
 
 	std::shared_ptr<IImage> img = ENGINE->renderHandler().loadImage(locator);
 	auto image = ENGINE->renderHandler().createImage(Point(200, 116), CanvasScalingPolicy::IGNORE);
-	Canvas canvas = image->getCanvas();
+	CanvasSoftware canvas = image->getCanvas();
 
 	std::array sourceRect = {
 		Rect(149, 144, 200, 116),
@@ -343,7 +343,7 @@ AssetGenerator::CanvasPtr AssetGenerator::createPaletteShiftedImage(const Animat
 		img->shiftPalette(element.start, element.length, paletteShiftCounter % element.length);
 
 	auto image = ENGINE->renderHandler().createImage(Point(32, 32), CanvasScalingPolicy::IGNORE);
-	Canvas canvas = image->getCanvas();
+	CanvasSoftware canvas = image->getCanvas();
 	canvas.draw(img, Point((32 - img->dimensions().x) / 2, (32 - img->dimensions().y) / 2));
 
 	return image;

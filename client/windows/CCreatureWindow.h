@@ -49,7 +49,7 @@ public:
 	void deselect(); //TODO: consider using observer pattern instead?
 	bool getIsMasterAbility();
 
-	void show(Canvas &to) override;
+	void show(ICanvas &to) override;
 };
 
 class CStackWindow : public CWindowObject

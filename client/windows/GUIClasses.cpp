@@ -36,7 +36,7 @@
 #include "../widgets/VideoWidget.h"
 #include "../widgets/GraphicalPrimitiveCanvas.h"
 
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IRenderHandler.h"
 #include "../render/IImage.h"
 #include "../render/IFont.h"
@@ -94,7 +94,7 @@ void CRecruitmentWindow::CCreatureCard::showPopupWindow(const Point & cursorPosi
 	ENGINE->windows().createAndPushWindow<CStackWindow>(creature, true);
 }
 
-void CRecruitmentWindow::CCreatureCard::showAll(Canvas & to)
+void CRecruitmentWindow::CCreatureCard::showAll(ICanvas & to)
 {
 	CIntObject::showAll(to);
 	if(selected)
@@ -187,7 +187,7 @@ void CRecruitmentWindow::buy()
 		close();
 }
 
-void CRecruitmentWindow::showAll(Canvas & to)
+void CRecruitmentWindow::showAll(ICanvas & to)
 {
 	CWindowObject::showAll(to);
 
@@ -584,7 +584,7 @@ void CTavernWindow::close()
 	CStatusbarWindow::close();
 }
 
-void CTavernWindow::show(Canvas & to)
+void CTavernWindow::show(ICanvas & to)
 {
 	CWindowObject::show(to);
 
@@ -1760,7 +1760,7 @@ VideoWindow::VideoWindow(const VideoPath & video, const ImagePath & rim, bool sh
 	}
 }
 
-void VideoWindow::showAll(Canvas & to)
+void VideoWindow::showAll(ICanvas & to)
 {
 	if(showBackground)
 		to.fillTexture(ENGINE->renderHandler().loadImage(ImagePath::builtin("DiBoxBck"), EImageBlitMode::OPAQUE));

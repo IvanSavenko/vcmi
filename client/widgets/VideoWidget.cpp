@@ -15,7 +15,7 @@
 #include "../GameEngine.h"
 #include "../media/ISoundPlayer.h"
 #include "../media/IVideoPlayer.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IScreenHandler.h"
 
 #include "../../lib/CConfigHandler.h"
@@ -86,7 +86,7 @@ void VideoWidgetBase::playVideo(const VideoPath & fileToPlay)
 	}
 }
 
-void VideoWidgetBase::show(Canvas & to)
+void VideoWidgetBase::show(ICanvas & to)
 {
 	if(videoInstance)
 		to.draw(*videoInstance, pos.topLeft());
@@ -162,7 +162,7 @@ void VideoWidgetBase::deactivate()
 		videoInstance->deactivate();
 }
 
-void VideoWidgetBase::showAll(Canvas & to)
+void VideoWidgetBase::showAll(ICanvas & to)
 {
 	if(videoInstance)
 		to.draw(*videoInstance, pos.topLeft());

@@ -13,7 +13,7 @@
 #include "../CCallback.h"
 #include "../CPlayerInterface.h"
 #include "../GameEngine.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/Colors.h"
 #include "../render/IImage.h"
 #include "../renderSDL/RenderHandler.h"

@@ -27,7 +27,7 @@
 #include "../gui/ShortcutHandler.h"
 #include "../gui/Shortcut.h"
 #include "../gui/WindowHandler.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../globalLobby/GlobalLobbyLoginWindow.h"
 #include "../globalLobby/GlobalLobbyClient.h"
 #include "../globalLobby/GlobalLobbyWindow.h"
@@ -113,7 +113,7 @@ std::shared_ptr<CIntObject> CMenuScreen::createTab(size_t index)
 		return std::make_shared<CMenuEntry>(this, config["items"].Vector()[index]);
 }
 
-void CMenuScreen::show(Canvas & to)
+void CMenuScreen::show(ICanvas & to)
 {
 	// TODO: avoid excessive redraws
 	CIntObject::showAll(to);

@@ -14,7 +14,7 @@
 #include "CIntObject.h"
 #include "CursorHandler.h"
 
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IScreenHandler.h"
 #include "../render/Colors.h"
 
@@ -106,7 +106,7 @@ void WindowHandler::totalRedrawImpl()
 {
 	logGlobal->debug("totalRedraw requested!");
 
-	Canvas target = ENGINE->screenHandler().getScreenCanvas();
+	ICanvas & target = ENGINE->screenHandler().getScreenCanvas();
 
 	for(auto & elem : windowsStack)
 		elem->showAll(target);
@@ -124,7 +124,7 @@ void WindowHandler::simpleRedraw()
 
 void WindowHandler::simpleRedrawImpl()
 {
-	Canvas target = ENGINE->screenHandler().getScreenCanvas();
+	ICanvas & target = ENGINE->screenHandler().getScreenCanvas();
 
 	if(!windowsStack.empty())
 		windowsStack.back()->show(target); //blit active interface/window

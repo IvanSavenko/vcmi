@@ -51,7 +51,7 @@ private:
 		static constexpr int offset_x = 8;
 		static constexpr int offset_y = 12;
 
-		void show(Canvas & to) override;
+		void show(ICanvas & to) override;
 
 	protected:
 		std::shared_ptr<CPicture> background;

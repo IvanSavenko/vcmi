@@ -72,12 +72,12 @@ CPuzzleWindow::CPuzzleWindow(const int3 & GrailPos, double discoveredRatio)
 	}
 }
 
-void CPuzzleWindow::showAll(Canvas & to)
+void CPuzzleWindow::showAll(ICanvas & to)
 {
 	CWindowObject::showAll(to);
 }
 
-void CPuzzleWindow::show(Canvas & to)
+void CPuzzleWindow::show(ICanvas & to)
 {
 	constexpr int animSpeed = 2;
 

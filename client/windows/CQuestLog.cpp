@@ -19,7 +19,7 @@
 #include "../widgets/Slider.h"
 #include "../adventureMap/AdventureMapInterface.h"
 #include "../adventureMap/CMinimap.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 
 #include "../../CCallback.h"
 #include "../../lib/CArtHandler.h"
@@ -41,7 +41,7 @@ void CQuestLabel::clickPressed(const Point & cursorPosition)
 	callback();
 }
 
-void CQuestLabel::showAll(Canvas & to)
+void CQuestLabel::showAll(ICanvas & to)
 {
 	CMultiLineLabel::showAll (to);
 }
@@ -57,9 +57,9 @@ void CQuestIcon::clickPressed(const Point & cursorPosition)
 	callback();
 }
 
-void CQuestIcon::showAll(Canvas & to)
+void CQuestIcon::showAll(ICanvas & to)
 {
-	CanvasClipRectGuard guard(to, parent->pos);
+	CanvasClipGuard guard(to, parent->pos);
 	CAnimImage::showAll(to);
 }
 
@@ -106,7 +106,7 @@ void CQuestMinimap::iconClicked()
 	//moveAdvMapSelection();
 }
 
-void CQuestMinimap::showAll(Canvas & to)
+void CQuestMinimap::showAll(ICanvas & to)
 {
 	CIntObject::showAll(to); // blitting IntObject directly to hide radar
 //	for (auto pic : icons)
@@ -199,7 +199,7 @@ void CQuestLog::recreateLabelList()
 	}
 }
 
-void CQuestLog::showAll(Canvas & to)
+void CQuestLog::showAll(ICanvas & to)
 {
 	CWindowObject::showAll(to);
 	if(questIndex >= 0 && questIndex < labels.size())

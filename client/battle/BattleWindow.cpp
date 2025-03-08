@@ -28,8 +28,9 @@
 #include "../windows/CMessage.h"
 #include "../windows/CCreatureWindow.h"
 #include "../render/CAnimation.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IRenderHandler.h"
+#include "../renderSDL/CanvasSoftware.h"
 #include "../adventureMap/CInGameConsole.h"
 #include "../adventureMap/TurnTimerWidget.h"
 
@@ -919,7 +920,7 @@ void BattleWindow::endWithAutocombat()
 	);
 }
 
-void BattleWindow::showAll(Canvas & to)
+void BattleWindow::showAll(ICanvas & to)
 {
 	CIntObject::showAll(to);
 
@@ -927,7 +928,7 @@ void BattleWindow::showAll(Canvas & to)
 		CMessage::drawBorder(owner.curInt->playerID, to, pos.w+28, pos.h+29, pos.x-14, pos.y-15);
 }
 
-void BattleWindow::show(Canvas & to)
+void BattleWindow::show(ICanvas & to)
 {
 	CIntObject::show(to);
 	GAME->interface()->cingconsole->show(to);

@@ -17,17 +17,17 @@ class int3;
 
 VCMI_LIB_NAMESPACE_END
 
-class Canvas;
 class MapViewModel;
+class ICanvas;
 
 class MapOverlayLogVisualizer : public IMapOverlayLogVisualizer
 {
 private:
-	Canvas & target;
+	ICanvas & target;
 	std::shared_ptr<MapViewModel> model;
 
 public:
-	MapOverlayLogVisualizer(Canvas & target, std::shared_ptr<MapViewModel> model);
+	MapOverlayLogVisualizer(ICanvas & target, std::shared_ptr<MapViewModel> model);
 	void drawLine(int3 start, int3 end) override;
 	void drawText(int3 tile, int lineNumber, const std::string & text, const std::optional<ColorRGBA> & color) override;
 };

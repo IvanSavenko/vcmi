@@ -20,9 +20,9 @@ VCMI_LIB_NAMESPACE_END
 
 class BattleHero;
 class CAnimation;
-class Canvas;
 class IImage;
 class BattleInterface;
+class CanvasSoftware;
 
 /// Handles battlefield grid as well as rendering of background layer of battle interface
 class BattleFieldController : public CIntObject
@@ -41,7 +41,7 @@ class BattleFieldController : public CIntObject
 	std::shared_ptr<CAnimation> spellCursors;
 
 	/// Canvas that contains background, hex grid (if enabled), absolute obstacles and movement range of active stack
-	std::unique_ptr<Canvas> backgroundWithHexes;
+	std::unique_ptr<CanvasSoftware> backgroundWithHexes;
 
 	/// direction which will be used to perform attack with current cursor position
 	Point currentAttackOriginPoint;
@@ -55,7 +55,7 @@ class BattleFieldController : public CIntObject
 	/// hexes that when in front of a unit cause it's amount box to move back
 	std::array<bool, GameConstants::BFIELD_SIZE> stackCountOutsideHexes;
 
-	void showHighlightedHex(Canvas & to, std::shared_ptr<IImage> highlight, const BattleHex & hex, bool darkBorder);
+	void showHighlightedHex(ICanvas & to, std::shared_ptr<IImage> highlight, const BattleHex & hex, bool darkBorder);
 
 	BattleHexArray getHighlightedHexesForActiveStack();
 	BattleHexArray getMovementRangeForHoveredStack();
@@ -84,10 +84,10 @@ class BattleFieldController : public CIntObject
 	/// calculates all hexes for a range limit and what images to be shown as highlight for each of the hexes
 	void calculateRangeLimitAndHighlightImages(uint8_t distance, std::shared_ptr<CAnimation> rangeLimitImages, BattleHexArray & rangeLimitHexes, std::vector<std::shared_ptr<IImage>> & rangeLimitHexesHighlights);
 
-	void showBackground(Canvas & canvas);
-	void showBackgroundImage(Canvas & canvas);
-	void showBackgroundImageWithHexes(Canvas & canvas);
-	void showHighlightedHexes(Canvas & canvas);
+	void showBackground(ICanvas & canvas);
+	void showBackgroundImage(ICanvas & canvas);
+	void showBackgroundImageWithHexes(ICanvas & canvas);
+	void showHighlightedHexes(ICanvas & canvas);
 	void updateAccessibleHexes();
 
 	BattleHex getHexAtPosition(Point hoverPosition);
@@ -103,8 +103,8 @@ class BattleFieldController : public CIntObject
 	void showPopupWindow(const Point & cursorPosition) override;
 	void activate() override;
 
-	void showAll(Canvas & to) override;
-	void show(Canvas & to) override;
+	void showAll(ICanvas & to) override;
+	void show(ICanvas & to) override;
 	void tick(uint32_t msPassed) override;
 
 	bool receiveEvent(const Point & position, int eventType) const override;
@@ -115,7 +115,7 @@ public:
 	void createHeroes();
 
 	void redrawBackgroundWithHexes();
-	void renderBattlefield(Canvas & canvas);
+	void renderBattlefield(ICanvas & canvas);
 
 	/// Returns position of hex relative to owner (BattleInterface)
 	Rect hexPositionLocal(const BattleHex & hex) const;

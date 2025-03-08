@@ -40,5 +40,5 @@ public:
 	void tick(uint32_t msPassed) override;
 	void clickPressed(const Point & cursorPosition) override;
 	void keyPressed(EShortcut key) override;
-	void show(Canvas & to) override;
+	void show(ICanvas & to) override;
 };

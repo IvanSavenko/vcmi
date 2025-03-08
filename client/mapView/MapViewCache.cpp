@@ -16,11 +16,12 @@
 #include "MapViewModel.h"
 
 #include "../render/CAnimation.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IImage.h"
 #include "../render/IFont.h"
 #include "../render/IRenderHandler.h"
 #include "../render/Graphics.h"
+#include "../renderSDL/CanvasSoftware.h"
 
 #include "../GameEngine.h"
 #include "../widgets/TextControls.h"
@@ -36,18 +37,13 @@ MapViewCache::MapViewCache(const std::shared_ptr<MapViewModel> & model)
 	, overlayWasVisible(false)
 	, mapRenderer(new MapRenderer())
 	, iconsStorage(ENGINE->renderHandler().loadAnimation(AnimationPath::builtin("VwSymbol"), EImageBlitMode::COLORKEY))
-	, intermediate(new Canvas(Point(32, 32), CanvasScalingPolicy::AUTO))
-	, terrain(new Canvas(model->getCacheDimensionsPixels(), CanvasScalingPolicy::AUTO))
-	, terrainTransition(new Canvas(model->getPixelsVisibleDimensions(), CanvasScalingPolicy::AUTO))
+	, intermediate(new CanvasSoftware(Point(32, 32), CanvasScalingPolicy::AUTO))
+	, terrain(new CanvasSoftware(model->getCacheDimensionsPixels(), CanvasScalingPolicy::AUTO))
+	, terrainTransition(new CanvasSoftware(model->getPixelsVisibleDimensions(), CanvasScalingPolicy::AUTO))
 {
 	Point visibleSize = model->getTilesVisibleDimensions();
 	terrainChecksum.resize(boost::extents[visibleSize.x][visibleSize.y]);
 	tilesUpToDate.resize(boost::extents[visibleSize.x][visibleSize.y]);
-}
-
-Canvas MapViewCache::getTile(const int3 & coordinates)
-{
-	return Canvas(*terrain, model->getCacheTileArea(coordinates));
 }
 
 std::shared_ptr<IImage> MapViewCache::getOverlayImageForTile(const std::shared_ptr<IMapRendererContext> & context, const int3 & coordinates)
@@ -90,20 +86,20 @@ void MapViewCache::updateTile(const std::shared_ptr<IMapRendererContext> & conte
 	if(cachedLevel == coordinates.z && oldCacheEntry == newCacheEntry && !context->tileAnimated(coordinates))
 		return;
 
-	Canvas target = getTile(coordinates);
+	CanvasViewGuard guard(*terrain, model->getCacheTileArea(coordinates));
 
 	if(model->getSingleTileSize() == Point(32, 32))
 	{
-		mapRenderer->renderTile(*context, target, coordinates);
+		mapRenderer->renderTile(*context, *terrain, coordinates);
 	}
 	else
 	{
 		mapRenderer->renderTile(*context, *intermediate, coordinates);
-		target.drawScaled(*intermediate, Point(0, 0), model->getSingleTileSize());
+		terrain->drawScaled(*intermediate, Point(0, 0), model->getSingleTileSize());
 	}
 
 	if(context->filterGrayscale())
-		target.applyGrayscale();
+		terrain->applyGrayscale();
 
 	oldCacheEntry = newCacheEntry;
 	tilesUpToDate[cacheX][cacheY] = false;
@@ -138,7 +134,7 @@ void MapViewCache::update(const std::shared_ptr<IMapRendererContext> & context)
 	cachedLevel = model->getLevel();
 }
 
-void MapViewCache::render(const std::shared_ptr<IMapRendererContext> & context, Canvas & target, bool fullRedraw)
+void MapViewCache::render(const std::shared_ptr<IMapRendererContext> & context, ICanvas & target, bool fullRedraw)
 {
 	bool mapMoved = (cachedPosition != model->getMapViewCenter());
 	bool overlayVisible = context->showImageOverlay() || context->showTextOverlay();
@@ -158,9 +154,9 @@ void MapViewCache::render(const std::shared_ptr<IMapRendererContext> & context, 
 			if(lazyUpdate && tilesUpToDate[cacheX][cacheY])
 				continue;
 
-			Canvas source = getTile(tile);
+			CanvasViewGuard guard(*terrain, model->getCacheTileArea(tile));
 			Rect targetRect = model->getTargetTileArea(tile);
-			target.draw(source, targetRect.topLeft());
+			target.draw(*terrain, targetRect.topLeft());
 
 			if (!fullRedraw)
 				tilesUpToDate[cacheX][cacheY] = true;

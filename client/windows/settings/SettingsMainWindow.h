@@ -40,7 +40,7 @@ public:
 	SettingsMainWindow(BattleInterface * parentBattleInterface = nullptr);
 
 	void close(); //TODO: copypaste of WindowBase::close(), consider changing Windowbase to IWindowbase with default close() implementation and changing WindowBase inheritance to CIntObject + IWindowBase
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 	void onScreenResize() override;
 };
 

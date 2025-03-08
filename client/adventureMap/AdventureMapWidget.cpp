@@ -391,7 +391,7 @@ void CAdventureMapIcon::setPlayerColor(const PlayerColor & player)
 	image->setFrame(index + player.getNum() * iconsPerPlayer);
 }
 
-void CAdventureMapOverlayWidget::show(Canvas & to)
+void CAdventureMapOverlayWidget::show(ICanvas & to)
 {
 	CIntObject::showAll(to);
 }

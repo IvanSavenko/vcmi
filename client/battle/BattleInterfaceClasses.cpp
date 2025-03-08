@@ -26,7 +26,7 @@
 #include "../gui/MouseButton.h"
 #include "../gui/WindowHandler.h"
 #include "../media/IMusicPlayer.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IImage.h"
 #include "../render/IFont.h"
 #include "../render/Graphics.h"
@@ -61,7 +61,7 @@
 #include "../../lib/json/JsonUtils.h"
 
 
-void BattleConsole::showAll(Canvas & to)
+void BattleConsole::showAll(ICanvas & to)
 {
 	CIntObject::showAll(to);
 
@@ -270,7 +270,7 @@ void BattleHero::tick(uint32_t msPassed)
 	}
 }
 
-void BattleHero::render(Canvas & canvas)
+void BattleHero::render(ICanvas & canvas)
 {
 	size_t groupIndex = static_cast<size_t>(phase);
 
@@ -529,7 +529,7 @@ void QuickSpellPanel::create()
 	}
 }
 
-void QuickSpellPanel::show(Canvas & to)
+void QuickSpellPanel::show(ICanvas & to)
 {
 	showAll(to);
 	CIntObject::show(to);
@@ -602,7 +602,7 @@ void HeroInfoBasicPanel::update(const InfoAboutHero & updatedInfo)
 	initializeData(updatedInfo);
 }
 
-void HeroInfoBasicPanel::show(Canvas & to)
+void HeroInfoBasicPanel::show(ICanvas & to)
 {
 	showAll(to);
 	CIntObject::show(to);
@@ -716,7 +716,7 @@ void StackInfoBasicPanel::update(const CStack * updatedInfo)
 	initializeData(updatedInfo);
 }
 
-void StackInfoBasicPanel::show(Canvas & to)
+void StackInfoBasicPanel::show(ICanvas & to)
 {
 	showAll(to);
 	CIntObject::show(to);
@@ -1001,7 +1001,7 @@ StackQueue::StackQueue(bool Embedded, BattleInterface & owner)
 	}
 }
 
-void StackQueue::show(Canvas & to)
+void StackQueue::show(ICanvas & to)
 {
 	if (embedded)
 		showAll(to);
@@ -1149,7 +1149,7 @@ bool StackQueue::StackBox::isBoundUnitHighlighted() const
 	return vstd::contains(unitIdsToHighlight, getBoundUnitID());
 }
 
-void StackQueue::StackBox::showAll(Canvas & to)
+void StackQueue::StackBox::showAll(ICanvas & to)
 {
 	CIntObject::showAll(to);
 
@@ -1157,7 +1157,7 @@ void StackQueue::StackBox::showAll(Canvas & to)
 		to.drawBorder(background->pos, Colors::CYAN, 2);
 }
 
-void StackQueue::StackBox::show(Canvas & to)
+void StackQueue::StackBox::show(ICanvas & to)
 {
 	CIntObject::show(to);
 

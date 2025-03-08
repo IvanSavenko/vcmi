@@ -38,7 +38,7 @@ class TurnTimerWidget : public CIntObject
 
 	void updateTimer(PlayerColor player, uint32_t msPassed);
 
-	void show(Canvas & to) override;
+	void show(ICanvas & to) override;
 	void tick(uint32_t msPassed) override;
 	
 	void updateNotifications(PlayerColor player, int timeMs);

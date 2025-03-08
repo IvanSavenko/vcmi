@@ -47,8 +47,8 @@ public:
 	void addMessage(const std::string & timeFormatted, const std::string & senderName, const std::string & messageText);
 
 	void tick(uint32_t msPassed) override;
-	void show(Canvas & to) override;
-	void showAll(Canvas & to) override;
+	void show(ICanvas & to) override;
+	void showAll(ICanvas & to) override;
 	void keyPressed(EShortcut key) override;
 	void textInputted(const std::string & enteredText) override;
 	void textEdited(const std::string & enteredText) override;

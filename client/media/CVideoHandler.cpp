@@ -17,7 +17,7 @@
 #include "../CMT.h"
 #include "../eventsSDL/InputHandler.h"
 #include "../GameEngine.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IScreenHandler.h"
 #include "../renderSDL/SDL_Extensions.h"
 

@@ -155,7 +155,7 @@ private:
 	std::shared_ptr<CCreatureAnim> anim; //displayed animation
 	std::shared_ptr<CLabel> amount;
 
-	void show(Canvas & to) override;
+	void show(ICanvas & to) override;
 public:
 	CCreaturePic(int x, int y, const CCreature * cre, bool Big=true, bool Animated=true);
 	void setAmount(int newAmount);
@@ -166,7 +166,7 @@ class CreatureTooltip : public CIntObject
 	std::shared_ptr<CAnimImage> creatureImage;
 	std::shared_ptr<CTextBox> tooltipTextbox;
 
-	void show(Canvas & to) override;
+	void show(ICanvas & to) override;
 public:
 	CreatureTooltip(Point pos, const CGCreature * creature);
 };
@@ -178,8 +178,8 @@ class CMinorResDataBar : public CIntObject
 
 	std::string buildDateString();
 public:
-	void show(Canvas & to) override;
-	void showAll(Canvas & to) override;
+	void show(ICanvas & to) override;
+	void showAll(ICanvas & to) override;
 	CMinorResDataBar();
 	~CMinorResDataBar();
 };

@@ -146,7 +146,7 @@ void CInfoWindow::close()
 		GAME->interface()->showingDialog->setFree();
 }
 
-void CInfoWindow::showAll(Canvas & to)
+void CInfoWindow::showAll(ICanvas & to)
 {
 	CIntObject::showAll(to);
 	CMessage::drawBorder(GAME->interface() ? GAME->interface()->playerID : PlayerColor(1), to, pos.w+28, pos.h+29, pos.x-14, pos.y-15);

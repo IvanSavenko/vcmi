@@ -23,7 +23,7 @@
 #include "../render/IImage.h"
 #include "../render/IScreenHandler.h"
 #include "../render/IRenderHandler.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/CanvasImage.h"
 
 #include "../CPlayerInterface.h"
@@ -32,8 +32,6 @@
 
 #include "../../lib/CConfigHandler.h"
 #include "../../lib/texts/CGeneralTextHandler.h" //for Unicode related stuff
-
-#include <SDL_surface.h>
 
 CWindowObject::CWindowObject(int options_, const ImagePath & imageName, Point centerAt):
 	WindowBase(0, Point()),
@@ -157,9 +155,9 @@ void CWindowObject::setShadow(bool on)
 		auto imageRight  = ENGINE->renderHandler().createImage(sizeRight,  CanvasScalingPolicy::AUTO);
 		auto imageBottom = ENGINE->renderHandler().createImage(sizeBottom, CanvasScalingPolicy::AUTO);
 
-		Canvas canvasCorner = imageCorner->getCanvas();
-		Canvas canvasRight = imageRight->getCanvas();
-		Canvas canvasBottom = imageBottom->getCanvas();
+		CanvasSoftware canvasCorner = imageCorner->getCanvas();
+		CanvasSoftware canvasRight = imageRight->getCanvas();
+		CanvasSoftware canvasBottom = imageBottom->getCanvas();
 
 		canvasCorner.drawColor(Rect(Point(0,0), sizeCorner), { 0, 0, 0, 128 });
 		canvasRight.drawColor(Rect(Point(0,0), sizeRight), { 0, 0, 0, 128 });
@@ -181,7 +179,7 @@ void CWindowObject::setShadow(bool on)
 	}
 }
 
-void CWindowObject::showAll(Canvas & to)
+void CWindowObject::showAll(ICanvas & to)
 {
 	auto color = GAME->interface() ? GAME->interface()->playerID : PlayerColor(1);
 	if(settings["session"]["spectate"].Bool())

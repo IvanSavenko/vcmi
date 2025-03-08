@@ -35,7 +35,6 @@ class CPlayerBattleCallback;
 VCMI_LIB_NAMESPACE_END
 
 class BattleHero;
-class Canvas;
 class BattleResultWindow;
 class StackQueue;
 class CPlayerInterface;
@@ -168,7 +167,7 @@ public:
 
 	const CGHeroInstance *getActiveHero(); //returns hero that can currently cast a spell
 
-	void showInterface(Canvas & to);
+	void showInterface(ICanvas & to);
 
 	void setHeroAnimation(BattleSide side, EHeroAnimType phase);
 

@@ -13,7 +13,7 @@
 #include "MapViewModel.h"
 
 #include "../../lib/logging/VisualLogger.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/Colors.h"
 #include "../render/EFont.h"
 #include "../render/IFont.h"
@@ -24,7 +24,7 @@
 #include "../GameEngine.h"
 
 
-MapOverlayLogVisualizer::MapOverlayLogVisualizer(Canvas & target, std::shared_ptr<MapViewModel> model)
+MapOverlayLogVisualizer::MapOverlayLogVisualizer(ICanvas & target, std::shared_ptr<MapViewModel> model)
 	: target(target), model(model)
 {
 }

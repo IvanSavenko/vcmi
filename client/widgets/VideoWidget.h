@@ -46,8 +46,8 @@ public:
 
 	void activate() override;
 	void deactivate() override;
-	void show(Canvas & to) override;
-	void showAll(Canvas & to) override;
+	void show(ICanvas & to) override;
+	void showAll(ICanvas & to) override;
 	void tick(uint32_t msPassed) override;
 
 	void setPlaybackFinishedCallback(std::function<void()>);

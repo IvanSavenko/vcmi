@@ -20,7 +20,7 @@
 #include "../CPlayerInterface.h"
 #include "../GameEngine.h"
 #include "../media/ISoundPlayer.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IImage.h"
 #include "../render/IRenderHandler.h"
 
@@ -108,7 +108,7 @@ ImagePath BattleSiegeController::getWallPieceImageName(EWallVisual::EWallVisual 
 	}
 }
 
-void BattleSiegeController::showWallPiece(Canvas & canvas, EWallVisual::EWallVisual what)
+void BattleSiegeController::showWallPiece(ICanvas & canvas, EWallVisual::EWallVisual what)
 {
 	auto & ci = town->getTown()->clientInfo;
 	auto const & pos = ci.siegePositions[what];
@@ -260,7 +260,7 @@ void BattleSiegeController::gateStateChanged(const EGateState state)
 		ENGINE->sound().playSound(soundBase::DRAWBRG);
 }
 
-void BattleSiegeController::showAbsoluteObstacles(Canvas & canvas)
+void BattleSiegeController::showAbsoluteObstacles(ICanvas & canvas)
 {
 	if (getWallPieceExistence(EWallVisual::MOAT))
 		showWallPiece(canvas, EWallVisual::MOAT);

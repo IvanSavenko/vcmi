@@ -21,7 +21,7 @@
 #include "../GameEngine.h"
 #include "../media/ISoundPlayer.h"
 #include "../render/CAnimation.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IRenderHandler.h"
 
 #include "../../CCallback.h"
@@ -122,7 +122,7 @@ void BattleObstacleController::obstaclePlaced(const std::vector<std::shared_ptr<
 	}
 }
 
-void BattleObstacleController::showAbsoluteObstacles(Canvas & canvas)
+void BattleObstacleController::showAbsoluteObstacles(ICanvas & canvas)
 {
 	//Blit absolute obstacles
 	for(auto & obstacle : owner.getBattle()->battleGetAllObstacles())

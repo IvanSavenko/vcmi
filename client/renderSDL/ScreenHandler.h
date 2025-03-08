@@ -116,7 +116,7 @@ public:
 
 	int getInterfaceScalingPercentage() const final;
 
-	Canvas getScreenCanvas() const final;
+	ICanvas & getScreenCanvas() const final;
 	void updateScreenTexture() final;
 	void presentScreenTexture() final;
 

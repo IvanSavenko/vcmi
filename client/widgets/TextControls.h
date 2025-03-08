@@ -26,7 +26,7 @@ protected:
 	/// returns size of border, for left- or right-aligned text
 	virtual Point getBorderSize() = 0;
 	/// do actual blitting of line. Text "what" will be placed at "where" and aligned according to alignment
-	void blitLine(Canvas & to, Rect where, std::string what);
+	void blitLine(ICanvas & to, Rect where, std::string what);
 
 	CTextContainer(ETextAlignment alignment, EFonts font, ColorRGBA color);
 
@@ -61,7 +61,7 @@ public:
 
 	CLabel(int x = 0, int y = 0, EFonts Font = FONT_SMALL, ETextAlignment Align = ETextAlignment::TOPLEFT,
 		const ColorRGBA & Color = Colors::WHITE, const std::string & Text = "", int maxWidth = 0);
-	void showAll(Canvas & to) override; //shows statusbar (with current text)
+	void showAll(ICanvas & to) override; //shows statusbar (with current text)
 };
 
 /// Small helper class to manage group of similar labels
@@ -97,7 +97,7 @@ public:
 
 	void setText(const std::string & Txt) override;
 	std::vector<std::string> getLines();
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 
 	void setVisibleSize(Rect visibleSize, bool redrawElement = true);
 	// scrolls text visible in widget. Positive value will move text up
@@ -157,7 +157,7 @@ public:
 		return ret;
 	}
 
-	void show(Canvas & to) override;
+	void show(ICanvas & to) override;
 	void activate() override;
 	void deactivate() override;
 

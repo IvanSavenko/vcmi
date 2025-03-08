@@ -15,7 +15,7 @@
 struct SDL_Surface;
 class CInfoWindow;
 class CComponent;
-class Canvas;
+class ICanvas;
 
 VCMI_LIB_NAMESPACE_BEGIN
 class ColorRGBA;
@@ -29,7 +29,7 @@ class CMessage
 
 public:
 	/// Draw border on exiting surface
-	static void drawBorder(PlayerColor playerColor, Canvas & to, int w, int h, int x, int y);
+	static void drawBorder(PlayerColor playerColor, ICanvas & to, int w, int h, int x, int y);
 
 	static void drawIWindow(CInfoWindow * ret, std::string text, PlayerColor player);
 

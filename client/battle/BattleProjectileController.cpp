@@ -16,7 +16,7 @@
 #include "CreatureAnimation.h"
 
 #include "../render/CAnimation.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IRenderHandler.h"
 #include "../GameEngine.h"
 
@@ -45,7 +45,7 @@ static double calculateCatapultParabolaY(const Point & from, const Point & dest,
 	return facA *pow(x, 2.0) + facB *x + facC;
 }
 
-void ProjectileMissile::show(Canvas & canvas)
+void ProjectileMissile::show(ICanvas & canvas)
 {
 	size_t group = reverse ? 1 : 0;
 	auto image = animation->getImage(frameNum, group, true);
@@ -85,7 +85,7 @@ void ProjectileCatapult::tick(uint32_t msPassed)
 	progress += timePassed * speed;
 }
 
-void ProjectileCatapult::show(Canvas & canvas)
+void ProjectileCatapult::show(ICanvas & canvas)
 {
 	int frameCounter = std::floor(frameProgress);
 	int frameIndex = (frameCounter + 1) % animation->size(0);
@@ -102,7 +102,7 @@ void ProjectileCatapult::show(Canvas & canvas)
 	}
 }
 
-void ProjectileRay::show(Canvas & canvas)
+void ProjectileRay::show(ICanvas & canvas)
 {
 	Point curr {
 		vstd::lerp(from.x, dest.x, progress),
@@ -226,7 +226,7 @@ void BattleProjectileController::emitStackProjectile(const CStack * stack)
 	}
 }
 
-void BattleProjectileController::render(Canvas & canvas)
+void BattleProjectileController::render(ICanvas & canvas)
 {
 	for ( auto projectile: projectiles)
 	{

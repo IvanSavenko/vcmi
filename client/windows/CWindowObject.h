@@ -50,7 +50,7 @@ public:
 	CWindowObject(int options = 0, const ImagePath & imageName = {});
 	~CWindowObject();
 
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 };
 
 class CStatusbarWindow : virtual public CWindowObject

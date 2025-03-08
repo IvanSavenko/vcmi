@@ -22,7 +22,7 @@
 #include "../GameEngine.h"
 #include "../GameInstance.h"
 #include "../render/CAnimation.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IImage.h"
 #include "../eventsSDL/InputHandler.h"
 
@@ -58,13 +58,13 @@ BasicMapView::BasicMapView(const Point & offset, const Point & dimensions)
 	pos.h = dimensions.y;
 }
 
-void BasicMapView::render(Canvas & target, bool fullUpdate)
+void BasicMapView::render(ICanvas & target, bool fullUpdate)
 {
-	Canvas targetClipped(target, pos);
+	CanvasViewGuard targetClipped(target, pos);
 	tilesCache->update(controller->getContext());
-	tilesCache->render(controller->getContext(), targetClipped, fullUpdate);
+	tilesCache->render(controller->getContext(), target, fullUpdate);
 
-	MapOverlayLogVisualizer r(targetClipped, model);
+	MapOverlayLogVisualizer r(target, model);
 	logVisual->visualize(r);
 }
 
@@ -73,17 +73,17 @@ void BasicMapView::tick(uint32_t msPassed)
 	controller->tick(msPassed);
 }
 
-void BasicMapView::show(Canvas & to)
+void BasicMapView::show(ICanvas & to)
 {
-	CanvasClipRectGuard guard(to, pos);
+	CanvasClipGuard guard(to, pos);
 	render(to, false);
 
 	controller->afterRender();
 }
 
-void BasicMapView::showAll(Canvas & to)
+void BasicMapView::showAll(ICanvas & to)
 {
-	CanvasClipRectGuard guard(to, pos);
+	CanvasClipGuard guard(to, pos);
 	render(to, true);
 }
 
@@ -95,7 +95,7 @@ void MapView::tick(uint32_t msPassed)
 	BasicMapView::tick(msPassed);
 }
 
-void MapView::show(Canvas & to)
+void MapView::show(ICanvas & to)
 {
 	actions->setContext(controller->getContext());
 	BasicMapView::show(to);

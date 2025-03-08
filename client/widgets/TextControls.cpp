@@ -20,7 +20,7 @@
 #include "../windows/InfoWindows.h"
 #include "../adventureMap/CInGameConsole.h"
 #include "../eventsSDL/InputHandler.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/Graphics.h"
 #include "../render/IFont.h"
 #include "../render/IRenderHandler.h"
@@ -36,7 +36,7 @@ std::string CLabel::visibleText()
 	return text;
 }
 
-void CLabel::showAll(Canvas & to)
+void CLabel::showAll(ICanvas & to)
 {
 	CIntObject::showAll(to);
 
@@ -182,7 +182,7 @@ std::vector<std::string> CMultiLineLabel::getLines()
 	return lines;
 }
 
-void CTextContainer::blitLine(Canvas & to, Rect destRect, std::string what)
+void CTextContainer::blitLine(ICanvas & to, Rect destRect, std::string what)
 {
 	const auto f = ENGINE->renderHandler().loadFont(font);
 	Point where = destRect.topLeft();
@@ -273,7 +273,7 @@ CTextContainer::CTextContainer(ETextAlignment alignment, EFonts font, ColorRGBA 
 {
 }
 
-void CMultiLineLabel::showAll(Canvas & to)
+void CMultiLineLabel::showAll(ICanvas & to)
 {
 	CIntObject::showAll(to);
 
@@ -299,7 +299,7 @@ void CMultiLineLabel::showAll(Canvas & to)
 	Point lineStart = getTextLocation().topLeft() - visibleSize + Point(0, beginLine * fontPtr->getLineHeight());
 	Point lineSize = Point(getTextLocation().w, fontPtr->getLineHeight());
 
-	CanvasClipRectGuard guard(to, getTextLocation()); // to properly trim text that is too big to fit
+	CanvasClipGuard guard(to, getTextLocation()); // to properly trim text that is too big to fit
 
 	for(int i = beginLine; i < std::min(totalLines, endLine); i++)
 	{
@@ -540,7 +540,7 @@ CGStatusBar::~CGStatusBar()
 	assert(ENGINE->statusbar().get() != this);
 }
 
-void CGStatusBar::show(Canvas & to)
+void CGStatusBar::show(ICanvas & to)
 {
 	showAll(to);
 }

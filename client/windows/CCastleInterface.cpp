@@ -34,7 +34,7 @@
 #include "../widgets/TextControls.h"
 #include "../widgets/RadialMenu.h"
 #include "../widgets/CExchangeController.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IImage.h"
 #include "../render/IRenderHandler.h"
 #include "../render/CAnimation.h"
@@ -174,7 +174,7 @@ void CBuildingRect::showPopupWindow(const Point & cursorPosition)
 	}
 }
 
-void CBuildingRect::show(Canvas & to)
+void CBuildingRect::show(ICanvas & to)
 {
 	uint32_t stageDelay = BUILDING_APPEAR_TIMEPOINT;
 
@@ -224,7 +224,7 @@ void CBuildingRect::tick(uint32_t msPassed)
 	stateTimeCounter += msPassed;
 }
 
-void CBuildingRect::showAll(Canvas & to)
+void CBuildingRect::showAll(ICanvas & to)
 {
 	if (stateTimeCounter == 0)
 		return;
@@ -730,7 +730,7 @@ void CCastleBuildings::recreate()
 	boost::sort(children, buildSorter); //TODO: create building in blit order
 }
 
-void CCastleBuildings::drawOverlays(Canvas & to, std::vector<std::shared_ptr<CBuildingRect>> buildingRects)
+void CCastleBuildings::drawOverlays(ICanvas & to, std::vector<std::shared_ptr<CBuildingRect>> buildingRects)
 {
 	std::vector<Rect> textRects;
 	for(auto & buildingRect : buildingRects)
@@ -769,7 +769,7 @@ void CCastleBuildings::drawOverlays(Canvas & to, std::vector<std::shared_ptr<CBu
 	}
 }
 
-void CCastleBuildings::show(Canvas & to)
+void CCastleBuildings::show(ICanvas & to)
 {
 	CIntObject::show(to);
 

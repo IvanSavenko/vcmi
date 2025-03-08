@@ -12,7 +12,6 @@
 #include "../../lib/logging/VisualLogger.h"
 #include "BattleRenderer.h"
 
-class Canvas;
 class BattleInterface;
 
 class BattleOverlayLogVisualizer : public IBattleOverlayLogVisualizer

@@ -30,7 +30,7 @@ class GraphicalPrimitiveCanvas : public CIntObject
 
 	std::vector<PrimitiveEntry> primitives;
 
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 
 public:
 	GraphicalPrimitiveCanvas(Rect position);

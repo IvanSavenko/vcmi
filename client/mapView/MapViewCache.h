@@ -17,10 +17,11 @@ VCMI_LIB_NAMESPACE_END
 
 class IImage;
 class CAnimation;
-class Canvas;
 class MapRenderer;
 class IMapRendererContext;
 class MapViewModel;
+class CanvasSoftware;
+class ICanvas;
 
 /// Class responsible for rendering of entire map view
 /// uses rendering parameters provided by owner class
@@ -48,14 +49,13 @@ class MapViewCache
 
 	std::shared_ptr<MapViewModel> model;
 
-	std::unique_ptr<Canvas> terrain;
-	std::unique_ptr<Canvas> terrainTransition;
-	std::unique_ptr<Canvas> intermediate;
+	std::unique_ptr<CanvasSoftware> terrain;
+	std::unique_ptr<CanvasSoftware> terrainTransition;
+	std::unique_ptr<CanvasSoftware> intermediate;
 	std::unique_ptr<MapRenderer> mapRenderer;
 
 	std::shared_ptr<CAnimation> iconsStorage;
 
-	Canvas getTile(const int3 & coordinates);
 	void updateTile(const std::shared_ptr<IMapRendererContext> & context, const int3 & coordinates);
 
 	std::shared_ptr<IImage> getOverlayImageForTile(const std::shared_ptr<IMapRendererContext> & context, const int3 & coordinates);
@@ -71,7 +71,7 @@ public:
 	void update(const std::shared_ptr<IMapRendererContext> & context);
 
 	/// renders updated terrain cache onto provided canvas
-	void render(const std::shared_ptr<IMapRendererContext> & context, Canvas & target, bool fullRedraw);
+	void render(const std::shared_ptr<IMapRendererContext> & context, ICanvas & target, bool fullRedraw);
 
 	/// creates snapshot of current view and stores it into internal canvas
 	/// used for view transition, e.g. Dimension Door spell or teleporters (Subterra gates / Monolith)

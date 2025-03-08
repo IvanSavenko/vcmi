@@ -23,10 +23,10 @@ class Point;
 
 VCMI_LIB_NAMESPACE_END
 
-class Canvas;
 class BattleInterface;
 class BattleRenderer;
 class IImage;
+class ICanvas;
 
 namespace EWallVisual
 {
@@ -85,7 +85,7 @@ class BattleSiegeController
 	/// returns true if chosen wall piece should be present in current battle
 	bool getWallPieceExistence(EWallVisual::EWallVisual what) const;
 
-	void showWallPiece(Canvas & canvas, EWallVisual::EWallVisual what);
+	void showWallPiece(ICanvas & canvas, EWallVisual::EWallVisual what);
 
 	BattleHex getTurretBattleHex(EWallVisual::EWallVisual wallPiece) const;
 	const CStack * getTurretStack(EWallVisual::EWallVisual wallPiece) const;
@@ -98,7 +98,7 @@ public:
 	void stackIsCatapulting(const CatapultAttack & ca);
 
 	/// call-ins from other battle controllers
-	void showAbsoluteObstacles(Canvas & canvas);
+	void showAbsoluteObstacles(ICanvas & canvas);
 	void collectRenderableObjects(BattleRenderer & renderer);
 
 	/// queries from other battle controllers

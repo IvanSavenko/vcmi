@@ -25,7 +25,7 @@
 #include "../../GameEngine.h"
 #include "../../GameInstance.h"
 #include "gui/WindowHandler.h"
-#include "render/Canvas.h"
+#include "render/ICanvas.h"
 #include "lobby/CSavingScreen.h"
 #include "widgets/Buttons.h"
 #include "widgets/Images.h"
@@ -177,7 +177,7 @@ void SettingsMainWindow::restartGameButtonCallback()
 	);
 }
 
-void SettingsMainWindow::showAll(Canvas & to)
+void SettingsMainWindow::showAll(ICanvas & to)
 {
 	auto color = GAME->interface() ? GAME->interface()->playerID : PlayerColor(1);
 	if(settings["session"]["spectate"].Bool())

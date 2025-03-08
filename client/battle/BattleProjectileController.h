@@ -21,14 +21,14 @@ class CSpell;
 VCMI_LIB_NAMESPACE_END
 
 class CAnimation;
-class Canvas;
 class BattleInterface;
+class ICanvas;
 
 /// Base class for projectiles
 struct ProjectileBase
 {
 	virtual ~ProjectileBase() = default;
-	virtual void show(Canvas & canvas) =  0;
+	virtual void show(ICanvas & canvas) =  0;
 	virtual void tick(uint32_t msPassed) = 0;
 
 	Point from; // initial position on the screen
@@ -43,7 +43,7 @@ struct ProjectileBase
 /// Projectile for most shooters - render pre-selected frame moving in straight line from origin to destination
 struct ProjectileMissile : ProjectileBase
 {
-	void show(Canvas & canvas) override;
+	void show(ICanvas & canvas) override;
 	void tick(uint32_t msPassed) override;
 
 	std::shared_ptr<CAnimation> animation;
@@ -61,7 +61,7 @@ struct ProjectileAnimatedMissile : ProjectileMissile
 /// Projectile for catapult - render spinning projectile moving at parabolic trajectory to its destination
 struct ProjectileCatapult : ProjectileBase
 {
-	void show(Canvas & canvas) override;
+	void show(ICanvas & canvas) override;
 	void tick(uint32_t msPassed) override;
 
 	std::shared_ptr<CAnimation> animation;
@@ -71,7 +71,7 @@ struct ProjectileCatapult : ProjectileBase
 /// Projectile for mages/evil eye - render ray expanding from origin position to destination
 struct ProjectileRay : ProjectileBase
 {
-	void show(Canvas & canvas) override;
+	void show(ICanvas & canvas) override;
 	void tick(uint32_t msPassed) override;
 
 	std::vector<CCreature::CreatureAnimation::RayColor> rayConfig;
@@ -96,7 +96,7 @@ class BattleProjectileController
 	bool stackUsesRayProjectile(const CStack * stack) const;
 	bool stackUsesMissileProjectile(const CStack * stack) const;
 
-	void showProjectile(Canvas & canvas, std::shared_ptr<ProjectileBase> projectile);
+	void showProjectile(ICanvas & canvas, std::shared_ptr<ProjectileBase> projectile);
 
 	const CCreature & getShooter(const CStack * stack) const;
 
@@ -107,7 +107,7 @@ public:
 	BattleProjectileController(BattleInterface & owner);
 
 	/// renders all currently active projectiles
-	void render(Canvas & canvas);
+	void render(ICanvas & canvas);
 
 	/// updates positioning / animations of all projectiles
 	void tick(uint32_t msPassed);

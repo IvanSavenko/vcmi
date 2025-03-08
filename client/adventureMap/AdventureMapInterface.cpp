@@ -30,7 +30,7 @@
 #include "../GameInstance.h"
 #include "../gui/Shortcut.h"
 #include "../gui/WindowHandler.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IImage.h"
 #include "../render/IRenderHandler.h"
 #include "../render/IScreenHandler.h"
@@ -155,21 +155,21 @@ void AdventureMapInterface::deactivate()
 		GAME->interface()->cingconsole->deactivate();
 }
 
-void AdventureMapInterface::showAll(Canvas & to)
+void AdventureMapInterface::showAll(ICanvas & to)
 {
 	CIntObject::showAll(to);
 	dim(to);
 	GAME->interface()->cingconsole->show(to);
 }
 
-void AdventureMapInterface::show(Canvas & to)
+void AdventureMapInterface::show(ICanvas & to)
 {
 	CIntObject::show(to);
 	dim(to);
 	GAME->interface()->cingconsole->show(to);
 }
 
-void AdventureMapInterface::dim(Canvas & to)
+void AdventureMapInterface::dim(ICanvas & to)
 {
 	auto const isBigWindow = [&](std::shared_ptr<CIntObject> window) { return window->pos.w >= 800 && window->pos.h >= 600; }; // OH3 fullscreen
 

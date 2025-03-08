@@ -24,7 +24,7 @@
 #include "media/CEmptyVideoPlayer.h"
 
 #include "adventureMap/AdventureMapInterface.h"
-#include "render/Canvas.h"
+#include "render/ICanvas.h"
 #include "render/Colors.h"
 #include "render/IFont.h"
 #include "render/EFont.h"
@@ -35,8 +35,6 @@
 
 #include "../lib/AsyncRunner.h"
 #include "../lib/CConfigHandler.h"
-
-#include <SDL_render.h>
 
 std::unique_ptr<GameEngine> ENGINE;
 
@@ -186,7 +184,7 @@ Point GameEngine::screenDimensions() const
 
 void GameEngine::drawFPSCounter()
 {
-	Canvas target = screenHandler().getScreenCanvas();
+	ICanvas & target = screenHandler().getScreenCanvas();
 	Rect targetArea(0, screenDimensions().y - 20, 48, 11);
 	std::string fps = std::to_string(framerate().getFramerate())+" FPS";
 

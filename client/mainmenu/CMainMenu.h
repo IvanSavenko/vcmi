@@ -58,7 +58,7 @@ public:
 	CMenuScreen(const JsonNode & configNode);
 
 	void activate() override;
-	void show(Canvas & to) override;
+	void show(ICanvas & to) override;
 
 	void switchToTab(size_t index);
 	void switchToTab(std::string name);

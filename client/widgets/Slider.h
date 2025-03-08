@@ -76,7 +76,7 @@ public:
 	void clickReleased(const Point & cursorPosition) override;
 	void mouseDragged(const Point & cursorPosition, const Point & lastUpdateDistance) override;
 	void gesturePanning(const Point & initialPosition, const Point & currentPosition, const Point & lastUpdateDistance) override;
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 
 	using SliderMovingFunctor = std::function<void(int)>;
 

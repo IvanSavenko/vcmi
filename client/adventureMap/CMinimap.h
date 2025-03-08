@@ -15,12 +15,12 @@ VCMI_LIB_NAMESPACE_BEGIN
 class ColorRGBA;
 VCMI_LIB_NAMESPACE_END
 
-class Canvas;
+class CanvasSoftware;
 class CMinimap;
 
 class CMinimapInstance : public CIntObject
 {
-	std::unique_ptr<Canvas> minimap;
+	std::unique_ptr<CanvasSoftware> minimap;
 	int level;
 
 	//get color of selected tile on minimap
@@ -31,7 +31,7 @@ public:
 	CMinimapInstance(const Point & position, const Point & dimensions, int level);
 	~CMinimapInstance();
 
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 	void refreshTile(const int3 & pos);
 };
 
@@ -66,7 +66,7 @@ public:
 	void update();
 	void setAIRadar(bool on);
 
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 
 	void updateTiles(const std::unordered_set<int3> & positions);
 };

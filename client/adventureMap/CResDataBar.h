@@ -35,6 +35,6 @@ public:
 	void setResourcePosition(const GameResID & resource, const Point & position);
 
 	void setPlayerColor(PlayerColor player);
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 };
 

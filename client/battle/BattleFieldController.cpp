@@ -23,9 +23,10 @@
 
 #include "../CPlayerInterface.h"
 #include "../render/CAnimation.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IImage.h"
 #include "../render/IRenderHandler.h"
+#include "../renderSDL/CanvasSoftware.h"
 #include "../GameEngine.h"
 #include "../GameInstance.h"
 #include "../gui/CursorHandler.h"
@@ -141,7 +142,7 @@ BattleFieldController::BattleFieldController(BattleInterface & owner):
 	pos.w = background->width();
 	pos.h = background->height();
 
-	backgroundWithHexes = std::make_unique<Canvas>(Point(background->width(), background->height()), CanvasScalingPolicy::AUTO);
+	backgroundWithHexes = std::make_unique<CanvasSoftware>(Point(background->width(), background->height()), CanvasScalingPolicy::AUTO);
 
 	updateAccessibleHexes();
 	addUsedEvents(LCLICK | SHOW_POPUP | MOVE | TIME | GESTURE);
@@ -213,20 +214,20 @@ void BattleFieldController::showPopupWindow(const Point & cursorPosition)
 		owner.actionsController->onHexRightClicked(selectedHex);
 }
 
-void BattleFieldController::renderBattlefield(Canvas & canvas)
+void BattleFieldController::renderBattlefield(ICanvas & canvas)
 {
-	Canvas clippedCanvas(canvas, pos);
+	CanvasViewGuard(canvas, pos);
 
-	showBackground(clippedCanvas);
+	showBackground(canvas);
 
 	BattleRenderer renderer(owner);
 
-	renderer.execute(clippedCanvas);
+	renderer.execute(canvas);
 
-	owner.projectilesController->render(clippedCanvas);
+	owner.projectilesController->render(canvas);
 }
 
-void BattleFieldController::showBackground(Canvas & canvas)
+void BattleFieldController::showBackground(ICanvas & canvas)
 {
 	if (owner.stacksController->getActiveStack() != nullptr )
 		showBackgroundImageWithHexes(canvas);
@@ -236,7 +237,7 @@ void BattleFieldController::showBackground(Canvas & canvas)
 	showHighlightedHexes(canvas);
 }
 
-void BattleFieldController::showBackgroundImage(Canvas & canvas)
+void BattleFieldController::showBackgroundImage(ICanvas & canvas)
 {
 	canvas.draw(background, Point(0, 0));
 
@@ -258,7 +259,7 @@ void BattleFieldController::showBackgroundImage(Canvas & canvas)
 	}
 }
 
-void BattleFieldController::showBackgroundImageWithHexes(Canvas & canvas)
+void BattleFieldController::showBackgroundImageWithHexes(ICanvas & canvas)
 {
 	canvas.draw(*backgroundWithHexes, Point(0, 0));
 }
@@ -302,7 +303,7 @@ void BattleFieldController::redrawBackgroundWithHexes()
 	}
 }
 
-void BattleFieldController::showHighlightedHex(Canvas & canvas, std::shared_ptr<IImage> highlight, const BattleHex & hex, bool darkBorder)
+void BattleFieldController::showHighlightedHex(ICanvas & canvas, std::shared_ptr<IImage> highlight, const BattleHex & hex, bool darkBorder)
 {
 	Point hexPos = hexPositionLocal(hex).topLeft();
 
@@ -520,7 +521,7 @@ void BattleFieldController::calculateRangeLimitAndHighlightImages(uint8_t distan
 		rangeLimitHexesHighlights = calculateRangeLimitHighlightImages(rangeLimitNeighbourDirections, rangeLimitImages);
 }
 
-void BattleFieldController::showHighlightedHexes(Canvas & canvas)
+void BattleFieldController::showHighlightedHexes(ICanvas & canvas)
 {
 	BattleHexArray rangedFullDamageLimitHexes;
 	BattleHexArray shootingRangeLimitHexes;
@@ -836,7 +837,7 @@ bool BattleFieldController::stackCountOutsideHex(const BattleHex & number) const
 	return stackCountOutsideHexes[number.toInt()];
 }
 
-void BattleFieldController::showAll(Canvas & to)
+void BattleFieldController::showAll(ICanvas & to)
 {
 	show(to);
 }
@@ -849,9 +850,9 @@ void BattleFieldController::tick(uint32_t msPassed)
 	owner.projectilesController->tick(msPassed);
 }
 
-void BattleFieldController::show(Canvas & to)
+void BattleFieldController::show(ICanvas & to)
 {
-	CanvasClipRectGuard guard(to, pos);
+	CanvasClipGuard guard(to, pos);
 
 	renderBattlefield(to);
 

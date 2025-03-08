@@ -53,9 +53,9 @@ void CanvasImage::exportBitmap(const boost::filesystem::path & path) const
 	IMG_SavePNG(surface, path.string().c_str());
 }
 
-Canvas CanvasImage::getCanvas()
+CanvasSoftware CanvasImage::getCanvas()
 {
-	return Canvas::createFromSurface(surface, scalingPolicy);
+	return CanvasSoftware::createFromSurface(surface, scalingPolicy);
 }
 
 Rect CanvasImage::contentRect() const

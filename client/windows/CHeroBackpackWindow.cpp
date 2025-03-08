@@ -18,7 +18,7 @@
 #include "../widgets/Images.h"
 #include "../widgets/TextControls.h"
 #include "CMessage.h"
-#include "render/Canvas.h"
+#include "render/ICanvas.h"
 #include "CPlayerInterface.h"
 
 #include "../../CCallback.h"
@@ -84,7 +84,7 @@ void CHeroBackpackWindow::notFocusedClick()
 	close();
 }
 
-void CHeroBackpackWindow::showAll(Canvas & to)
+void CHeroBackpackWindow::showAll(ICanvas & to)
 {
 	CIntObject::showAll(to);
 	CMessage::drawBorder(PlayerColor(GAME->interface()->playerID), to, pos.w+28, pos.h+29, pos.x-14, pos.y-15);
@@ -130,7 +130,7 @@ void CHeroQuickBackpackWindow::notFocusedClick()
 	close();
 }
 
-void CHeroQuickBackpackWindow::showAll(Canvas & to)
+void CHeroQuickBackpackWindow::showAll(ICanvas & to)
 {
 	if(arts->getSlotsNum() == 0)
 	{

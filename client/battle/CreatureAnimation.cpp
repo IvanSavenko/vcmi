@@ -15,7 +15,7 @@
 
 #include "../GameEngine.h"
 #include "../render/CAnimation.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/ColorFilter.h"
 #include "../render/Colors.h"
 #include "../render/IRenderHandler.h"
@@ -325,7 +325,7 @@ static ColorRGBA genBorderColor(ui8 alpha, const ColorRGBA & base)
 	return ColorRGBA(base.r, base.g, base.b, ui8(base.a * alpha / 256));
 }
 
-void CreatureAnimation::nextFrame(Canvas & canvas, const ColorRGBA & effectColor, uint8_t transparency, bool facingRight)
+void CreatureAnimation::nextFrame(ICanvas & canvas, const ColorRGBA & effectColor, uint8_t transparency, bool facingRight)
 {
 	size_t frame = static_cast<size_t>(floor(currentFrame));
 

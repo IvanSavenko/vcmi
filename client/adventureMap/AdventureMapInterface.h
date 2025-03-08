@@ -92,7 +92,7 @@ private:
 	bool isValidAdventureSpellTarget(int3 targetPosition) const;
 
 	/// dim interface if some windows opened
-	void dim(Canvas & to);
+	void dim(ICanvas & to);
 
 protected:
 	/// CIntObject interface implementation
@@ -101,8 +101,8 @@ protected:
 	void deactivate() override;
 
 	void tick(uint32_t msPassed) override;
-	void show(Canvas & to) override;
-	void showAll(Canvas & to) override;
+	void show(ICanvas & to) override;
+	void showAll(ICanvas & to) override;
 
 	void keyPressed(EShortcut key) override;
 

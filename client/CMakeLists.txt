@@ -86,7 +86,6 @@ set(vcmiclientcommon_SRCS
 	render/CAnimation.cpp
 	render/CBitmapHandler.cpp
 	render/CDefFile.cpp
-	render/Canvas.cpp
 	render/CanvasImage.cpp
 	render/ColorFilter.cpp
 	render/Colors.cpp
@@ -94,6 +93,7 @@ set(vcmiclientcommon_SRCS
 	render/IFont.cpp
 	render/ImageLocator.cpp
 
+	renderSDL/CanvasSoftware.cpp
 	renderSDL/CBitmapFont.cpp
 	renderSDL/CTrueTypeFont.cpp
 	renderSDL/CursorHardware.cpp
@@ -291,7 +291,7 @@ set(vcmiclientcommon_HEADERS
 	render/CAnimation.h
 	render/CBitmapHandler.h
 	render/CDefFile.h
-	render/Canvas.h
+	render/ICanvas.h
 	render/CanvasImage.h
 	render/ColorFilter.h
 	render/Colors.h
@@ -305,6 +305,7 @@ set(vcmiclientcommon_HEADERS
 	render/IRenderHandler.h
 	render/IScreenHandler.h
 
+	renderSDL/CanvasSoftware.h
 	renderSDL/CBitmapFont.h
 	renderSDL/CTrueTypeFont.h
 	renderSDL/CursorHardware.h

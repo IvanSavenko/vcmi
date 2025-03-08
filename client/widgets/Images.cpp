@@ -16,7 +16,7 @@
 #include "../render/IImage.h"
 #include "../render/IRenderHandler.h"
 #include "../render/CAnimation.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/ColorFilter.h"
 #include "../render/Colors.h"
 
@@ -105,13 +105,13 @@ CPicture::CPicture(std::shared_ptr<IImage> image, const Rect &SrcRect, int x, in
 	addUsedEvents(SHOW_POPUP);
 }
 
-void CPicture::show(Canvas & to)
+void CPicture::show(ICanvas & to)
 {
 	if (needRefresh)
 		showAll(to);
 }
 
-void CPicture::showAll(Canvas & to)
+void CPicture::showAll(ICanvas & to)
 {
 	if(bg)
 	{
@@ -169,9 +169,9 @@ CFilledTexture::CFilledTexture(const ImagePath & imageName, Rect position, Rect 
 	pos.h = position.h;
 }
 
-void CFilledTexture::showAll(Canvas & to)
+void CFilledTexture::showAll(ICanvas & to)
 {
-	CanvasClipRectGuard guard(to, pos);
+	CanvasClipGuard guard(to, pos);
 
 	for (int y=pos.top(); y < pos.bottom(); y+= imageArea.h)
 	{
@@ -258,7 +258,7 @@ CAnimImage::~CAnimImage()
 {
 }
 
-void CAnimImage::showAll(Canvas & to)
+void CAnimImage::showAll(ICanvas & to)
 {
 	if(!visible)
 		return;
@@ -405,7 +405,7 @@ void CShowableAnim::clipRect(int posX, int posY, int width, int height)
 	pos.h = height;
 }
 
-void CShowableAnim::show(Canvas & to)
+void CShowableAnim::show(ICanvas & to)
 {
 	if ( flags & BASE )// && frame != first) // FIXME: results in graphical glytch in Fortress, upgraded hydra's dwelling
 		blitImage(first, group, to);
@@ -427,14 +427,14 @@ void CShowableAnim::tick(uint32_t msPassed)
 	}
 }
 
-void CShowableAnim::showAll(Canvas & to)
+void CShowableAnim::showAll(ICanvas & to)
 {
 	if ( flags & BASE )// && frame != first)
 		blitImage(first, group, to);
 	blitImage(frame, group, to);
 }
 
-void CShowableAnim::blitImage(size_t frame, size_t group, Canvas & to)
+void CShowableAnim::blitImage(size_t frame, size_t group, ICanvas & to)
 {
 	Rect src( xOffset, yOffset, pos.w, pos.h);
 	auto img = anim->getImage(frame, group);

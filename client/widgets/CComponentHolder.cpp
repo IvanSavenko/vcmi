@@ -17,7 +17,7 @@
 #include "CComponent.h"
 #include "Images.h"
 
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/Colors.h"
 #include "../render/IRenderHandler.h"
 #include "../CPlayerInterface.h"

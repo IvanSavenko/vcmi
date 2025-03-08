@@ -72,8 +72,8 @@ public:
 	void mouseMoved (const Point & cursorPosition, const Point & lastUpdateDistance) override;
 	bool receiveEvent(const Point & position, int eventType) const override;
 	void tick(uint32_t msPassed) override;
-	void show(Canvas & to) override;
-	void showAll(Canvas & to) override;
+	void show(ICanvas & to) override;
+	void showAll(ICanvas & to) override;
 };
 
 /// Dwelling info box - right-click screen for dwellings
@@ -162,8 +162,8 @@ class CCastleBuildings : public CIntObject
 
 	void recreate();
 
-	void drawOverlays(Canvas & to, std::vector<std::shared_ptr<CBuildingRect>> buildingRects);
-	void show(Canvas & to) override;
+	void drawOverlays(ICanvas & to, std::vector<std::shared_ptr<CBuildingRect>> buildingRects);
+	void show(ICanvas & to) override;
 public:
 	CBuildingRect * selectedBuilding;
 

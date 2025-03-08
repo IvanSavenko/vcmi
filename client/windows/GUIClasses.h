@@ -70,7 +70,7 @@ class CRecruitmentWindow : public CStatusbarWindow
 
 		void clickPressed(const Point & cursorPosition) override;
 		void showPopupWindow(const Point & cursorPosition) override;
-		void showAll(Canvas & to) override;
+		void showAll(ICanvas & to) override;
 	};
 
 	std::function<void(CreatureID,int)> onRecruit; //void (int ID, int amount) <-- call to recruit creatures
@@ -98,7 +98,7 @@ class CRecruitmentWindow : public CStatusbarWindow
 	void buy();
 	void sliderMoved(int to);
 
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 public:
 	const CGDwelling * const dwelling;
 	CRecruitmentWindow(const CGDwelling * Dwelling, int Level, const CArmedInstance * Dst, const std::function<void(CreatureID,int)> & Recruit, const std::function<void()> & onClose, int y_offset = 0);
@@ -301,7 +301,7 @@ public:
 	void close() override;
 	void recruitb();
 	void thievesguildb();
-	void show(Canvas & to) override;
+	void show(ICanvas & to) override;
 };
 
 /// Here you can buy ships
@@ -531,5 +531,5 @@ public:
 	void clickPressed(const Point & cursorPosition) override;
 	void keyPressed(EShortcut key) override;
 	void notFocusedClick() override;
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 };

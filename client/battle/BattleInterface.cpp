@@ -31,7 +31,8 @@
 #include "../media/IMusicPlayer.h"
 #include "../media/ISoundPlayer.h"
 #include "../windows/CTutorialWindow.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
+#include "../renderSDL/CanvasSoftware.h"
 #include "../adventureMap/AdventureMapInterface.h"
 
 #include "../../CCallback.h"

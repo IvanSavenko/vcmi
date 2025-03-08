@@ -25,7 +25,7 @@
 #include "../widgets/Buttons.h"
 #include "../widgets/TextControls.h"
 #include "../widgets/VideoWidget.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 
 CTutorialWindow::CTutorialWindow(const TutorialMode & m)
 	: CWindowObject(BORDERED, ImagePath::builtin("DIBOXBCK")), mode { m }, page { 0 }

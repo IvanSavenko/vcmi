@@ -17,7 +17,7 @@
 
 class GameEngine;
 class CPicture;
-class Canvas;
+class ICanvas;
 
 VCMI_LIB_NAMESPACE_BEGIN
 class CArmedInstance;
@@ -30,8 +30,8 @@ public:
 	virtual void deactivate()=0;
 
 	virtual void redraw()=0;
-	virtual void show(Canvas & to) = 0;
-	virtual void showAll(Canvas & to) = 0;
+	virtual void show(ICanvas & to) = 0;
+	virtual void showAll(ICanvas & to) = 0;
 
 	virtual bool isPopupWindow() const = 0;
 	virtual void onScreenResize() = 0;
@@ -89,9 +89,9 @@ public:
 	void deactivate() override;
 
 	//called each frame to update screen
-	void show(Canvas & to) override;
+	void show(ICanvas & to) override;
 	//called on complete redraw only
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 	//request complete redraw of this object
 	void redraw() override;
 	// Move child object to foreground

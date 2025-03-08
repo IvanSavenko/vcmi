@@ -407,7 +407,7 @@ void CSpellWindow::fRcornerb()
 	computeSpellsPerArea();
 }
 
-void CSpellWindow::show(Canvas & to)
+void CSpellWindow::show(ICanvas & to)
 {
 	if(video)
 		video->show(to);

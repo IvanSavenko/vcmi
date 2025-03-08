@@ -24,7 +24,7 @@
 #include "../gui/InterfaceObjectConfigurable.h"
 #include "../media/ISoundPlayer.h"
 #include "../windows/InfoWindows.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IRenderHandler.h"
 
 #include "../../lib/CConfigHandler.h"
@@ -373,7 +373,7 @@ void ButtonBase::setPlayerColor(PlayerColor player)
 		image->setPlayerColor(player);
 }
 
-void CButton::showAll(Canvas & to)
+void CButton::showAll(ICanvas & to)
 {
 	CIntObject::showAll(to);
 

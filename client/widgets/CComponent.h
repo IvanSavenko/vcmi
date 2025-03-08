@@ -73,7 +73,7 @@ public:
 	std::function<void()> onSelect; //function called on selection change
 	std::function<void()> onChoose; //function called on doubleclick
 
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 	void select(bool on);
 
 	void clickPressed(const Point & cursorPosition) override; //call-in

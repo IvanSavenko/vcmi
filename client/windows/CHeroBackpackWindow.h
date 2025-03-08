@@ -25,7 +25,7 @@ protected:
 	std::shared_ptr<CFilledTexture> stretchedBackground;
 	const int windowMargin = 5;
 
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 };
 
 class CHeroQuickBackpackWindow : public CWindowWithArtifacts
@@ -41,5 +41,5 @@ private:
 	std::shared_ptr<CFilledTexture> stretchedBackground;
 	const int windowMargin = 5;
 
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 };

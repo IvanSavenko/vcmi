@@ -15,7 +15,7 @@ class Point;
 class Rect;
 VCMI_LIB_NAMESPACE_END
 
-class Canvas;
+class ICanvas;
 
 class IScreenHandler
 {
@@ -29,7 +29,7 @@ public:
 	virtual void clearScreen() = 0;
 
 	/// Returns canvas that can be used to display objects on screen
-	virtual Canvas getScreenCanvas() const = 0;
+	virtual ICanvas & getScreenCanvas() const = 0;
 
 	/// Synchronizes internal screen texture. Screen canvas may not be modified during this call
 	virtual void updateScreenTexture() = 0;

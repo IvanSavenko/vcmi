@@ -62,8 +62,8 @@ public:
 
 	void addRClickCallback(const std::function<void()> & callback);
 
-	void show(Canvas & to) override;
-	void showAll(Canvas & to) override;
+	void show(ICanvas & to) override;
+	void showAll(ICanvas & to) override;
 	void showPopupWindow(const Point & cursorPosition) override;
 };
 
@@ -78,7 +78,7 @@ public:
 	CFilledTexture(const ImagePath & imageName, Rect position, Rect imageArea);
 	CFilledTexture(const ImagePath & imageName, Rect position);
 
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 };
 
 /// area filled with specific texture, colorized to player color if image is indexed
@@ -135,7 +135,7 @@ public:
 	/// returns true if image has player-colored effect applied
 	bool isPlayerColored() const;
 
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 
 	void setAnimationPath(const AnimationPath & name, size_t frame);
 
@@ -171,7 +171,7 @@ protected:
 	ui8 flags;//Flags from EFlags enum
 
 	//blit image with optional rotation, fitting into rect, etc
-	void blitImage(size_t frame, size_t group, Canvas & to);
+	void blitImage(size_t frame, size_t group, ICanvas & to);
 
 	//For clipping in rect, offsets of picture coordinates
 	int xOffset, yOffset;
@@ -204,8 +204,8 @@ public:
 	void setDuration(int durationMs);
 
 	//show current frame and increase counter
-	void show(Canvas & to) override;
-	void showAll(Canvas & to) override;
+	void show(ICanvas & to) override;
+	void showAll(ICanvas & to) override;
 	void tick(uint32_t msPassed) override;
 };
 

@@ -22,7 +22,7 @@
 #include "../gui/TextAlignment.h"
 #include "../media/ISoundPlayer.h"
 #include "../render/Colors.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IScreenHandler.h"
 #include "../adventureMap/AdventureMapInterface.h"
 #include "../windows/CMessage.h"
@@ -40,12 +40,12 @@ CInGameConsole::CInGameConsole()
 	setRedrawParent(true);
 }
 
-void CInGameConsole::showAll(Canvas & to)
+void CInGameConsole::showAll(ICanvas & to)
 {
 	show(to);
 }
 
-void CInGameConsole::show(Canvas & to)
+void CInGameConsole::show(ICanvas & to)
 {
 	if (GAME->interface()->cingconsole != this)
 		return;

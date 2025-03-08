@@ -97,7 +97,7 @@ TurnTimerWidget::TurnTimerWidget(const Point & position, PlayerColor player)
 	backgroundBorder->pos = pos;
 }
 
-void TurnTimerWidget::show(Canvas & to)
+void TurnTimerWidget::show(ICanvas & to)
 {
 	showAll(to);
 }

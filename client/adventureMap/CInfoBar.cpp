@@ -38,7 +38,7 @@ CInfoBar::CVisibleInfo::CVisibleInfo()
 {
 }
 
-void CInfoBar::CVisibleInfo::show(Canvas & to)
+void CInfoBar::CVisibleInfo::show(ICanvas & to)
 {
 	CIntObject::show(to);
 	for(auto object : forceRefresh)

@@ -27,7 +27,7 @@
 #include "../gui/WindowHandler.h"
 #include "../media/ISoundPlayer.h"
 #include "../render/Colors.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IRenderHandler.h"
 #include "../render/Graphics.h"
 #include "../render/IFont.h"
@@ -281,7 +281,7 @@ std::shared_ptr<IImage> BattleStacksController::getStackAmountBox(const CStack *
 	return amountEffNeutral;
 }
 
-void BattleStacksController::showStackAmountBox(Canvas & canvas, const CStack * stack)
+void BattleStacksController::showStackAmountBox(ICanvas & canvas, const CStack * stack)
 {
 	auto amountBG = getStackAmountBox(stack);
 
@@ -332,7 +332,7 @@ void BattleStacksController::showStackAmountBox(Canvas & canvas, const CStack * 
 	canvas.drawText(textPosition, EFonts::FONT_TINY, Colors::WHITE, ETextAlignment::CENTER, TextOperations::formatMetric(stack->getCount(), 4));
 }
 
-void BattleStacksController::showStack(Canvas & canvas, const CStack * stack)
+void BattleStacksController::showStack(ICanvas & canvas, const CStack * stack)
 {
 	ColorRGBA effectColor = Colors::TRANSPARENCY;
 	uint8_t transparency = 255;

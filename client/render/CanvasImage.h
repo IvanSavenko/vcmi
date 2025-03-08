@@ -10,7 +10,9 @@
 #pragma once
 
 #include "IImage.h"
-#include "Canvas.h"
+#include "ICanvas.h"
+
+#include "renderSDL/CanvasSoftware.h"
 
 class CanvasImage : public IImage
 {
@@ -18,7 +20,7 @@ public:
 	CanvasImage(const Point & size, CanvasScalingPolicy scalingPolicy);
 	~CanvasImage();
 
-	Canvas getCanvas();
+	CanvasSoftware getCanvas();
 
 	void draw(SDL_Surface * where, const Point & pos, const Rect * src, int scalingFactor) const override;
 	void scaleTo(const Point & size, EScalingAlgorithm algorithm) override;

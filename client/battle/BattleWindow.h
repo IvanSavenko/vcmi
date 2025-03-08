@@ -131,8 +131,8 @@ public:
 	void keyPressed(EShortcut key) override;
 	bool captureThisKey(EShortcut key) override;
 	void clickPressed(const Point & cursorPosition) override;
-	void show(Canvas & to) override;
-	void showAll(Canvas & to) override;
+	void show(ICanvas & to) override;
+	void showAll(ICanvas & to) override;
 
 	/// Toggle UI to displaying tactics phase
 	void tacticPhaseStarted();

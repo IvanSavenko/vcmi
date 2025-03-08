@@ -20,8 +20,9 @@
 #include "../gui/MouseButton.h"
 #include "../gui/WindowHandler.h"
 #include "../render/Colors.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/Graphics.h"
+#include "../renderSDL/CanvasSoftware.h"
 #include "../windows/InfoWindows.h"
 
 #include "../../CCallback.h"
@@ -71,7 +72,7 @@ void CMinimapInstance::redrawMinimap()
 }
 
 CMinimapInstance::CMinimapInstance(const Point & position, const Point & dimensions, int Level):
-	minimap(new Canvas(Point(GAME->interface()->cb->getMapSize().x, GAME->interface()->cb->getMapSize().y), CanvasScalingPolicy::IGNORE)),
+	minimap(new CanvasSoftware(Point(GAME->interface()->cb->getMapSize().x, GAME->interface()->cb->getMapSize().y), CanvasScalingPolicy::IGNORE)),
 	level(Level)
 {
 	pos += position;
@@ -82,7 +83,7 @@ CMinimapInstance::CMinimapInstance(const Point & position, const Point & dimensi
 
 CMinimapInstance::~CMinimapInstance() = default;
 
-void CMinimapInstance::showAll(Canvas & to)
+void CMinimapInstance::showAll(ICanvas & to)
 {
 	to.drawScaled(*minimap, pos.topLeft(), pos.dimensions());
 }
@@ -175,9 +176,9 @@ void CMinimap::mouseDragged(const Point & cursorPosition, const Point & lastUpda
 	moveAdvMapSelection(cursorPosition);
 }
 
-void CMinimap::showAll(Canvas & to)
+void CMinimap::showAll(ICanvas & to)
 {
-	CanvasClipRectGuard guard(to, aiShield->pos);
+	CanvasClipGuard guard(to, aiShield->pos);
 	CIntObject::showAll(to);
 
 	if(minimap)
@@ -193,8 +194,8 @@ void CMinimap::showAll(Canvas & to)
 			screenArea.h * pos.h / mapSizes.y - 1
 		};
 
-		Canvas clippedTarget(to, pos);
-		clippedTarget.drawBorderDashed(radar, Colors::PURPLE);
+		CanvasViewGuard clippedTarget(to, pos);
+		to.drawBorderDashed(radar, Colors::PURPLE);
 	}
 }
 

@@ -13,7 +13,7 @@
 #include "BattleInterface.h"
 #include "BattleFieldController.h"
 
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/Colors.h"
 #include "../render/EFont.h"
 #include "../render/IFont.h"

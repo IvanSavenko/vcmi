@@ -11,12 +11,14 @@
 #include "StdInc.h"
 #include "ScreenHandler.h"
 
+#include "CanvasSoftware.h"
+
 #include "../CMT.h"
 #include "../eventsSDL/NotificationHandler.h"
 #include "../GameEngine.h"
 #include "../gui/CursorHandler.h"
 #include "../gui/WindowHandler.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 
 #include "../../lib/CConfigHandler.h"
 #include "../../lib/constants/StringConstants.h"
@@ -617,9 +619,10 @@ void ScreenHandler::clearScreen()
 	SDL_RenderPresent(mainRenderer);
 }
 
-Canvas ScreenHandler::getScreenCanvas() const
+ICanvas & ScreenHandler::getScreenCanvas() const
 {
-	return Canvas::createFromSurface(screen, CanvasScalingPolicy::AUTO);
+	static auto canvas = CanvasSoftware::createFromSurface(screen, CanvasScalingPolicy::AUTO);
+	return canvas;
 }
 
 void ScreenHandler::updateScreenTexture()

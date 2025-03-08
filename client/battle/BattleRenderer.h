@@ -11,8 +11,8 @@
 
 #include "../../lib/battle/BattleHex.h"
 
-class Canvas;
 class BattleInterface;
+class ICanvas;
 
 enum class EBattleFieldLayer {
 					   // confirmed ordering requirements:
@@ -28,7 +28,7 @@ enum class EBattleFieldLayer {
 class BattleRenderer
 {
 public:
-	using RendererRef = Canvas &;
+	using RendererRef = ICanvas &;
 	using RenderFunctor = std::function<void(RendererRef)>;
 
 private:

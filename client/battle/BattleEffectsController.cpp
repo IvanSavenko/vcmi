@@ -21,7 +21,7 @@
 #include "../CPlayerInterface.h"
 #include "../GameEngine.h"
 #include "../media/ISoundPlayer.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/CAnimation.h"
 #include "../render/Graphics.h"
 

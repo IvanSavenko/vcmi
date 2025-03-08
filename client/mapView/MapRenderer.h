@@ -21,7 +21,7 @@ VCMI_LIB_NAMESPACE_END
 
 class CAnimation;
 class IImage;
-class Canvas;
+class ICanvas;
 class IMapRendererContext;
 enum class EImageBlitMode : uint8_t;
 
@@ -45,7 +45,7 @@ public:
 	MapRendererTerrain();
 
 	uint8_t checksum(IMapRendererContext & context, const int3 & coordinates);
-	void renderTile(IMapRendererContext & context, Canvas & target, const int3 & coordinates);
+	void renderTile(IMapRendererContext & context, ICanvas & target, const int3 & coordinates);
 };
 
 class MapRendererRiver
@@ -56,7 +56,7 @@ public:
 	MapRendererRiver();
 
 	uint8_t checksum(IMapRendererContext & context, const int3 & coordinates);
-	void renderTile(IMapRendererContext & context, Canvas & target, const int3 & coordinates);
+	void renderTile(IMapRendererContext & context, ICanvas & target, const int3 & coordinates);
 };
 
 class MapRendererRoad
@@ -67,7 +67,7 @@ public:
 	MapRendererRoad();
 
 	uint8_t checksum(IMapRendererContext & context, const int3 & coordinates);
-	void renderTile(IMapRendererContext & context, Canvas & target, const int3 & coordinates);
+	void renderTile(IMapRendererContext & context, ICanvas & target, const int3 & coordinates);
 };
 
 class MapRendererObjects
@@ -82,12 +82,12 @@ class MapRendererObjects
 
 	std::shared_ptr<IImage> getImage(IMapRendererContext & context, const CGObjectInstance * obj, const std::shared_ptr<CAnimation> & animation) const;
 
-	void renderImage(IMapRendererContext & context, Canvas & target, const int3 & coordinates, const CGObjectInstance * object, const std::shared_ptr<IImage> & image);
-	void renderObject(IMapRendererContext & context, Canvas & target, const int3 & coordinates, const CGObjectInstance * obj);
+	void renderImage(IMapRendererContext & context, ICanvas & target, const int3 & coordinates, const CGObjectInstance * object, const std::shared_ptr<IImage> & image);
+	void renderObject(IMapRendererContext & context, ICanvas & target, const int3 & coordinates, const CGObjectInstance * obj);
 
 public:
 	uint8_t checksum(IMapRendererContext & context, const int3 & coordinates);
-	void renderTile(IMapRendererContext & context, Canvas & target, const int3 & coordinates);
+	void renderTile(IMapRendererContext & context, ICanvas & target, const int3 & coordinates);
 };
 
 class MapRendererBorder
@@ -100,7 +100,7 @@ public:
 	MapRendererBorder();
 
 	uint8_t checksum(IMapRendererContext & context, const int3 & coordinates);
-	void renderTile(IMapRendererContext & context, Canvas & target, const int3 & coordinates);
+	void renderTile(IMapRendererContext & context, ICanvas & target, const int3 & coordinates);
 };
 
 class MapRendererFow
@@ -112,7 +112,7 @@ public:
 	MapRendererFow();
 
 	uint8_t checksum(IMapRendererContext & context, const int3 & coordinates);
-	void renderTile(IMapRendererContext & context, Canvas & target, const int3 & coordinates);
+	void renderTile(IMapRendererContext & context, ICanvas & target, const int3 & coordinates);
 };
 
 class MapRendererPath
@@ -128,7 +128,7 @@ public:
 	MapRendererPath();
 
 	uint8_t checksum(IMapRendererContext & context, const int3 & coordinates);
-	void renderTile(IMapRendererContext & context, Canvas & target, const int3 & coordinates);
+	void renderTile(IMapRendererContext & context, ICanvas & target, const int3 & coordinates);
 };
 
 class MapRendererOverlay
@@ -141,7 +141,7 @@ public:
 	MapRendererOverlay();
 
 	uint8_t checksum(IMapRendererContext & context, const int3 & coordinates);
-	void renderTile(IMapRendererContext & context, Canvas & target, const int3 & coordinates);
+	void renderTile(IMapRendererContext & context, ICanvas & target, const int3 & coordinates);
 };
 
 class MapRenderer
@@ -160,5 +160,5 @@ public:
 
 	TileChecksum getTileChecksum(IMapRendererContext & context, const int3 & coordinates);
 
-	void renderTile(IMapRendererContext & context, Canvas & target, const int3 & coordinates);
+	void renderTile(IMapRendererContext & context, ICanvas & target, const int3 & coordinates);
 };

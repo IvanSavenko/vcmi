@@ -125,6 +125,11 @@ public:
 		return Rect(x*mul, y*mul, w*mul, h*mul);
 	}
 
+	template<typename T>
+	Rect operator/(const T &div) const
+	{
+		return Rect(x/div, y/div, w/div, h/div);
+	}
 
 	Rect& operator=(const Rect &p)
 	{

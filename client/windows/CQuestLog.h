@@ -46,7 +46,7 @@ public:
 	CQuestLabel(Rect position, EFonts Font = FONT_SMALL, ETextAlignment Align = ETextAlignment::TOPLEFT, const ColorRGBA &Color = Colors::WHITE, const std::string &Text =  "")
 		: CMultiLineLabel (position, FONT_SMALL, ETextAlignment::TOPLEFT, Colors::WHITE, Text){};
 	void clickPressed(const Point & cursorPosition) override;
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 };
 
 class CQuestIcon : public CAnimImage
@@ -57,7 +57,7 @@ public:
 	CQuestIcon(const AnimationPath & defname, int index, int x=0, int y=0);
 
 	void clickPressed(const Point & cursorPosition) override;
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 };
 
 class CQuestMinimap : public CMinimap
@@ -76,7 +76,7 @@ public:
 	void update();
 	void addQuestMarks (const QuestInfo * q);
 
-	void showAll(Canvas & to) override;
+	void showAll(ICanvas & to) override;
 };
 
 class CQuestLog : public CWindowObject
@@ -107,5 +107,5 @@ public:
 	void recreateLabelList();
 	void recreateQuestList (int pos);
 	void toggleComplete(bool on);
-	void showAll (Canvas & to) override;
+	void showAll (ICanvas & to) override;
 };

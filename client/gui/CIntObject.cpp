@@ -14,7 +14,7 @@
 #include "WindowHandler.h"
 #include "EventDispatcher.h"
 #include "Shortcut.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/IScreenHandler.h"
 #include "../windows/CMessage.h"
 
@@ -43,14 +43,14 @@ CIntObject::~CIntObject()
 		parent_m->removeChild(this);
 }
 
-void CIntObject::show(Canvas & to)
+void CIntObject::show(ICanvas & to)
 {
 	for(auto & elem : children)
 		if(elem->recActions & UPDATE)
 			elem->show(to);
 }
 
-void CIntObject::showAll(Canvas & to)
+void CIntObject::showAll(ICanvas & to)
 {
 	for(auto & elem : children)
 		if(elem->recActions & SHOWALL)
@@ -238,7 +238,7 @@ void CIntObject::redraw()
 		}
 		else
 		{
-			Canvas buffer = ENGINE->screenHandler().getScreenCanvas();
+			ICanvas & buffer = ENGINE->screenHandler().getScreenCanvas();
 			showAll(buffer);
 		}
 	}

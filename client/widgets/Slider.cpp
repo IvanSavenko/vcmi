@@ -16,7 +16,7 @@
 #include "../gui/MouseButton.h"
 #include "../gui/Shortcut.h"
 #include "../GameEngine.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/Colors.h"
 
 void CSlider::mouseDragged(const Point & cursorPosition, const Point & lastUpdateDistance)
@@ -274,7 +274,7 @@ void CSlider::setAmount( int to )
 	vstd::amax(positions, 0);
 }
 
-void CSlider::showAll(Canvas & to)
+void CSlider::showAll(ICanvas & to)
 {
 	to.drawColor(pos, Colors::BLACK);
 	CIntObject::showAll(to);

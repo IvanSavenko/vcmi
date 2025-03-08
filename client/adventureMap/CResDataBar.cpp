@@ -11,7 +11,7 @@
 #include "CResDataBar.h"
 
 #include "../CPlayerInterface.h"
-#include "../render/Canvas.h"
+#include "../render/ICanvas.h"
 #include "../render/Colors.h"
 #include "../render/EFont.h"
 #include "../GameEngine.h"
@@ -69,7 +69,7 @@ std::string CResDataBar::buildDateString()
 	return boost::str(formatted);
 }
 
-void CResDataBar::showAll(Canvas & to)
+void CResDataBar::showAll(ICanvas & to)
 {
 	CIntObject::showAll(to);
 

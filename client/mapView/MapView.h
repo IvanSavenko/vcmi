@@ -16,7 +16,6 @@ struct ObjectPosInfo;
 class CGObjectInstance;
 VCMI_LIB_NAMESPACE_END
 
-class Canvas;
 class MapViewActions;
 class MapViewController;
 class MapViewModel;
@@ -32,15 +31,15 @@ protected:
 
 	std::shared_ptr<MapViewModel> createModel(const Point & dimensions) const;
 
-	void render(Canvas & target, bool fullUpdate);
+	void render(ICanvas & target, bool fullUpdate);
 
 public:
 	BasicMapView(const Point & offset, const Point & dimensions);
 	~BasicMapView() override;
 
 	void tick(uint32_t msPassed) override;
-	void show(Canvas & to) override;
-	void showAll(Canvas & to) override;
+	void show(ICanvas & to) override;
+	void showAll(ICanvas & to) override;
 };
 
 /// Main class that represents visible section of adventure map
@@ -61,7 +60,7 @@ class MapView : public BasicMapView
 
 public:
 	void tick(uint32_t msPassed) override;
-	void show(Canvas & to) override;
+	void show(ICanvas & to) override;
 
 	MapView(const Point & offset, const Point & dimensions);
 
