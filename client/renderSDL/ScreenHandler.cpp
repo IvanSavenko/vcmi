@@ -418,6 +418,8 @@ void ScreenHandler::initializeScreenBuffers()
 		logGlobal->error("Unable to create surface %dx%d with %d bpp: %s", logicalSize.x, logicalSize.y, 32, SDL_GetError());
 		throw std::runtime_error("Unable to create surface");
 	}
+	canvas = std::make_unique<CanvasSoftware>(screen, CanvasScalingPolicy::AUTO);
+
 	//No blending for screen itself. Required for proper cursor rendering.
 	SDL_SetSurfaceBlendMode(screen, SDL_BLENDMODE_NONE);
 
@@ -621,8 +623,7 @@ void ScreenHandler::clearScreen()
 
 ICanvas & ScreenHandler::getScreenCanvas() const
 {
-	static auto canvas = CanvasSoftware::createFromSurface(screen, CanvasScalingPolicy::AUTO);
-	return canvas;
+	return *canvas;
 }
 
 void ScreenHandler::updateScreenTexture()

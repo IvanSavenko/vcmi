@@ -17,6 +17,7 @@ struct SDL_Texture;
 struct SDL_Window;
 struct SDL_Renderer;
 struct SDL_Surface;
+class CanvasSoftware;
 
 enum class EWindowMode
 {
@@ -47,6 +48,7 @@ class ScreenHandler final : public IScreenHandler
 	SDL_Window * mainWindow = nullptr;
 	SDL_Texture * screenTexture = nullptr;
 	SDL_Surface * screen = nullptr;
+	std::unique_ptr<CanvasSoftware> canvas;
 
 	EUpscalingFilter upscalingFilter = EUpscalingFilter::AUTO;
 

@@ -15,6 +15,7 @@
 
 struct SDL_Surface;
 class IImage;
+class ISharedImage;
 class IVideoInstance;
 enum EFonts : int8_t;
 
@@ -22,7 +23,6 @@ enum class CanvasScalingPolicy
 {
 	AUTO,  // automatically scale canvas operations by global scaling factor
 	IGNORE // disable any scaling processing. Scaling factor will be set to 1
-
 };
 
 /// Class that represents surface for drawing on
@@ -93,6 +93,8 @@ public:
 	virtual void fillTexture(const std::shared_ptr<IImage>& image) = 0;
 
 	virtual Rect getRenderArea() const = 0;
+
+	virtual std::shared_ptr<ISharedImage> toSharedImage() = 0;
 };
 
 class CanvasClipGuard : boost::noncopyable

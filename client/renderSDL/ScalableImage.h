@@ -18,7 +18,7 @@
 struct SDL_Palette;
 
 class ScalableImageInstance;
-class CanvasImage;
+class ICanvas;
 
 struct ScalableImageParameters : boost::noncopyable
 {
@@ -104,7 +104,7 @@ class ScalableImageInstance final : public IImage
 	friend class ScalableImageShared;
 
 	std::shared_ptr<ScalableImageShared> image;
-	std::shared_ptr<CanvasImage> scaledImage;
+	std::shared_ptr<ISharedImage> scaledImage;
 
 	ScalableImageParameters parameters;
 	EImageBlitMode blitMode;

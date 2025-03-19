@@ -18,9 +18,9 @@
 #include "../render/ColorFilter.h"
 #include "../render/Colors.h"
 #include "../render/Graphics.h"
+#include "../render/ICanvas.h"
 #include "../render/IRenderHandler.h"
 #include "../render/IScreenHandler.h"
-#include "../render/CanvasImage.h"
 
 #include "../../lib/constants/EntityIdentifiers.h"
 
@@ -328,11 +328,10 @@ void ScalableImageInstance::scaleTo(const Point & size, EScalingAlgorithm algori
 {
 	scaledImage = nullptr;
 
-	auto newScaledImage = ENGINE->renderHandler().createImage(dimensions(), CanvasScalingPolicy::AUTO);
+	auto newScaledImage = ENGINE->renderHandler().createImage(size, CanvasScalingPolicy::AUTO);
 
-	newScaledImage->getCanvas().draw(*this, Point(0, 0));
-	newScaledImage->scaleTo(size, algorithm);
-	scaledImage = newScaledImage;
+	newScaledImage->draw(*this, Point(0, 0));
+	scaledImage = newScaledImage->toSharedImage();
 }
 
 void ScalableImageInstance::exportBitmap(const boost::filesystem::path & path) const
@@ -365,7 +364,7 @@ void ScalableImageInstance::setAlpha(uint8_t value)
 void ScalableImageInstance::draw(SDL_Surface * where, const Point & pos, const Rect * src, int scalingFactor) const
 {
 	if (scaledImage)
-		scaledImage->draw(where, pos, src, scalingFactor);
+		scaledImage->draw(where, nullptr, pos, src, Colors::WHITE_TRUE, 255, blitMode);
 	else
 		image->draw(where, pos, src, parameters, scalingFactor);
 }

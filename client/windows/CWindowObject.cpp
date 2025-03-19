@@ -24,7 +24,6 @@
 #include "../render/IScreenHandler.h"
 #include "../render/IRenderHandler.h"
 #include "../render/ICanvas.h"
-#include "../render/CanvasImage.h"
 
 #include "../CPlayerInterface.h"
 
@@ -155,17 +154,13 @@ void CWindowObject::setShadow(bool on)
 		auto imageRight  = ENGINE->renderHandler().createImage(sizeRight,  CanvasScalingPolicy::AUTO);
 		auto imageBottom = ENGINE->renderHandler().createImage(sizeBottom, CanvasScalingPolicy::AUTO);
 
-		CanvasSoftware canvasCorner = imageCorner->getCanvas();
-		CanvasSoftware canvasRight = imageRight->getCanvas();
-		CanvasSoftware canvasBottom = imageBottom->getCanvas();
+		imageCorner->drawColor(Rect(Point(0,0), sizeCorner), { 0, 0, 0, 128 });
+		imageRight->drawColor(Rect(Point(0,0), sizeRight), { 0, 0, 0, 128 });
+		imageBottom->drawColor(Rect(Point(0,0), sizeBottom), { 0, 0, 0, 128 });
 
-		canvasCorner.drawColor(Rect(Point(0,0), sizeCorner), { 0, 0, 0, 128 });
-		canvasRight.drawColor(Rect(Point(0,0), sizeRight), { 0, 0, 0, 128 });
-		canvasBottom.drawColor(Rect(Point(0,0), sizeBottom), { 0, 0, 0, 128 });
-
-		canvasCorner.drawColor(Rect(Point(0,0), sizeCorner - Point(1,1)), { 0, 0, 0, 192 });
-		canvasRight.drawColor(Rect(Point(0,0),   sizeRight - Point(0,1)), { 0, 0, 0, 192 });
-		canvasBottom.drawColor(Rect(Point(0,0), sizeBottom - Point(1,0)), { 0, 0, 0, 192 });
+		imageCorner->drawColor(Rect(Point(0,0), sizeCorner - Point(1,1)), { 0, 0, 0, 192 });
+		imageRight->drawColor(Rect(Point(0,0),   sizeRight - Point(0,1)), { 0, 0, 0, 192 });
+		imageBottom->drawColor(Rect(Point(0,0), sizeBottom - Point(1,0)), { 0, 0, 0, 192 });
 
 		//generate "shadow" object with these 3 pieces in it
 		{

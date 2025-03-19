@@ -20,7 +20,7 @@
 #include "../widgets/TextControls.h"
 #include "../windows/GUIClasses.h"
 #include "../windows/InfoWindows.h"
-#include "../render/CanvasImage.h"
+#include "../render/ICanvas.h"
 #include "../render/IImage.h"
 #include "../render/IRenderHandler.h"
 #include "../render/Graphics.h"
@@ -58,10 +58,9 @@ CMapOverview::CMapOverview(const std::string & mapName, const std::string & file
 	fitToScreen(10);
 }
 
-std::shared_ptr<CanvasImage> CMapOverviewWidget::createMinimapForLayer(std::unique_ptr<CMap> & map, int layer) const
+std::shared_ptr<ICanvas> CMapOverviewWidget::createMinimapForLayer(std::unique_ptr<CMap> & map, int layer) const
 {
 	auto canvasImage = ENGINE->renderHandler().createImage(Point(map->width, map->height), CanvasScalingPolicy::IGNORE);
-	auto canvas = canvasImage->getCanvas();
 
 	for (int y = 0; y < map->height; ++y)
 		for (int x = 0; x < map->width; ++x)
@@ -89,15 +88,15 @@ std::shared_ptr<CanvasImage> CMapOverviewWidget::createMinimapForLayer(std::uniq
 					}
 				}
 
-			canvas.drawPoint(Point(x, y), color);
+			canvasImage->drawPoint(Point(x, y), color);
 		}
 	
 	return canvasImage;
 }
 
-std::vector<std::shared_ptr<CanvasImage>> CMapOverviewWidget::createMinimaps(const ResourcePath & resource) const
+std::vector<std::shared_ptr<ICanvas>> CMapOverviewWidget::createMinimaps(const ResourcePath & resource) const
 {
-	std::vector<std::shared_ptr<CanvasImage>> ret;
+	std::vector<std::shared_ptr<ICanvas>> ret;
 
 	CMapService mapService;
 	std::unique_ptr<CMap> map;
@@ -114,9 +113,9 @@ std::vector<std::shared_ptr<CanvasImage>> CMapOverviewWidget::createMinimaps(con
 	return createMinimaps(map);
 }
 
-std::vector<std::shared_ptr<CanvasImage>> CMapOverviewWidget::createMinimaps(std::unique_ptr<CMap> & map) const
+std::vector<std::shared_ptr<ICanvas>> CMapOverviewWidget::createMinimaps(std::unique_ptr<CMap> & map) const
 {
-	std::vector<std::shared_ptr<CanvasImage>> ret;
+	std::vector<std::shared_ptr<ICanvas>> ret;
 
 	for(int i = 0; i < (map->twoLevel ? 2 : 1); i++)
 		ret.push_back(createMinimapForLayer(map, i));

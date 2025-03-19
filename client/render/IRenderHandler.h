@@ -19,8 +19,8 @@ struct SDL_Surface;
 
 class IFont;
 class IImage;
+class ICanvas;
 class CAnimation;
-class CanvasImage;
 class SDLImageShared;
 enum class EImageBlitMode : uint8_t;
 enum class CanvasScalingPolicy;
@@ -43,7 +43,7 @@ public:
 	virtual std::shared_ptr<SDLImageShared> loadScaledImage(const ImageLocator & locator) = 0;
 
 	/// Creates image which can be used as target for drawing on
-	virtual std::shared_ptr<CanvasImage> createImage(const Point & size, CanvasScalingPolicy scalingPolicy) = 0;
+	virtual std::shared_ptr<ICanvas> createImage(const Point & size, CanvasScalingPolicy scalingPolicy) = 0;
 
 	/// Loads animation using given path
 	virtual std::shared_ptr<CAnimation> loadAnimation(const AnimationPath & path, EImageBlitMode mode) = 0;

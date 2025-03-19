@@ -26,12 +26,6 @@ class CanvasSoftware final : public ICanvas
 	/// Current rendering area, all rendering operations will be moved into selected area
 	Rect renderArea;
 
-	/// constructs canvas using existing surface. Caller maintains ownership on the surface
-	explicit CanvasSoftware(SDL_Surface * surface, CanvasScalingPolicy scalingPolicy);
-
-	/// copy constructor
-	CanvasSoftware(const CanvasSoftware & other);
-
 	Point transformPos(const Point & input);
 	Point transformSize(const Point & input);
 
@@ -42,11 +36,10 @@ class CanvasSoftware final : public ICanvas
 
 public:
 	/// constructs canvas of specified size
-	explicit CanvasSoftware(const Point & size, CanvasScalingPolicy scalingPolicy);
+	CanvasSoftware(const Point & size, CanvasScalingPolicy scalingPolicy);
 
 	/// constructs canvas using existing surface. Caller maintains ownership on the surface
-	/// Compatibility method. AVOID USAGE. To be removed once SDL abstraction layer is finished.
-	static CanvasSoftware createFromSurface(SDL_Surface * surface, CanvasScalingPolicy scalingPolicy);
+	CanvasSoftware(SDL_Surface * surface, CanvasScalingPolicy scalingPolicy);
 
 	~CanvasSoftware();
 
@@ -105,4 +98,6 @@ public:
 
 	/// get the render area
 	Rect getRenderArea() const override;
+
+	std::shared_ptr<ISharedImage> toSharedImage() override;
 };

@@ -61,7 +61,7 @@ public:
 
 	std::shared_ptr<CAnimation> loadAnimation(const AnimationPath & path, EImageBlitMode mode) override;
 
-	std::shared_ptr<CanvasImage> createImage(const Point & size, CanvasScalingPolicy scalingPolicy) override;
+	std::shared_ptr<ICanvas> createImage(const Point & size, CanvasScalingPolicy scalingPolicy) override;
 
 	/// Returns font with specified identifer
 	std::shared_ptr<const IFont> loadFont(EFonts font) override;

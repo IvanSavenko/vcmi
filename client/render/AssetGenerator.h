@@ -16,13 +16,13 @@ class PlayerColor;
 VCMI_LIB_NAMESPACE_END
 
 class ISharedImage;
-class CanvasImage;
+class ICanvas;
 
 class AssetGenerator
 {
 public:
 	using AnimationLayoutMap = std::map<size_t, std::vector<ImageLocator>>;
-	using CanvasPtr = std::shared_ptr<CanvasImage>;
+	using CanvasPtr = std::shared_ptr<ICanvas>;
 
 	void initialize();
 

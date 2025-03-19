@@ -11,6 +11,7 @@
 #include "CanvasSoftware.h"
 
 #include "SDL_Extensions.h"
+#include "SDLImage.h"
 
 #include "../GameEngine.h"
 #include "../media/IVideoPlayer.h"
@@ -27,14 +28,6 @@ CanvasSoftware::CanvasSoftware(SDL_Surface * surface, CanvasScalingPolicy scalin
 	scalingPolicy(scalingPolicy),
 	surface(surface),
 	renderArea(0,0, surface->w, surface->h)
-{
-	surface->refcount++;
-}
-
-CanvasSoftware::CanvasSoftware(const CanvasSoftware & other):
-	scalingPolicy(other.scalingPolicy),
-	surface(other.surface),
-	renderArea(other.renderArea)
 {
 	surface->refcount++;
 }
@@ -87,11 +80,6 @@ Point CanvasSoftware::transformSize(const Point & input)
 	return input * getScalingFactor();
 }
 
-CanvasSoftware CanvasSoftware::createFromSurface(SDL_Surface * surface, CanvasScalingPolicy scalingPolicy)
-{
-	return CanvasSoftware(surface, scalingPolicy);
-}
-
 void CanvasSoftware::applyTransparency(bool on)
 {
 	if (on)
@@ -137,13 +125,13 @@ void CanvasSoftware::draw(const std::shared_ptr<IImage>& image, const Point & po
 
 void CanvasSoftware::draw(const ICanvas & image, const Point & pos)
 {
-	auto actualImage = dynamic_cast<const CanvasSoftware&>(image);
+	auto & actualImage = dynamic_cast<const CanvasSoftware&>(image);
 	CSDL_Ext::blitSurface(actualImage.surface, actualImage.renderArea, surface, transformPos(pos));
 }
 
 void CanvasSoftware::drawTransparent(const ICanvas & image, const Point & pos, double transparency)
 {
-	auto actualImage = dynamic_cast<const CanvasSoftware&>(image);
+	auto & actualImage = dynamic_cast<const CanvasSoftware&>(image);
 
 	SDL_BlendMode oldMode;
 
@@ -157,7 +145,7 @@ void CanvasSoftware::drawTransparent(const ICanvas & image, const Point & pos, d
 
 void CanvasSoftware::drawScaled(const ICanvas & image, const Point & pos, const Point & targetSize)
 {
-	auto actualImage = dynamic_cast<const CanvasSoftware&>(image);
+	auto & actualImage = dynamic_cast<const CanvasSoftware&>(image);
 
 	SDL_Rect targetRect = CSDL_Ext::toSDL(Rect(transformPos(pos), transformSize(targetSize)));
 	SDL_BlitScaled(actualImage.surface, nullptr, surface, &targetRect);
@@ -248,4 +236,9 @@ void CanvasSoftware::fillTexture(const std::shared_ptr<IImage>& image)
 Rect CanvasSoftware::getRenderArea() const
 {
 	return renderArea;
+}
+
+std::shared_ptr<ISharedImage> CanvasSoftware::toSharedImage()
+{
+	return std::make_shared<SDLImageShared>(surface);
 }

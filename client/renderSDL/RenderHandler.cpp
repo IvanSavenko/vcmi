@@ -13,20 +13,18 @@
 #include "SDLImage.h"
 #include "ScalableImage.h"
 #include "FontChain.h"
+#include "CanvasSoftware.h"
 
 #include "../GameEngine.h"
 
 #include "../render/AssetGenerator.h"
 #include "../render/CAnimation.h"
-#include "../render/CanvasImage.h"
 #include "../render/CDefFile.h"
-#include "../render/Colors.h"
 #include "../render/ColorFilter.h"
 #include "../render/IScreenHandler.h"
 
 #include "../../lib/CConfigHandler.h"
-#include "../../lib/CThreadHelper.h"
-#include "../../lib/ExceptionsCommon.h"
+#include "../../lib/Rect.h"
 #include "../../lib/VCMIDirs.h"
 #include "../../lib/constants/StringConstants.h"
 #include "../../lib/entities/building/CBuilding.h"
@@ -353,9 +351,9 @@ std::shared_ptr<IImage> RenderHandler::loadImage(const ImagePath & path, EImageB
 	return loadImage(locator);
 }
 
-std::shared_ptr<CanvasImage> RenderHandler::createImage(const Point & size, CanvasScalingPolicy scalingPolicy)
+std::shared_ptr<ICanvas> RenderHandler::createImage(const Point & size, CanvasScalingPolicy scalingPolicy)
 {
-	return std::make_shared<CanvasImage>(size, scalingPolicy);
+	return std::make_shared<CanvasSoftware>(size, scalingPolicy);
 }
 
 std::shared_ptr<CAnimation> RenderHandler::loadAnimation(const AnimationPath & path, EImageBlitMode mode)
