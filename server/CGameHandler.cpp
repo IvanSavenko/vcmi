@@ -1842,12 +1842,17 @@ void CGameHandler::save(const std::string & filename, PlayerColor playerToNotify
 
 	try
 	{
-		CSaveFile save;
+		SaveFile save;
 		gameState().saveGame(save);
+#if 0
+		VerifyGameState vgs;
+		vgs.data = save.currentContent();
+		sendAndApply(vgs);
+#endif
 		logGlobal->info("Saving server state");
 		save.save(*this);
 		const auto saveFile = *CResourceHandler::get("local")->getResourceName(savePath);
-		save.write(saveFile);
+		save.writeFile(saveFile);
 
 		pruneAutosaves(savePath, autosaveCountLimit);
 

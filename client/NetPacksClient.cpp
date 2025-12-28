@@ -36,6 +36,7 @@
 #include "../lib/GameLibrary.h"
 #include "../lib/mapping/CMap.h"
 #include "../lib/VCMIDirs.h"
+#include "../lib/serializer/CSaveFile.h"
 #include "../lib/CSoundBase.h"
 #include "../lib/StartInfo.h"
 #include "../lib/CConfigHandler.h"
@@ -1209,4 +1210,10 @@ void ApplyClientNetPackVisitor::visitChangeTownName(ChangeTownName & pack)
 void ApplyClientNetPackVisitor::visitResponseStatistic(ResponseStatistic & pack)
 {
 	callInterfaceIfPresent(cl, pack.player, &IGameEventsReceiver::responseStatistic, pack.statistic);
+}
+
+void ApplyClientNetPackVisitor::visitVerifyGameState(VerifyGameState & pack)
+{
+	VerifyFile file(pack.data);
+	cl.gameState().saveGame(file);
 }

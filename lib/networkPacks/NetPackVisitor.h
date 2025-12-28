@@ -199,4 +199,5 @@ public:
 	virtual void visitBattleStackMoved(BattleLogMessage & pack) {}
 	virtual void visitResponseStatistic(ResponseStatistic & pack) {}
 	virtual void visitAdvInterfaceReady(AdvInterfaceReady & pack) {}
+	virtual void visitVerifyGameState(VerifyGameState & pack) {}
 };

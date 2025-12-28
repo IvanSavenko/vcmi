@@ -1595,3 +1595,15 @@ struct DLL_LINKAGE ResponseStatistic : public CPackForClient
 		h & statistic;
 	}
 };
+
+struct DLL_LINKAGE VerifyGameState : public CPackForClient
+{
+	std::vector<std::byte> data;
+
+	void visitTyped(ICPackVisitor & visitor) override;
+
+	template <typename Handler> void serialize(Handler & h)
+	{
+		h & data;
+	}
+};

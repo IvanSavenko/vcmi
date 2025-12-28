@@ -920,3 +920,8 @@ void AdvInterfaceReady::visitTyped(ICPackVisitor & visitor)
 {
 	visitor.visitAdvInterfaceReady(*this);
 }
+
+void VerifyGameState::visitTyped(ICPackVisitor & visitor)
+{
+	visitor.visitVerifyGameState(*this);
+}
