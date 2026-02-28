@@ -25,8 +25,6 @@
 #include "../mapping/CMap.h"
 #include "../CPlayerState.h"
 
-#define ASSERT_IF_CALLED_WITH_PLAYER if(!getPlayerID()) {logGlobal->error(BOOST_CURRENT_FUNCTION); assert(0);}
-
 VCMI_LIB_NAMESPACE_BEGIN
 
 //TODO make clean
@@ -484,7 +482,7 @@ std::vector <const CGObjectInstance *> CGameInfoCallback::getFlaggableObjects(in
 
 std::vector<const CGHeroInstance *> CGameInfoCallback::getAvailableHeroes(const CGObjectInstance * townOrTavern) const
 {
-	ASSERT_IF_CALLED_WITH_PLAYER
+	THROW_IF_CALLED_WITH_PLAYER();
 	std::vector<const CGHeroInstance *> ret;
 	//TODO: town needs to be owned, advmap tavern needs to be visited; to be reimplemented when visit tracking is done
 	const CGTownInstance * town = getTown(townOrTavern->id);
