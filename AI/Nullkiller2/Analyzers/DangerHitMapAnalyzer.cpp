@@ -116,7 +116,7 @@ void DangerHitMapAnalyzer::updateHitMap()
 		townThreats[town->id]; // insert empty list
 	}
 
-	foreach_tile_pos(*aiNk->cc, [&](const int3 & pos){
+	foreach_visible_tile_pos(*aiNk->cc, [&](const int3 & pos){
 		hitMap[pos.x][pos.y][pos.z].reset();
 	});
 

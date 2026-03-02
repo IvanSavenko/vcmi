@@ -485,6 +485,7 @@ set(lib_MAIN_HEADERS
 	bonuses/Updaters.h
 
 	callback/CAdventureAI.h
+	callback/CallbackDefines.h
 	callback/CBattleCallback.h
 	callback/CBattleGameInterface.h
 	callback/CCallback.h
