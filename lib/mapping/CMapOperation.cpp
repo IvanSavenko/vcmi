@@ -111,7 +111,7 @@ void CDrawTerrainOperation::execute()
 	updateTerrainViews();
 }
 
-void CDrawTerrainOperation::changeTerrainType(CTerrainSelection selection, TerrainId terrainType)
+void CDrawTerrainOperation::changeTerrainType(const CTerrainSelection & selection, TerrainId terrainType)
 {
 	for(const auto & pos : selection.getSelectedItems())
 	{
@@ -153,14 +153,13 @@ std::string CDrawTerrainOperation::getLabel() const
 	return "Draw Terrain";
 }
 
-void CDrawTerrainOperation::expandSelection(CTerrainSelection selection)
+void CDrawTerrainOperation::expandSelection(const CTerrainSelection & selection)
 {
 	auto positions = selection.getSelectedItems();
 	while(!positions.empty())
 	{
 		const auto & centerPos = *(positions.begin());
 		auto centerTile = map->getTile(centerPos);
-		//logGlobal->debug("Set terrain tile at pos '%s' to type '%s'", centerPos, centerTile.terType);
 		auto tiles = getInvalidTiles(centerPos);
 		auto updateTerrainType = [&](const int3& pos)
 		{
@@ -168,16 +167,20 @@ void CDrawTerrainOperation::expandSelection(CTerrainSelection selection)
 			map->getTile(pos).terrainType = centerTile.terrainType;
 			positions.insert(pos);
 			expandInvalidatedTileList(pos);
-			//logGlobal->debug("Set additional terrain tile at pos '%s' to type '%s'", pos, centerTile.terType);
 		};
 
-		// Fill foreign invalid tiles
-		for(const auto & tile : tiles.foreignTiles)
+		// Fill foreign invalid tiles. If there were any, the neighbourhood
+		// of centerPos changed and getInvalidTiles must be re-run; otherwise
+		// the previous result is still accurate.
+		if(!tiles.foreignTiles.empty())
 		{
-			updateTerrainType(tile);
+			for(const auto & tile : tiles.foreignTiles)
+			{
+				updateTerrainType(tile);
+			}
+			tiles = getInvalidTiles(centerPos);
 		}
 
-		tiles = getInvalidTiles(centerPos);
 		if(tiles.nativeTiles.find(centerPos) != tiles.nativeTiles.end())
 		{
 			// Blow up
@@ -539,6 +542,28 @@ CDrawTerrainOperation::InvalidTiles CDrawTerrainOperation::getInvalidTiles(const
 	InvalidTiles tiles;
 	const auto * centerTerType = map->getTile(centerPos).getTerrain();
 	auto rect = extendTileAround(centerPos);
+
+	// Fast path: if the in-map 5x5 around centerPos is fully homogeneous
+	// (every cell has the same terrain as centerPos), then for each cell of
+	// the inner 3x3 the all-native "n1" pattern is guaranteed to match (its
+	// own 3x3 fits inside the homogeneous 5x5), and the special transition
+	// patterns s1/s2 cannot match because they require a foreign neighbour.
+	// This skips the per-cell pattern validation, which dominates the cost
+	// for large uniform fills.
+	auto neighbourhood = MapRect(int3(centerPos.x - 2, centerPos.y - 2, centerPos.z), 5, 5)
+		& MapRect(int3(0, 0, centerPos.z), map->width, map->height);
+	bool homogeneous = true;
+	neighbourhood.forEach([&](const int3 & pos)
+		{
+			if(homogeneous && map->getTile(pos).getTerrain() != centerTerType)
+				homogeneous = false;
+		});
+	if(homogeneous)
+	{
+		tiles.centerPosValid = true;
+		return tiles;
+	}
+
 	rect.forEach([&](const int3& pos)
 		{
 			if(map->isInTheMap(pos))
