@@ -92,6 +92,7 @@ template<typename ReturnType, typename... Args>
 ReturnType LuaContext::callMethod(const std::string & name, const JsonNode & params, Args&&... args)
 {
 	std::lock_guard guard(mutex);
+	logScript->debug("Script '%s': calling '%s'", script->getIdentifier(), name);
 
 	if(!scriptTable)
 	{
@@ -152,11 +153,13 @@ ReturnType LuaContext::callMethod(const std::string & name, const JsonNode & par
 			logScript->error("Script '%s', function '%s' returned unexpected value: %s", script->getIdentifier(), name, e.what());
 			return ReturnType{};
 		}
+		logScript->debug("Script '%s': finished '%s'", script->getIdentifier(), name);
 		S.restoreInitialTop();
 		return ret;
 	}
 	else
 	{
+		logScript->debug("Script '%s': finished '%s'", script->getIdentifier(), name);
 		S.clear();
 		return;
 	}

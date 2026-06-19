@@ -323,6 +323,7 @@ void LuaContext::registerPublicTypes()
 
 int LuaContext::require(lua_State * L)
 {
+	logScript->debug("Loading required module");
 	auto * self = static_cast<LuaContext *>(lua_touserdata(L, lua_upvalueindex(1)));
 
 	if(!self)
@@ -331,10 +332,23 @@ int LuaContext::require(lua_State * L)
 		return lua_error(L);
 	}
 
-	int result = self->loadModule();
-	if(result < 0)
-		return lua_error(L); // error string was pushed by loadModule; its locals are already destroyed
-	return result;
+	try {
+		int result = self->loadModule();
+		if(result < 0)
+		{
+			logScript->debug("Loading required module: FAIL");
+			return lua_error(L); // error string was pushed by loadModule; its locals are already destroyed
+		}
+
+		logScript->debug("Loading required module: OK");
+		return result;
+	}
+	catch (const std::exception & e)
+	{
+		logScript->debug("Loading required module: EXCEPTION %s", e.what());
+		lua_pushstring(L, e.what());
+		return lua_error(L);
+	}
 }
 
 int LuaContext::loadModule()
@@ -375,6 +389,8 @@ int LuaContext::loadModule()
 		scope = temp.at(0);
 		modulePath = temp.at(1);
 	}
+
+	logScript->debug("Loading required module %s", modulePath);
 
 	auto * loader = scope.empty() ? CResourceHandler::get() : CResourceHandler::get(scope);
 
