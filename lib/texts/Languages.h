@@ -30,9 +30,8 @@ enum class ELanguages
 {
 	BELARUSIAN,
 	BULGARIAN,
-	CZECH,
 	CHINESE_SIMPLIFIED,
-	CHINESE_TRADITIONAL,
+	CZECH,
 	DUTCH,
 	ENGLISH,
 	FILIPINO,
@@ -54,6 +53,7 @@ enum class ELanguages
 	SERBIAN,
 	SPANISH,
 	SWEDISH,
+	CHINESE_TRADITIONAL,
 	TURKISH,
 	UKRAINIAN,
 	VIETNAMESE,
@@ -100,9 +100,8 @@ inline const auto & getLanguageList()
 	{ {
 		{ "belarusian",  "Belarusian",  "Беларускі",    "CP1251",      "be_BY", "be", "bel", "%d.%m.%Y %H:%M",    EPluralForms::UK_3, true },
 		{ "bulgarian",   "Bulgarian",   "Български",    "CP1251",      "bg_BG", "bg", "bul", "%d.%m.%Y %H:%M",    EPluralForms::EN_2, true },
-		{ "czech",       "Czech",       "Čeština",      "CP1250",      "cs_CZ", "cs", "cze", "%d.%m.%Y %H:%M",    EPluralForms::CZ_3, true },
 		{ "chinese",     "Simplified Chinese", "简体中文",  "GBK",      "zh_CN", "zh-CN", "chi", "%Y-%m-%d %H:%M", EPluralForms::VI_1, true },
-		{ "tchinese",    "Traditional Chinese", "正體字",   "GBK",      "zh_TW", "zh-TW", "chi", "%Y-%m-%d %H:%M", EPluralForms::VI_1, true },
+		{ "czech",       "Czech",       "Čeština",      "CP1250",      "cs_CZ", "cs", "cze", "%d.%m.%Y %H:%M",    EPluralForms::CZ_3, true },
 		{ "dutch",       "Dutch",       "Nederlands",   "CP1252",      "nl_NL", "nl", "nld", "%Y-%m-%d %H:%M",    EPluralForms::EN_2, true },
 		{ "english",     "English",     "English",      "CP1252",      "en_US", "en", "eng", "%Y-%m-%d %H:%M",    EPluralForms::EN_2, true }, // English uses international date/time format here
 		{ "filipino",    "Filipino",    "Pilipino",     "CP1252",      "fil_FIL","fil","fil","%Y-%m-%d %H:%M",    EPluralForms::EN_2, true },
@@ -124,6 +123,7 @@ inline const auto & getLanguageList()
 		{ "serbian",     "Serbian",     "Српски",       "CP1252",      "sr_SR", "sr", "srp", "%Y-%m-%d %H:%M",    EPluralForms::UK_3, true },
 		{ "spanish",     "Spanish",     "Español",      "CP1252",      "es_ES", "es", "spa", "%d/%m/%Y %H:%M",    EPluralForms::EN_2, true },
 		{ "swedish",     "Swedish",     "Svenska",      "CP1252",      "sv_SE", "sv", "swe", "%Y-%m-%d %H:%M",    EPluralForms::EN_2, true },
+		{ "tchinese",    "Traditional Chinese", "正體字",   "GBK",      "zh_TW", "zh-TW", "chi", "%Y-%m-%d %H:%M", EPluralForms::VI_1, true },
 		{ "turkish",     "Turkish",     "Türkçe",       "CP1254",      "tr_TR", "tr", "tur", "%d.%m.%Y %H:%M",    EPluralForms::EN_2, true },
 		{ "ukrainian",   "Ukrainian",   "Українська",   "CP1251",      "uk_UA", "uk", "ukr", "%d.%m.%Y %H:%M",    EPluralForms::UK_3, true },
 		{ "vietnamese",  "Vietnamese",  "Tiếng Việt",   "UTF-8",       "vi_VN", "vi", "vie", "%d/%m/%Y %H:%M",    EPluralForms::VI_1, true }, // Fan translation uses special encoding

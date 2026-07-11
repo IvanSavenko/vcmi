@@ -24,13 +24,6 @@
 		]
 	},
 
-	"czech" : {
-		"skipValidation" : true,
-		"translations" : [
-			"config/translations/czech.json"
-		]
-	},
-
 	"chinese" : {
 		"skipValidation" : true,
 		"translations" : [
@@ -38,10 +31,10 @@
 		]
 	},
 
-	"tchinese" : {
+	"czech" : {
 		"skipValidation" : true,
 		"translations" : [
-			"config/translations/chinese.json"
+			"config/translations/czech.json"
 		]
 	},
 
@@ -185,6 +178,20 @@
 		]
 	},
 
+	"tchinese" : {
+		"skipValidation" : true,
+		"translations" : [
+			"config/translations/chinese.json"
+		]
+	},
+
+	"turkish" : {
+		"skipValidation" : true,
+		"translations" : [
+			"config/translations/turkish.json"
+		]
+	},
+
 	"ukrainian" : {
 		"skipValidation" : true,
 		"translations" : [
@@ -192,17 +199,10 @@
 		]
 	},
 
-	"vietnamese": {
-		"skipValidation": true,
-		"translations": [
+	"vietnamese" : {
+		"skipValidation" : true,
+		"translations" : [
 			"config/translations/vietnamese.json"
-		]
-	},
-
-	"turkish": {
-		"skipValidation": true,
-		"translations": [
-			"config/translations/turkish.json"
 		]
 	},
 

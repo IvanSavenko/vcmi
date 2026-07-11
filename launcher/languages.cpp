@@ -22,9 +22,8 @@ static const std::array<std::string, 29> languageTranslatedNamesGenerator = {
 	{
 		QT_TRANSLATE_NOOP("Language", "Belarusian"),
 		QT_TRANSLATE_NOOP("Language", "Bulgarian"),
-		QT_TRANSLATE_NOOP("Language", "Czech"),
 		QT_TRANSLATE_NOOP("Language", "Simplified Chinese"),
-		QT_TRANSLATE_NOOP("Language", "Traditional Chinese"),
+		QT_TRANSLATE_NOOP("Language", "Czech"),
 		QT_TRANSLATE_NOOP("Language", "Dutch"),
 		QT_TRANSLATE_NOOP("Language", "English"),
 		QT_TRANSLATE_NOOP("Language", "Filipino"),
@@ -46,6 +45,7 @@ static const std::array<std::string, 29> languageTranslatedNamesGenerator = {
 		QT_TRANSLATE_NOOP("Language", "Serbian"),
 		QT_TRANSLATE_NOOP("Language", "Spanish"),
 		QT_TRANSLATE_NOOP("Language", "Swedish"),
+		QT_TRANSLATE_NOOP("Language", "Traditional Chinese"),
 		QT_TRANSLATE_NOOP("Language", "Turkish"),
 		QT_TRANSLATE_NOOP("Language", "Ukrainian"),
 		QT_TRANSLATE_NOOP("Language", "Vietnamese"),
