@@ -46,12 +46,13 @@ enum class ESerializationVersion : int32_t
 	REWARDABLE_RESET_CALENDAR, // rewardable reset period split into days/weeks/months
 	CONTROL_LOSS_TRACKING, // track when players ever controlled special defeat-condition objects
 	QUEST_REWORK, // quest objects reshape: persist requiredKeys / allowedDifficulties limiter fields, quest-log identity (object or keymaster-colour type)
+	SCRIPT_VARIABLES, // per-map script variable storage (mod-namespaced key/value store)
 
 	RELEASE_170 = HOTA_MAP_STACK_COUNT,
 	RELEASE_174 = CUSTOM_GARRISON_TITLE,
 
 	MINIMAL = RELEASE_170,
-	CURRENT = QUEST_REWORK,
+	CURRENT = SCRIPT_VARIABLES,
 };
 
 static_assert(ESerializationVersion::MINIMAL <= ESerializationVersion::CURRENT, "Invalid serialization version definition!");
