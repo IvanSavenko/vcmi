@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Without this, Android 8+ launchers shrink the legacy bitmap onto a white
+     plate and the icon ends up covering about half of the tile. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+	<background android:drawable="@color/ic_launcher_background" />
+	<foreground android:drawable="@mipmap/ic_launcher_foreground" />
+</adaptive-icon>
