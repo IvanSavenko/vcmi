@@ -33,14 +33,6 @@ public:
 	static constexpr int adjacentHex = aimedHex + 1;
 	static constexpr int distantHex = 8 * GameConstants::BFIELD_WIDTH + 10;
 
-	static ScriptID scriptByName(const std::string & name)
-	{
-		auto identifier = LIBRARY->identifiers()->getIdentifier(ModScope::scopeGame(), "script", name);
-		EXPECT_TRUE(identifier.has_value()) << "unknown script " << name;
-
-		return identifier ? ScriptID(*identifier) : ScriptID();
-	}
-
 	/// Grants the bonus that offers the action, the way content declaring it would.
 	static void giveScriptedAction(CStack * stack, const ScriptID & script, const JsonNode & parameters)
 	{

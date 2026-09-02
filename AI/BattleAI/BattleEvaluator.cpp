@@ -209,6 +209,92 @@ std::optional<PossibleSpellcast> BattleEvaluator::findBestCreatureSpell(const CS
 	return std::nullopt;
 }
 
+std::optional<PossibleScriptedAction> BattleEvaluator::findBestScriptedAction(const CStack * stack)
+{
+	std::optional<PossibleScriptedAction> best;
+
+	for(const auto & bonus : *stack->getBonusesOfType(BonusType::COMBAT_ACTION))
+	{
+		ScriptID scriptID = bonus->subtype.as<ScriptID>();
+		ScriptedActionInfo info = cb->getBattle(battleID)->getScriptedAction(stack, scriptID);
+
+		if(!info.script)
+			continue;
+
+		for(const BattleHex & hex : info.script->getSelectableHexes(*cb->getBattle(battleID), stack, info.parameters))
+		{
+			PossibleScriptedAction candidate;
+			candidate.script = scriptID;
+			candidate.target = hex;
+			evaluateScriptedAction(stack, candidate);
+
+			if(!best || candidate.value > best->value)
+				best = candidate;
+		}
+	}
+
+	if(best && best->value > 0)
+		return best;
+
+	return std::nullopt;
+}
+
+/// Runs the action on a copy of the battle and answers what it gained, the same way a creature
+/// spellcast is valued - which is what lets an action the engine knows nothing about be compared
+/// against the attack it competes with.
+void BattleEvaluator::evaluateScriptedAction(const CStack * stack, PossibleScriptedAction & action)
+{
+	using ValueMap = PossibleSpellcast::ValueMap;
+
+	HypotheticBattle state(env.get(), cb->getBattle(battleID));
+	TStacks all = cb->getBattle(battleID)->battleGetAllStacks(false);
+
+	ValueMap healthOfStack;
+
+	for(const auto & unit : all)
+		healthOfStack[unit->unitId()] = unit->getAvailableHealth();
+
+	ScriptedActionInfo info = state.getScriptedAction(state.battleGetUnitByID(stack->unitId()), action.script);
+
+	if(!info.script)
+	{
+		action.value = -1;
+		return;
+	}
+
+	info.script->execute(state.getServerCallback(), state, state.battleGetUnitByID(stack->unitId()), BattleHexArray({action.target}), info.parameters);
+
+	int64_t totalGain = 0;
+
+	for(const auto & unit : all)
+	{
+		const auto * localUnit = state.battleGetUnitByID(unit->unitId());
+		int64_t healthDiff = localUnit->getAvailableHealth() - healthOfStack[unit->unitId()];
+
+		if(localUnit->unitOwner() != cb->getBattle(battleID)->getPlayerID())
+			healthDiff = -healthDiff;
+
+		if(healthDiff < 0)
+		{
+			action.value = -1;
+			return; //do not harm own units at all
+		}
+
+		totalGain += healthDiff;
+	}
+
+	// an action that summons or resurrects leaves units the battle did not have before
+	auto newUnits = state.getUnitsIf([&](const battle::Unit * u) -> bool
+		{
+			return !u->isGhost() && !u->isTurret() && !vstd::contains(healthOfStack, u->unitId());
+		});
+
+	for(const auto & unit : newUnits)
+		totalGain += unit->getAvailableHealth();
+
+	action.value = totalGain;
+}
+
 BattleAction BattleEvaluator::selectStackAction(const CStack * stack)
 {
 #if BATTLE_TRACE_LEVEL >= 1
@@ -216,6 +302,14 @@ BattleAction BattleEvaluator::selectStackAction(const CStack * stack)
 #endif
 	//evaluate casting spell for spellcasting stack
 	std::optional<PossibleSpellcast> bestSpellcast = findBestCreatureSpell(stack);
+	std::optional<PossibleScriptedAction> bestScriptedAction = findBestScriptedAction(stack);
+
+	// both are valued in health gained, so whichever gained more is the one worth weighing against
+	// the attack below
+	if(bestSpellcast && bestScriptedAction && bestSpellcast->value >= bestScriptedAction->value)
+		bestScriptedAction.reset();
+	else if(bestScriptedAction)
+		bestSpellcast.reset();
 
 	auto moveTarget = scoreEvaluator.findMoveTowardsUnreachable(stack, *targets, damageCache, hb);
 	float score = EvaluationResult::INEFFECTIVE_SCORE;
@@ -227,6 +321,12 @@ BattleAction BattleEvaluator::selectStackAction(const CStack * stack)
 		&& !stack->canShoot()
 		&& hasWorkingTowers()
 		&& !enemyMellee.empty();
+
+	if(targets->possibleAttacks.empty() && bestScriptedAction.has_value())
+	{
+		activeActionMade = true;
+		return BattleAction::makeScriptedAction(stack, bestScriptedAction->script, BattleHexArray({bestScriptedAction->target}));
+	}
 
 	if(targets->possibleAttacks.empty() && bestSpellcast.has_value())
 	{
@@ -247,6 +347,12 @@ BattleAction BattleEvaluator::selectStackAction(const CStack * stack)
 		cachedAttack.score = evaluationResult.score;
 		cachedAttack.turn = 0;
 		cachedAttack.waited = evaluationResult.wait;
+
+		if(bestScriptedAction.has_value() && bestScriptedAction->value > bestAttack.damageDiff())
+		{
+			activeActionMade = true;
+			return BattleAction::makeScriptedAction(stack, bestScriptedAction->script, BattleHexArray({bestScriptedAction->target}));
+		}
 
 		//TODO: consider more complex spellcast evaluation, f.e. because "re-retaliation" during enemy move in same turn for melee attack etc.
 		if(bestSpellcast.has_value() && bestSpellcast->value > bestAttack.damageDiff())

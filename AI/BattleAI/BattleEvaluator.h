@@ -17,6 +17,15 @@ class CSpell;
 class CBattleCallback;
 class BattleAction;
 
+/// One aim of one of the scripted actions a unit offers, and what simulating it was worth. The value
+/// is health gained, the same currency a spellcast is valued in, so the two can be compared.
+struct PossibleScriptedAction
+{
+	ScriptID script;
+	BattleHex target;
+	int64_t value = 0;
+};
+
 struct CachedAttack
 {
 	std::optional<AttackPossibility> ap;
@@ -46,6 +55,9 @@ public:
 	bool attemptCastingSpell(const CStack * stack);
 	bool canCastSpell();
 	std::optional<PossibleSpellcast> findBestCreatureSpell(const CStack * stack);
+	/// Best of every aim of every action the unit offers through a COMBAT_ACTION bonus, or nothing
+	/// when none of them is worth taking.
+	std::optional<PossibleScriptedAction> findBestScriptedAction(const CStack * stack);
 	BattleAction goTowardsNearest(
 		const CStack * stack,
 		const BattleHexArray & movementTargets,
@@ -54,6 +66,7 @@ public:
 	std::vector<BattleHex> getBrokenWallMoatHexes() const;
 	bool hasWorkingTowers() const;
 	void evaluateCreatureSpellcast(const CStack * stack, PossibleSpellcast & ps);
+	void evaluateScriptedAction(const CStack * stack, PossibleScriptedAction & action);
 	/// Value that bonuses of a simulated cast add to our army and take away from the enemy. Health that
 	/// the same cast changed is scored separately, so only what the bonuses are worth is counted here
 	float scoreBonusEffects(const battle::Units & units, const DamageCache & cache) const;

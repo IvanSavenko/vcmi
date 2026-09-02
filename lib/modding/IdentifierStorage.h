@@ -101,6 +101,10 @@ public:
 	std::optional<si32> getIdentifier(const std::string & type, const JsonNode & name, bool silent = false) const;
 	std::optional<si32> getIdentifier(const JsonNode & name, bool silent = false) const;
 	std::optional<si32> getIdentifier(const std::string & scope, const std::string & fullName, bool silent = false) const;
+	/// Three string literals bind to (scope, fullName, silent) rather than (scope, type, name),
+	/// because a char pointer converts to bool without a user-defined conversion - which silently
+	/// looks up the wrong name and suppresses the error. Reject it instead.
+	std::optional<si32> getIdentifier(const std::string & scope, const std::string & type, const char * name) const = delete;
 	std::optional<si32> getIdentifierCaseInsensitive(const std::string & scope, const std::string & type, const std::string & name, bool silent) const;
 
 	/// registers new object
