@@ -783,6 +783,7 @@ set(lib_MAIN_HEADERS
 	spells/adventure/TownPortalEffect.h
 	spells/adventure/ViewWorldEffect.h
 
+	combatScripts/ICombatActionScript.h
 	combatScripts/CombatEventPayload.h
 	combatScripts/ICombatEventScript.h
 	combatScripts/IDamageCalculatorScript.h

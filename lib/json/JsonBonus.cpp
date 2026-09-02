@@ -221,6 +221,7 @@ static TBonusParametersPtr loadBonusAddInfo(BonusType type, const JsonNode & val
 			}
 			break;
 		}
+		case BonusType::COMBAT_ACTION:
 		case BonusType::COMBAT_EVENT_TRIGGER:
 		{
 			// the whole addInfo is the script payload - which script runs is the bonus subtype
@@ -237,18 +238,18 @@ static TBonusParametersPtr loadBonusAddInfo(BonusType type, const JsonNode & val
 /// A combat script validates the parameters the bonus hands it and registers any translatable text
 /// among them. Both need the script itself, which only resolves once every mod has been loaded -
 /// scripts are a content type of their own and may well load after whoever refers to them.
-static void prepareCombatScriptParameters(Bonus * b, const JsonNode & scriptNode, const TextIdentifier & descriptionID)
+static void prepareCombatScriptParameters(Bonus * b, const JsonNode & scriptNode, const TextIdentifier & descriptionID, ScriptKind expectedKind)
 {
-	LIBRARY->identifiers()->requestIdentifier("script", scriptNode, [b, descriptionID](int32_t identifier)
+	LIBRARY->identifiers()->requestIdentifier("script", scriptNode, [b, descriptionID, expectedKind](int32_t identifier)
 	{
 		ScriptID scriptID(identifier);
 
 		const ScriptTypeDescription & script = LIBRARY->scriptTypes()->getById(scriptID);
 
-		if (script.kind != ScriptKind::COMBAT_EVENT)
+		if (script.kind != expectedKind)
 		{
-			// the bonus stays, but no combat event script will ever be found for it, so it does nothing
-			logMod->error("Bonus '%s' runs script '%s', which is not a combat event script!", descriptionID.get(), script.scriptId);
+			// the bonus stays, but no script of the kind it needs will ever be found for it, so it does nothing
+			logMod->error("Bonus '%s' runs script '%s', which is of the wrong kind!", descriptionID.get(), script.scriptId);
 			return;
 		}
 
@@ -771,7 +772,10 @@ bool JsonUtils::parseBonus(const JsonNode &ability, Bonus *b, const TextIdentifi
 		b->parameters = loadBonusAddInfo(b->type, addinfoNode);
 
 		if (b->type == BonusType::COMBAT_EVENT_TRIGGER)
-			prepareCombatScriptParameters(b, subtypeNode, descriptionID);
+			prepareCombatScriptParameters(b, subtypeNode, descriptionID, ScriptKind::COMBAT_EVENT);
+
+		if (b->type == BonusType::COMBAT_ACTION)
+			prepareCombatScriptParameters(b, subtypeNode, descriptionID, ScriptKind::COMBAT_ACTION);
 	});
 
 	b->val = static_cast<si32>(ability["val"].Float());

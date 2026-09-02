@@ -40,11 +40,14 @@ public:
 		SACRIFICE,
 		FREE_LOCATION,        // used with Force Field and Fire Wall - all tiles affected by spell must be free
 		AIMED_SPELL_CREATURE, // spell targeted at creature
+
+		SCRIPTED_ACTION,      // action defined by a script, named by actionScript
 	};
 
 private:
 	Actions action;
 	SpellID spellToCast;
+	ScriptID actionScript;
 
 public:
 	bool spellcast() const
@@ -63,20 +66,36 @@ public:
 		return spellToCast;
 	}
 
+	ScriptID script() const
+	{
+		return actionScript;
+	}
+
 	PossiblePlayerBattleAction(Actions action, SpellID spellToCast = SpellID::NONE):
-		action(static_cast<Actions>(action)),
+		action(action),
 		spellToCast(spellToCast)
 	{
 		assert((spellToCast != SpellID::NONE) == spellcast());
+		assert(action != SCRIPTED_ACTION);
+	}
+
+	/// A unit offers one of these per COMBAT_ACTION bonus it carries, so the script is what tells
+	/// two of them apart - everything else about them is identical
+	explicit PossiblePlayerBattleAction(ScriptID actionScript):
+		action(SCRIPTED_ACTION),
+		spellToCast(SpellID::NONE),
+		actionScript(actionScript)
+	{
+		assert(actionScript.hasValue());
 	}
 
 	bool operator == (const PossiblePlayerBattleAction & other) const
 	{
-		return action == other.action && spellToCast == other.spellToCast;
+		return action == other.action && spellToCast == other.spellToCast && actionScript == other.actionScript;
 	}
 
 	bool operator != (const PossiblePlayerBattleAction & other) const
 	{
-		return action != other.action || spellToCast != other.spellToCast;
+		return !(*this == other);
 	}
 };

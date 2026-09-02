@@ -1,0 +1,29 @@
+// Scripts that exist only to test engine features, rather than to implement an ability of a mod.
+{
+	"probeAction" : {
+		"implements" : "combatAction",
+		"script" : "combat/probeAction",
+		"patches" : [ ],
+		"schema" : {
+			"required" : ["damage"],
+			"properties" : {
+				"damage" : { "type" : "number", "description" : "damage dealt to every unit the action hits" }
+			},
+			"additionalProperties" : false
+		},
+		"description" : "{Probe Strike}\nHits the target and everything standing next to it."
+	},
+	"battleWideAction" : {
+		"implements" : "combatAction",
+		"script" : "combat/battleWideAction",
+		"patches" : [ ],
+		"schema" : {
+			"required" : ["damage"],
+			"properties" : {
+				"damage" : { "type" : "number", "description" : "damage dealt to every enemy on the field" }
+			},
+			"additionalProperties" : false
+		},
+		"description" : "{Probe Blast}\nHits every enemy on the battlefield."
+	}
+}

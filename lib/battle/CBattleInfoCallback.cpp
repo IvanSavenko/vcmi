@@ -349,6 +349,10 @@ std::vector<PossiblePlayerBattleAction> CBattleInfoCallback::getClientActionsFor
 			if(stack->canCast()) //TODO: check for battlefield effects that prevent casting?
 				allowedActionList.push_back(PossiblePlayerBattleAction(PossiblePlayerBattleAction::WALK_AND_SPELLCAST, spellID));
 		}
+
+		// one action per bonus, so a unit offering several of them is simply carrying several
+		for(const auto & bonus : *stack->getBonusesOfType(BonusType::COMBAT_ACTION))
+			allowedActionList.push_back(PossiblePlayerBattleAction(bonus->subtype.as<ScriptID>()));
 	}
 
 	return allowedActionList;

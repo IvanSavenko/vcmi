@@ -24,6 +24,7 @@
 #include "../../lib/battle/BattleAction.h"
 #include "../../lib/bonuses/BonusParameters.h"
 #include "../../lib/scripting/ScriptService.h"
+#include "../../lib/combatScripts/ICombatActionScript.h"
 #include "../../lib/combatScripts/ICombatEventScript.h"
 #include "../../lib/callback/IGameInfoCallback.h"
 #include "../../lib/callback/GameRandomizer.h"
@@ -571,6 +572,58 @@ bool BattleActionProcessor::doUnitSpellAction(const CBattleInfoCallback & battle
 	return true;
 }
 
+bool BattleActionProcessor::doScriptedAction(const CBattleInfoCallback & battle, const BattleAction & ba)
+{
+	const CStack * stack = battle.battleGetStackByID(ba.stackNumber);
+
+	if (!canStackAct(battle, stack))
+		return false;
+
+	// the unit has to actually offer this action - the script named in the request is otherwise
+	// whatever the client felt like naming
+	auto selector = Selector::typeSubtype(BonusType::COMBAT_ACTION, BonusSubtypeID(ba.actionScript));
+	std::shared_ptr<const Bonus> bonus = stack->getBonus(selector);
+
+	if (!bonus)
+	{
+		gameHandler->complain("This stack does not have the requested action!");
+		return false;
+	}
+
+	const ScriptTypeDescription & description = LIBRARY->scriptTypes()->getById(ba.actionScript);
+
+	if (!description.combatActionScript)
+	{
+		gameHandler->complain("Requested action is not backed by a combat action script!");
+		return false;
+	}
+
+	BattleHexArray targets;
+	for (const auto & destination : ba.target)
+		targets.insert(destination.hexValue);
+
+	if (targets.empty())
+	{
+		gameHandler->complain("Destination required for scripted action.");
+		return false;
+	}
+
+	JsonNode parameters;
+	if (bonus->parameters)
+		parameters = bonus->parameters->toCustom<JsonNode>();
+
+	parameters["val"].Integer() = bonus->val;
+
+	if (!description.combatActionScript->getSelectableHexes(battle, stack, parameters).contains(targets.front()))
+	{
+		gameHandler->complain("Invalid target for scripted action!");
+		return false;
+	}
+
+	description.combatActionScript->execute(gameHandler->spellcastEnvironment(), battle, stack, targets, parameters);
+	return true;
+}
+
 bool BattleActionProcessor::doHealAction(const CBattleInfoCallback & battle, const BattleAction & ba)
 {
 	const CStack * stack = battle.battleGetStackByID(ba.stackNumber);
@@ -736,6 +789,8 @@ bool BattleActionProcessor::dispatchBattleAction(const CBattleInfoCallback & bat
 			return doUnitSpellAction(battle, ba);
 		case EActionType::STACK_HEAL:
 			return doHealAction(battle, ba);
+		case EActionType::SCRIPTED_ACTION:
+			return doScriptedAction(battle, ba);
 	}
 	gameHandler->complain("Unrecognized action type received!!");
 	return false;

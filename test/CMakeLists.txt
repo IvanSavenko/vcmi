@@ -118,6 +118,7 @@ set(test_SRCS
 		server/battles/HotaAbilitiesTest.cpp
 		server/battles/LifeDrainTest.cpp
 		server/battles/RebirthTest.cpp
+		server/battles/ScriptedActionTest.cpp
 		server/battles/SoulStealTest.cpp
 		server/battles/SummonGuardiansTest.cpp
 		server/battles/TurnOrderTest.cpp

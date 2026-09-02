@@ -11,6 +11,7 @@
 
 #include "LuaScriptFactory.h"
 
+#include "LuaCombatActionScript.h"
 #include "LuaCombatEventScript.h"
 #include "LuaDamageCalculatorScript.h"
 #include "LuaScriptInstance.h"
@@ -52,6 +53,11 @@ LuaScriptFactory::LuaScriptFactory(LuaScriptStore & store)
 void LuaScriptFactory::initialize(const ScriptTypeDescription & description)
 {
 	store.load(description);
+}
+
+std::shared_ptr<ICombatActionScript> LuaScriptFactory::createCombatActionScript(const std::string & scriptId) const
+{
+	return std::make_shared<LuaCombatActionScript>(store.get(scriptId));
 }
 
 std::shared_ptr<ICombatEventScript> LuaScriptFactory::createCombatEventScript(const std::string & scriptId) const

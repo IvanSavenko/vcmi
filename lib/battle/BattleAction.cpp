@@ -120,6 +120,18 @@ BattleAction BattleAction::makeMove(const battle::Unit * stack, const BattleHex 
 	return ba;
 }
 
+BattleAction BattleAction::makeScriptedAction(const battle::Unit * stack, const ScriptID & actionScript, const BattleHexArray & targets)
+{
+	BattleAction ba;
+	ba.side = stack->unitSide();
+	ba.actionType = EActionType::SCRIPTED_ACTION;
+	ba.stackNumber = stack->unitId();
+	ba.actionScript = actionScript;
+	for(const BattleHex & hex : targets)
+		ba.aimToHex(hex);
+	return ba;
+}
+
 BattleAction BattleAction::makeEndOFTacticPhase(BattleSide side)
 {
 	BattleAction ba;
@@ -215,7 +227,7 @@ void BattleAction::setTarget(const battle::Target & target_)
 
 bool BattleAction::isUnitAction() const
 {
-	static const std::array<EActionType, 109> actions = {
+	static const std::array actions = {
 		EActionType::NO_ACTION,
 		EActionType::WALK,
 		EActionType::WAIT,
@@ -226,7 +238,8 @@ bool BattleAction::isUnitAction() const
 		EActionType::MONSTER_SPELL,
 		EActionType::BAD_MORALE,
 		EActionType::STACK_HEAL,
-		EActionType::WALK_AND_CAST
+		EActionType::WALK_AND_CAST,
+		EActionType::SCRIPTED_ACTION
 	};
 	return vstd::contains(actions, actionType);
 }
@@ -252,7 +265,7 @@ bool BattleAction::isBattleEndAction() const
 
 bool BattleAction::isTacticsAction() const
 {
-	static const std::array<EActionType, 9> actions = {
+	static const std::array actions = {
 		EActionType::WALK,
 		EActionType::END_TACTIC_PHASE,
 		EActionType::RETREAT,

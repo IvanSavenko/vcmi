@@ -14,6 +14,7 @@
 
 #include "../constants/EntityIdentifiers.h"
 
+class ICombatActionScript;
 class ICombatEventScript;
 class IDamageCalculatorScript;
 class JsonNode;
@@ -36,6 +37,7 @@ public:
 
 	/// One creator per script kind. Returning null is a load error, which the handler reports
 	/// rather than passing on.
+	virtual std::shared_ptr<ICombatActionScript> createCombatActionScript(const std::string & scriptId) const = 0;
 	virtual std::shared_ptr<ICombatEventScript> createCombatEventScript(const std::string & scriptId) const = 0;
 	virtual std::shared_ptr<IDamageCalculatorScript> createDamageCalculatorScript(const std::string & scriptId) const = 0;
 	virtual std::shared_ptr<spells::effects::Effect> createSpellEffect(const std::string & scriptId) const = 0;

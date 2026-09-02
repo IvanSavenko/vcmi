@@ -28,6 +28,9 @@ public:
 
 	SpellID spell;
 
+	/// which script backs this action, set only for SCRIPTED_ACTION
+	ScriptID actionScript;
+
 	BattleAction();
 
 	static BattleAction makeHeal(const battle::Unit * healer, const battle::Unit * healed);
@@ -39,6 +42,7 @@ public:
 	static BattleAction makeWalkAndCast(const battle::Unit * stack, const BattleHex & castFrom, const battle::Unit * target, const SpellID & spellID);
 	static BattleAction makeCreatureSpellcast(const battle::Unit * stack, const battle::Target & target, const SpellID & spellID);
 	static BattleAction makeMove(const battle::Unit * stack, const BattleHex & dest);
+	static BattleAction makeScriptedAction(const battle::Unit * stack, const ScriptID & actionScript, const BattleHexArray & targets);
 	static BattleAction makeEndOFTacticPhase(BattleSide side);
 	static BattleAction makeRetreat(BattleSide side);
 	static BattleAction makeSurrender(BattleSide side);
@@ -62,6 +66,9 @@ public:
 		h & actionType;
 		h & spell;
 		h & target;
+
+		if(h.hasFeature(Handler::Version::SCRIPTED_BATTLE_ACTIONS))
+			h & actionScript;
 	}
 
 	struct DestinationInfo

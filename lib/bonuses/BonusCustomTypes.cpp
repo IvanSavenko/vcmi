@@ -103,6 +103,7 @@ EntityTypeEnum bonusSubtypeEntityType(BonusType type)
 		case BonusType::NO_TERRAIN_PENALTY:
 			return EntityTypeEnum::TERRAIN;
 
+		case BonusType::COMBAT_ACTION:
 		case BonusType::COMBAT_EVENT_TRIGGER:
 			return EntityTypeEnum::SCRIPT;
 

@@ -29,6 +29,8 @@ ScriptKind parseKind(const std::string & name)
 		return ScriptKind::COMBAT_EVENT;
 	if(name == "damageCalculator")
 		return ScriptKind::DAMAGE_CALCULATOR;
+	if(name == "combatAction")
+		return ScriptKind::COMBAT_ACTION;
 
 	return ScriptKind::INVALID;
 }
@@ -106,6 +108,15 @@ void ScriptHandler::loadObject(const std::string & scope, const std::string & na
 		// nothing to gain by carrying on with the load
 		if(!description.combatEventScript)
 			throw std::runtime_error("Scripting host can not provide combat event scripts, required by '" + description.scriptId + "'!");
+	}
+
+	if(description.kind == ScriptKind::COMBAT_ACTION)
+	{
+		description.combatActionScript = factory->createCombatActionScript(description.scriptId);
+
+		// the action would be offered to the player and then do nothing, so the load stops here
+		if(!description.combatActionScript)
+			throw std::runtime_error("Scripting host can not provide combat action scripts, required by '" + description.scriptId + "'!");
 	}
 
 	if(description.kind == ScriptKind::DAMAGE_CALCULATOR)

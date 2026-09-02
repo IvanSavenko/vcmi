@@ -12,6 +12,7 @@
 
 #include "../json/JsonNode.h"
 
+class ICombatActionScript;
 class ICombatEventScript;
 class IDamageCalculatorScript;
 
@@ -25,6 +26,7 @@ enum class ScriptKind
 	SPELL_EFFECT,
 	COMBAT_EVENT,
 	DAMAGE_CALCULATOR,
+	COMBAT_ACTION,
 
 	INVALID
 };
@@ -51,4 +53,7 @@ struct ScriptTypeDescription
 	/// the damage calculator is one for the whole game rather than one per bearer, so the single
 	/// instance is likewise created on load. Null for every other kind
 	std::shared_ptr<IDamageCalculatorScript> damageCalculatorScript;
+
+	/// stateless and shared for the same reason a combat event script is. Null for every other kind
+	std::shared_ptr<ICombatActionScript> combatActionScript;
 };

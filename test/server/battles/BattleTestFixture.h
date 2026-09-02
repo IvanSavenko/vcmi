@@ -100,6 +100,8 @@ public:
 	bool attackFrom(const CStack * attacker, const BattleHex & targetHex, const BattleHex & fromHex);
 	/// Moves the stack to `destination`
 	bool move(const CStack * stack, const BattleHex & destination);
+	/// Uses one of the stack's scripted actions, aimed at the given hex.
+	bool useScriptedAction(const CStack * stack, const ScriptID & actionScript, const BattleHex & target);
 	/// Executes a defend action
 	bool defend(const CStack * stack);
 	/// Sets the clone state used by clone-specific abilities
