@@ -1,0 +1,7 @@
+/// Cursors whose artwork this mod ships, so that they are declared where that artwork lives.
+{
+	"mapTurn1Aviate" : { "pivotX" : 16, "pivotY" : 32, "animation" : "airshipCursor", "frame" : 0 },
+	"mapTurn2Aviate" : { "pivotX" : 16, "pivotY" : 32, "animation" : "airshipCursor", "frame" : 1 },
+	"mapTurn3Aviate" : { "pivotX" : 16, "pivotY" : 32, "animation" : "airshipCursor", "frame" : 2 },
+	"mapTurn4Aviate" : { "pivotX" : 16, "pivotY" : 32, "animation" : "airshipCursor", "frame" : 3 }
+}

@@ -12,6 +12,10 @@
 	"skills" : [ "config/hotaSkills.json" ],
 	"spells" : [ "config/hotaSpells.json" ],
 	"bonuses" : [ "config/hotaBonuses.json" ],
+
+	"english" : {
+		"translations" : [ "config/translations/english.json" ]
+	},
 	"objects" : {
 		"questGate" : {
 			"name" : "Quest Gate",

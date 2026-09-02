@@ -11,9 +11,10 @@
 #pragma once
 
 #include "../battle/BattleHexArray.h"
+#include "../json/JsonNode.h"
+#include "../texts/MetaString.h"
 
 class CBattleInfoCallback;
-class JsonNode;
 class ServerCallback;
 
 namespace battle
@@ -34,7 +35,25 @@ public:
 	/// anything the client cannot see.
 	virtual BattleHexArray getSelectableHexes(const CBattleInfoCallback & battle, const battle::Unit * unit, const JsonNode & parameters) const = 0;
 
+	/// Hexes the action would affect if used as aimed, which is what the player sees shaded. May be
+	/// empty for an action with nothing to show.
+	virtual BattleHexArray getAffectedHexes(const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const = 0;
+
+	/// Which of the cursors the script declares to show, by the name it declared it under. An empty
+	/// answer keeps whatever the engine chose.
+	virtual std::string getCursor(const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const = 0;
+
+	/// Line for the status bar, left unresolved so that each client renders it in its own language.
+	virtual MetaString getStatusMessage(const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const = 0;
+
 	/// Carries the action out. `targets` is what the owner aimed at, its first entry being the hex
 	/// the action was aimed at.
 	virtual void execute(ServerCallback * server, const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const = 0;
+};
+
+/// One scripted action a unit offers, resolved from the bonus granting it.
+struct DLL_LINKAGE ScriptedActionInfo
+{
+	const ICombatActionScript * script = nullptr;
+	JsonNode parameters;
 };

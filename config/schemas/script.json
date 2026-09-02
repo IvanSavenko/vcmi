@@ -16,6 +16,17 @@
 			"then" : {
 				"required" : [ "description", "priority" ]
 			}
+		},
+		{
+			"if" : {
+				"required" : [ "implements" ],
+				"properties" : {
+					"implements" : { "const" : "combatAction" }
+				}
+			},
+			"then" : {
+				"required" : [ "description", "icon" ]
+			}
 		}
 	],
 	"properties" : {
@@ -56,6 +67,11 @@
 		"description" : {
 			"type" : "string",
 			"description" : "description of the ability shown to the player, may refer to script parameters as ${parameterName}. Required of a combat event script, which shares one bonus type with every other and so has nothing else to describe it by"
+		},
+		"icon" : {
+			"type" : "string",
+			"format" : "imageFile",
+			"description" : "image of the button offering this action to the player. Required of a combat action script, which the player picks from a list of buttons and would otherwise have a blank one"
 		},
 		"priority" : {
 			"type" : "number",

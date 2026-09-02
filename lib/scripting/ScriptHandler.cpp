@@ -78,6 +78,7 @@ void ScriptHandler::loadObject(const std::string & scope, const std::string & na
 	description.kind = parseKind(data["implements"].String());
 	description.parametersSchema = data["schema"];
 	description.priority = data["priority"].Integer();
+	description.icon = ImagePath::fromJson(data["icon"]);
 
 	for(const auto & patchEntry : data["patches"].Vector())
 		description.patches.emplace_back(patchEntry.getModScope(), patchEntry.String());

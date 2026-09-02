@@ -225,6 +225,45 @@ std::set<TModID> CModHandler::getModEnabledSoftDependencies(const TModID & modId
 	return softDependencies;
 }
 
+JsonNode CModHandler::assembleModConfigs(const std::string & fieldName, const JsonPath & legacyPath, const std::string & schemaName) const
+{
+	JsonNode result;
+
+	for(const TModID & modName : getActiveMods())
+	{
+		const JsonNode & declared = getModInfo(modName).getLocalValue(fieldName);
+		JsonNode modConfig;
+
+		if(!declared.isNull())
+		{
+			modConfig = JsonUtils::assembleFromFiles(declared);
+		}
+		else if(CResourceHandler::get(modName)->existsResource(legacyPath))
+		{
+			// mods older than the manifest field simply ship the file, and are read the way they
+			// always were, so that none of them has to be changed
+			bool isValidFile = true;
+			modConfig = JsonUtils::assembleFromFiles({legacyPath.getOriginalName()}, modName, {}, isValidFile);
+		}
+
+		// most mods declare nothing, and merging a null onto the result clears it
+		if(modConfig.isNull())
+			continue;
+
+		// assembling leaves the scope on the root alone, while the checks below resolve what an
+		// entry names against the filesystem of its own mod - so every entry needs its owner
+		modConfig.setModScope(modName);
+
+		if(!schemaName.empty())
+			for(const auto & entry : modConfig.Struct())
+				JsonUtils::validate(entry.second, schemaName, fieldName + " " + entry.first + " of mod " + modName);
+
+		JsonUtils::merge(result, modConfig);
+	}
+
+	return result;
+}
+
 void CModHandler::initializeConfig()
 {
 	for(const TModID & modName : getActiveMods())

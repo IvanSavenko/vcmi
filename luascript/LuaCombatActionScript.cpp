@@ -15,6 +15,8 @@
 #include "LuaScriptInstance.h"
 #include "LuaScriptPool.h"
 
+#include "api/LuaMetaString.h"
+
 #include <vcmi/ServerCallback.h>
 
 #include "../lib/battle/CBattleInfoCallback.h"
@@ -24,6 +26,9 @@ namespace scripting
 {
 
 static const std::string GET_SELECTABLE_HEXES = "getSelectableHexes";
+static const std::string GET_AFFECTED_HEXES = "getAffectedHexes";
+static const std::string GET_CURSOR = "getCursor";
+static const std::string GET_STATUS_MESSAGE = "getStatusMessage";
 static const std::string EXECUTE = "execute";
 
 LuaCombatActionScript::LuaCombatActionScript(const LuaScriptInstance * script)
@@ -43,6 +48,21 @@ BattleHexArray LuaCombatActionScript::getSelectableHexes(const CBattleInfoCallba
 	// a script cannot construct a BattleHexArray, so it is handed an empty one to fill - the same
 	// arrangement spell effects use for adjustAffectedHexes
 	return contextOf(battle)->callMethod<BattleHexArray>(GET_SELECTABLE_HEXES, parameters, &battle, unit, BattleHexArray());
+}
+
+BattleHexArray LuaCombatActionScript::getAffectedHexes(const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const
+{
+	return contextOf(battle)->callMethod<BattleHexArray>(GET_AFFECTED_HEXES, parameters, &battle, unit, targets, BattleHexArray());
+}
+
+std::string LuaCombatActionScript::getCursor(const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const
+{
+	return contextOf(battle)->callMethod<std::string>(GET_CURSOR, parameters, &battle, unit, targets);
+}
+
+MetaString LuaCombatActionScript::getStatusMessage(const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const
+{
+	return contextOf(battle)->callMethod<api::LuaMetaString>(GET_STATUS_MESSAGE, parameters, &battle, unit, targets).toMetaString();
 }
 
 void LuaCombatActionScript::execute(ServerCallback * server, const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const

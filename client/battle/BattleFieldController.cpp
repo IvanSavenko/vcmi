@@ -685,9 +685,15 @@ void BattleFieldController::showHighlightedHexes(Canvas & canvas)
 	}
 	else
 	{
-		hoveredMouseHexes = useSpellRangeForMouse
-			? hoveredSpellHexes
-			: ( useMoveRangeForMouse ? hoveredMoveHexes : hoveredMouseHex);
+		// a scripted action decides its own shaded area, which is the only thing that knows what it hits
+		BattleHexArray scriptedHexes = owner.actionsController->currentActionAffectedHexes(hoveredHex);
+
+		if(!scriptedHexes.empty())
+			hoveredMouseHexes = scriptedHexes;
+		else
+			hoveredMouseHexes = useSpellRangeForMouse
+				? hoveredSpellHexes
+				: ( useMoveRangeForMouse ? hoveredMoveHexes : hoveredMouseHex);
 	}
 
 	for(int hex = 0; hex < GameConstants::BFIELD_SIZE; ++hex)

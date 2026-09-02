@@ -320,6 +320,10 @@
 			"description" : "List of configuration files for biomes",
 			"$ref" : "#/definitions/fileListOrObject"
 		},
+		"cursors" : {
+			"description" : "List of configuration files with cursors added or changed by this mod",
+			"$ref" : "#/definitions/fileListOrObject"
+		},
 		"bonuses" : {
 			"description" : "List of configuration files for bonuses",
 			"$ref" : "#/definitions/fileListOrObject"

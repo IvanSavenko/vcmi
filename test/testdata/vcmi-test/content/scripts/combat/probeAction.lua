@@ -9,20 +9,9 @@ function Script:isEnemy(unit, other)
 	return other and other:isAlive() and other:getSide() ~= unit:getSide()
 end
 
-function Script:getSelectableHexes(battle, unit, hexes)
-	for _, other in ipairs(battle:getUnitsIf(function(candidate) return self:isEnemy(unit, candidate) end)) do
-		local occupied = other:getHexes()
-		for i = 1, occupied:size() do
-			hexes:insert(occupied:at(i))
-		end
-	end
-
-	return hexes
-end
-
-function Script:execute(server, battle, unit, targets)
-	local aim = battle:getUnitByPos(targets:at(1), true)
-	if not aim then return end
+function Script:getVictims(battle, unit, aimHex)
+	local aim = battle:getUnitByPos(aimHex, true)
+	if not aim then return {} end
 
 	local victims = { [aim:unitID()] = aim }
 	local around = aim:getSurroundingHexes()
@@ -34,7 +23,44 @@ function Script:execute(server, battle, unit, targets)
 		end
 	end
 
-	for _, victim in pairs(victims) do
+	return victims
+end
+
+function Script:getSelectableHexes(battle, unit, hexes)
+	for _, other in ipairs(battle:getUnitsIf(function(candidate) return self:isEnemy(unit, candidate) end)) do
+		local occupied = other:getHexes()
+		for i = 1, occupied:size() do
+			hexes:insert(occupied:at(i))
+		end
+	end
+
+	return hexes
+end
+
+function Script:getAffectedHexes(battle, unit, targets, hexes)
+	for _, victim in pairs(self:getVictims(battle, unit, targets:at(1))) do
+		local occupied = victim:getHexes()
+		for i = 1, occupied:size() do
+			hexes:insert(occupied:at(i))
+		end
+	end
+
+	return hexes
+end
+
+function Script:getCursor(battle, unit, targets)
+	return "combatHitNorth"
+end
+
+function Script:getStatusMessage(battle, unit, targets)
+	local count = 0
+	for _ in pairs(self:getVictims(battle, unit, targets:at(1))) do count = count + 1 end
+
+	return { append = { "vcmi-test.action.probeStrike" }, replaceNumbers = { count } }
+end
+
+function Script:execute(server, battle, unit, targets)
+	for _, victim in pairs(self:getVictims(battle, unit, targets:at(1))) do
 		server:damageUnit(battle, victim, self.damage)
 	end
 end

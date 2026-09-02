@@ -15,6 +15,9 @@
 #include "../../../lib/bonuses/BonusParameters.h"
 #include "../../../lib/modding/ModScope.h"
 #include "../../../lib/modding/IdentifierStorage.h"
+#include "../../../lib/scripting/ScriptService.h"
+#include "../../../lib/texts/CGeneralTextHandler.h"
+#include "../../../lib/texts/MetaString.h"
 
 /// Actions a unit offers because it carries a COMBAT_ACTION bonus, rather than because the engine
 /// knows about them. The fixture script hits the unit it is aimed at together with everything
@@ -147,4 +150,85 @@ TEST_F(ScriptedActionTest, battleWideActionIsAimedAtItsOwnBearer)
 	EXPECT_EQ(nearBefore - near->getAvailableHealth(), damagePerVictim);
 	EXPECT_EQ(farBefore - far->getAvailableHealth(), damagePerVictim);
 	EXPECT_EQ(actor->getAvailableHealth(), actorBefore);
+}
+
+/// What the client asks a scripted action before the player commits to it: where it may be aimed,
+/// what it would hit, which cursor to show and what to write in the status bar. All of it runs off
+/// the battle callback alone, which is what lets the client answer without the server.
+TEST_F(ScriptedActionTest, answersTheFeedbackTheClientNeeds)
+{
+	startGame();
+	startBattle();
+
+	CStack * actor = addStack(BattleSide::ATTACKER, creatureByName("core:pikeman"), BattleHex(attackerHex), 10);
+	CStack * aimed = addStack(BattleSide::DEFENDER, creatureByName("core:pikeman"), BattleHex(aimedHex), 1000);
+	addStack(BattleSide::DEFENDER, creatureByName("core:pikeman"), BattleHex(adjacentHex), 1000);
+	addStack(BattleSide::DEFENDER, creatureByName("core:pikeman"), BattleHex(distantHex), 1000);
+	ASSERT_NE(actor, nullptr);
+
+	JsonNode parameters;
+	parameters["damage"].Integer() = damagePerVictim;
+
+	const ScriptID script = scriptByName("vcmi-test:probeAction");
+	giveScriptedAction(actor, script, parameters);
+
+	beginCombat();
+
+	ScriptedActionInfo info = battle()->getScriptedAction(actor, script);
+	ASSERT_NE(info.script, nullptr);
+
+	const BattleHexArray targets({BattleHex(aimedHex)});
+
+	// aimable at every enemy, including the one out of reach of the blast
+	BattleHexArray selectable = info.script->getSelectableHexes(*battle(), actor, info.parameters);
+	EXPECT_TRUE(selectable.contains(BattleHex(aimedHex)));
+	EXPECT_TRUE(selectable.contains(BattleHex(distantHex)));
+	EXPECT_FALSE(selectable.contains(BattleHex(attackerHex)));
+
+	// but hitting only the aimed unit and the one beside it
+	BattleHexArray affected = info.script->getAffectedHexes(*battle(), actor, targets, info.parameters);
+	EXPECT_TRUE(affected.contains(BattleHex(aimedHex)));
+	EXPECT_TRUE(affected.contains(BattleHex(adjacentHex)));
+	EXPECT_FALSE(affected.contains(BattleHex(distantHex)));
+
+	EXPECT_EQ(info.script->getCursor(*battle(), actor, targets, info.parameters), "combatHitNorth");
+
+	// the message stays unresolved until something renders it, and carries the count as a number
+	// rather than as text glued onto the end of a translated string
+	MetaString message = info.script->getStatusMessage(*battle(), actor, targets, info.parameters);
+	EXPECT_EQ(message.toString(LIBRARY->generaltexth.get()), "Strike 2 units");
+
+	// the parameters the bonus carried reach the script, alongside the value of that bonus
+	EXPECT_EQ(info.parameters["damage"].Integer(), damagePerVictim);
+
+	(void)aimed;
+}
+
+/// A script that implements none of the feedback methods still works - the base class answers for it.
+TEST_F(ScriptedActionTest, fallsBackToTheBaseClassForFeedback)
+{
+	startGame();
+	startBattle();
+
+	CStack * actor = addStack(BattleSide::ATTACKER, creatureByName("core:pikeman"), BattleHex(attackerHex), 10);
+	addStack(BattleSide::DEFENDER, creatureByName("core:pikeman"), BattleHex(aimedHex), 1000);
+	ASSERT_NE(actor, nullptr);
+
+	JsonNode parameters;
+	parameters["damage"].Integer() = damagePerVictim;
+
+	const ScriptID script = scriptByName("vcmi-test:battleWideAction");
+	giveScriptedAction(actor, script, parameters);
+
+	beginCombat();
+
+	ScriptedActionInfo info = battle()->getScriptedAction(actor, script);
+	ASSERT_NE(info.script, nullptr);
+
+	const BattleHexArray targets({actor->getPosition()});
+
+	EXPECT_TRUE(info.script->getAffectedHexes(*battle(), actor, targets, info.parameters).contains(actor->getPosition()));
+	EXPECT_EQ(info.script->getCursor(*battle(), actor, targets, info.parameters), "");
+
+	EXPECT_EQ(info.script->getStatusMessage(*battle(), actor, targets, info.parameters).toString(LIBRARY->generaltexth.get()), "");
 }

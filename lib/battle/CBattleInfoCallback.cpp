@@ -21,6 +21,7 @@
 #include "../bonuses/BonusParameters.h"
 #include "../entities/building/TownFortifications.h"
 #include "../GameLibrary.h"
+#include "../combatScripts/ICombatActionScript.h"
 #include "../combatScripts/IDamageCalculatorScript.h"
 #include "../scripting/ScriptService.h"
 #include "../spells/ObstacleCasterProxy.h"
@@ -356,6 +357,27 @@ std::vector<PossiblePlayerBattleAction> CBattleInfoCallback::getClientActionsFor
 	}
 
 	return allowedActionList;
+}
+
+ScriptedActionInfo CBattleInfoCallback::getScriptedAction(const battle::Unit * unit, const ScriptID & actionScript) const
+{
+	ScriptedActionInfo result;
+
+	auto selector = Selector::typeSubtype(BonusType::COMBAT_ACTION, BonusSubtypeID(actionScript));
+	std::shared_ptr<const Bonus> bonus = unit->getBonus(selector);
+
+	if(!bonus)
+		return result;
+
+	result.script = LIBRARY->scriptTypes()->getById(actionScript).combatActionScript.get();
+
+	if(bonus->parameters)
+		result.parameters = bonus->parameters->toCustom<JsonNode>();
+
+	// value of this bonus alone, matching how a combat event script is handed its own value
+	result.parameters["val"].Integer() = bonus->val;
+
+	return result;
 }
 
 PossiblePlayerBattleAction CBattleInfoCallback::getCasterAction(const CSpell * spell, const spells::Caster * caster, spells::Mode mode) const

@@ -21,7 +21,9 @@
 #include "render/IRenderHandler.h"
 
 #include "../../lib/CConfigHandler.h"
+#include "../../lib/GameLibrary.h"
 #include "../../lib/json/JsonUtils.h"
+#include "../../lib/modding/CModHandler.h"
 
 std::unique_ptr<ICursor> CursorHandler::createCursor()
 {
@@ -54,7 +56,7 @@ CursorHandler::~CursorHandler() = default;
 
 void CursorHandler::init()
 {
-	JsonNode cursorConfig = JsonUtils::assembleFromFiles("config/cursors.json");
+	JsonNode cursorConfig = LIBRARY->modh->assembleModConfigs("cursors", JsonPath::builtin("config/cursors.json"), "vcmi:cursor");
 	std::vector<AnimationPath> animations;
 
 	for (const auto & cursorEntry : cursorConfig.Struct())
@@ -84,14 +86,20 @@ void CursorHandler::set(const std::string & index)
 	currentCursorID = index;
 	currentCursorIndex = 0;
 	frameTime = 0;
+	bool found = false;
 	for (size_t i = 0; i < cursors.size(); ++i)
 	{
 		if (cursors[i].cursorID == index)
 		{
 			currentCursorIndex = i;
+			found = true;
 			break;
 		}
 	}
+
+	// content naming a cursor that does not exist would otherwise silently get the first one
+	if (!found)
+		logGlobal->error("Requested unknown cursor '%s'!", index);
 
 	const auto & currentCursor = cursors.at(currentCursorIndex);
 

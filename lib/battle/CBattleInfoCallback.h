@@ -13,6 +13,7 @@
 
 #include "ReachabilityInfo.h"
 #include "BattleAttackInfo.h"
+#include "../combatScripts/ICombatActionScript.h"
 
 class CGHeroInstance;
 class CStack;
@@ -164,6 +165,11 @@ public:
 	SpellID getRandomCastedSpell(vstd::RNG & rand, const CStack * caster) const; //called at the beginning of turn for Faerie Dragon
 
 	std::vector<PossiblePlayerBattleAction> getClientActionsForStack(const CStack * stack, const BattleClientInterfaceData & data);
+
+	/// The script backing one of the unit's scripted actions, with the parameters of the bonus that
+	/// granted it. Answers a null script when the unit offers no such action, which is what the
+	/// server checks before running anything a client asked for.
+	ScriptedActionInfo getScriptedAction(const battle::Unit * unit, const ScriptID & actionScript) const;
 	PossiblePlayerBattleAction getCasterAction(const CSpell * spell, const spells::Caster * caster, spells::Mode mode) const;
 
 	//convenience methods using the ones above

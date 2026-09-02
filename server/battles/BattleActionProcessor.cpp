@@ -581,20 +581,11 @@ bool BattleActionProcessor::doScriptedAction(const CBattleInfoCallback & battle,
 
 	// the unit has to actually offer this action - the script named in the request is otherwise
 	// whatever the client felt like naming
-	auto selector = Selector::typeSubtype(BonusType::COMBAT_ACTION, BonusSubtypeID(ba.actionScript));
-	std::shared_ptr<const Bonus> bonus = stack->getBonus(selector);
+	ScriptedActionInfo action = battle.getScriptedAction(stack, ba.actionScript);
 
-	if (!bonus)
+	if (!action.script)
 	{
 		gameHandler->complain("This stack does not have the requested action!");
-		return false;
-	}
-
-	const ScriptTypeDescription & description = LIBRARY->scriptTypes()->getById(ba.actionScript);
-
-	if (!description.combatActionScript)
-	{
-		gameHandler->complain("Requested action is not backed by a combat action script!");
 		return false;
 	}
 
@@ -608,19 +599,13 @@ bool BattleActionProcessor::doScriptedAction(const CBattleInfoCallback & battle,
 		return false;
 	}
 
-	JsonNode parameters;
-	if (bonus->parameters)
-		parameters = bonus->parameters->toCustom<JsonNode>();
-
-	parameters["val"].Integer() = bonus->val;
-
-	if (!description.combatActionScript->getSelectableHexes(battle, stack, parameters).contains(targets.front()))
+	if (!action.script->getSelectableHexes(battle, stack, action.parameters).contains(targets.front()))
 	{
 		gameHandler->complain("Invalid target for scripted action!");
 		return false;
 	}
 
-	description.combatActionScript->execute(gameHandler->spellcastEnvironment(), battle, stack, targets, parameters);
+	action.script->execute(gameHandler->spellcastEnvironment(), battle, stack, targets, action.parameters);
 	return true;
 }
 

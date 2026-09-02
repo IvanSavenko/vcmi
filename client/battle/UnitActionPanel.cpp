@@ -26,6 +26,7 @@
 #include "../../lib/GameLibrary.h"
 #include "../../lib/battle/CPlayerBattleCallback.h"
 #include "../../lib/json/JsonUtils.h"
+#include "../../lib/scripting/ScriptService.h"
 #include "../../lib/mapObjects/CGHeroInstance.h"
 #include "../../lib/spells/CSpell.h"
 #include "../GameInstance.h"
@@ -113,6 +114,39 @@ void UnitActionPanel::testAndAddSpell(const std::vector<PossiblePlayerBattleActi
 	buttons.push_back(button);
 }
 
+void UnitActionPanel::testAndAddScriptedAction(const std::vector<PossiblePlayerBattleAction> & allActions, const ScriptID & scriptFilter)
+{
+	std::vector<PossiblePlayerBattleAction> filteredActions;
+
+	for (const auto & action : allActions)
+		if (action.get() == PossiblePlayerBattleAction::SCRIPTED_ACTION && action.script() == scriptFilter)
+			filteredActions.push_back(action);
+
+	if (filteredActions.empty())
+		return;
+
+	const ScriptTypeDescription & description = LIBRARY->scriptTypes()->getById(scriptFilter);
+
+	if (description.icon.empty())
+	{
+		logGlobal->error("Combat action script '%s' declares no icon, so it can not be offered as a button!", description.scriptId);
+		return;
+	}
+
+	int index = buttons.size();
+
+	const auto & callback = [this, filteredActions, index](bool isSelected){ if (isSelected) setActions(index, filteredActions); else restoreAllActions(); };
+
+	MetaString tooltip;
+	tooltip.appendTextID(description.descriptionTextID);
+
+	auto button = std::make_shared<CToggleButton>(Point(2, 7 + 50 * index), AnimationPath::builtin("battleUnitAction"), CButton::tooltip(tooltip.toString(&GAME->translator())), callback);
+	button->setOverlay(std::make_shared<CPicture>(description.icon));
+	button->setHighlightedBorderColor(Colors::WHITE);
+	button->setAllowDeselection(true);
+	buttons.push_back(button);
+}
+
 void UnitActionPanel::setPossibleActions(const std::vector<PossiblePlayerBattleAction> & newActions)
 {
 	OBJECT_CONSTRUCTION;
@@ -133,6 +167,11 @@ void UnitActionPanel::setPossibleActions(const std::vector<PossiblePlayerBattleA
 	testAndAddAction(newActions, actionsShoot, ImagePath::builtin("battle/actionShoot"), "vcmi.battle.action.shoot");
 	testAndAddAction(newActions, actionsGenie, ImagePath::builtin("battle/actionGenie"), "vcmi.battle.action.genie");
 	testAndAddAction(newActions, actionsAttackLongWeapon, ImagePath::builtin("battle/actionLongWeapon"), "vcmi.battle.action.attackLongWeapon");
+
+	// one button per script, so a unit offering two variants of an ability gets one button each
+	for (const auto & action : newActions)
+		if (action.get() == PossiblePlayerBattleAction::SCRIPTED_ACTION)
+			testAndAddScriptedAction(newActions, action.script());
 
 	std::vector<SpellID> spells;
 

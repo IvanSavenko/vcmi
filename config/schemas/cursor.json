@@ -1,0 +1,35 @@
+{
+	"type" : "object",
+	"$schema" : "http://json-schema.org/draft-04/schema",
+	"title" : "VCMI cursor format",
+	"description" : "One cursor, as declared in a file listed under 'cursors' in the mod manifest",
+	"additionalProperties" : false,
+	"properties" : {
+		"image" : {
+			"type" : "string",
+			"format" : "imageFile",
+			"description" : "image to use for this cursor. Overrides 'animation'"
+		},
+		"animation" : {
+			"type" : "string",
+			"format" : "animationFile",
+			"description" : "animation to take this cursor from. Requires 'frame' or 'animated'"
+		},
+		"frame" : {
+			"type" : "number",
+			"description" : "index of the frame inside the animation to use for this cursor"
+		},
+		"animated" : {
+			"type" : "boolean",
+			"description" : "when true the cursor is animated using the entire animation file"
+		},
+		"pivotX" : {
+			"type" : "number",
+			"description" : "horizontal position inside the image acting as the pointer tip, which is the pixel a click is reported at"
+		},
+		"pivotY" : {
+			"type" : "number",
+			"description" : "vertical position inside the image acting as the pointer tip"
+		}
+	}
+}

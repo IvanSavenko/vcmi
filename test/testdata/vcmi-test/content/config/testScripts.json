@@ -11,6 +11,7 @@
 			},
 			"additionalProperties" : false
 		},
+		"icon" : "battle/actionAttack",
 		"description" : "{Probe Strike}\nHits the target and everything standing next to it."
 	},
 	"battleWideAction" : {
@@ -24,6 +25,7 @@
 			},
 			"additionalProperties" : false
 		},
+		"icon" : "battle/actionAttack",
 		"description" : "{Probe Blast}\nHits every enemy on the battlefield."
 	}
 }

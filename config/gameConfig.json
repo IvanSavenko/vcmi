@@ -1,4 +1,9 @@
 {
+	"cursors" :
+	[
+		"config/cursors.json"
+	],
+
 	"factions" :
 	[
 		"config/factions/castle.json",

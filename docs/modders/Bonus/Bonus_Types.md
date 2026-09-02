@@ -110,6 +110,32 @@ Example:
 }
 ```
 
+### COMBAT_ACTION
+
+Offers the affected unit one more action to take in combat, defined by a
+[combat action script](../Lua/Combat_Action_Scripts.md). The script decides where the action may be
+aimed, what it does, and what the player sees while choosing it.
+
+- subtype: combat action script backing this action
+- val: magnitude of the ability, whatever that means for this script
+- addInfo: optional, arbitrary json initializing the script on every call, the same way
+  [COMBAT_EVENT_TRIGGER](#combat_event_trigger) parameters do. Read-only.
+
+A unit may carry several of these. Each one is a separate action with its own button, so a creature
+offering two variants of an ability carries the same script twice with different parameters.
+
+Example:
+
+```json
+{
+	"type" : "COMBAT_ACTION",
+	"subtype" : "devour",
+	"addInfo" : {
+		"healPercentage" : 50
+	}
+}
+```
+
 ## Player bonuses
 
 Intended to be setup as global effect, AI cheat etc.

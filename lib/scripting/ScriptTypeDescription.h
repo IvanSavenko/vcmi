@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../json/JsonNode.h"
+#include "../filesystem/ResourcePath.h"
 
 class ICombatActionScript;
 class ICombatEventScript;
@@ -44,6 +45,7 @@ struct ScriptTypeDescription
 	JsonNode parametersSchema; ///< json schema validating the parameters of every instance
 	std::vector<std::string> stringRegistrations; ///< parameter fields holding translatable text
 	std::string descriptionTextID; ///< text shown to the player, empty if the script declares none
+	ImagePath icon; ///< button image, for a kind of script the player picks from a list
 	int priority = 0; ///< scripts reacting to the same event run from lowest to highest
 
 	/// a combat event script is stateless and shared between every unit running it, so the single

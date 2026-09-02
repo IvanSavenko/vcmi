@@ -17,6 +17,7 @@ Every script is declared in the `scripts` section of a mod. `implements` selects
 
 - [Spell Effect Scripts](Spell_Effect_Scripts.md) - `"implements" : "spellEffect"`, an effect of a spell, such as the built-in `core:damage` or `core:summon`
 - [Combat Event Scripts](Combat_Event_Scripts.md) - `"implements" : "combatEvent"`, a reaction to events happening to a unit in combat, such as Fire Shield or Death Stare
+- [Combat Action Scripts](Combat_Action_Scripts.md) - `"implements" : "combatAction"`, one more action a unit offers its owner, alongside attack, shoot and move
 - [Damage Calculator Script](Damage_Calculator_Script.md) - `"implements" : "damageCalculator"`, attack damage calculation. One instance handles the game, and mods change its rules with patches
 
 ## Script globals
@@ -48,6 +49,11 @@ Fields a `combatEvent` script declares on top of those:
 
 - `description` - text shown for the ability. `${val}` is replaced with the bonus value and `${parameterName}` with a script parameter. This field distinguishes scripted abilities in the creature window. Use an empty string for a hidden script
 - `priority` - handler execution order, from lowest to highest. The field is required because ordering affects behavior. `0` is the usual value
+
+Fields a `combatAction` script declares on top of the shared ones:
+
+- `icon` - image of the button offering this action to the player, who picks it from a row of them
+- `description` - text shown to the player, used as the tooltip of that button
 
 Fields a script may declare:
 

@@ -33,6 +33,7 @@
 #include "../../lib/GameLibrary.h"
 #include "../../lib/battle/BattleAction.h"
 #include "../../lib/battle/CPlayerBattleCallback.h"
+#include "../../lib/scripting/ScriptService.h"
 #include "../../lib/callback/CCallback.h"
 #include "../../lib/spells/ISpellMechanics.h"
 #include "../../lib/spells/effects/Effect.h"
@@ -361,6 +362,9 @@ void BattleActionsController::reorderPossibleActionsPriority(const CStack * stac
 			case PossiblePlayerBattleAction::RANDOM_GENIE_SPELL:
 				return 2;
 				break;
+			case PossiblePlayerBattleAction::SCRIPTED_ACTION:
+				return 3;
+				break;
 			case PossiblePlayerBattleAction::SHOOT:
 				if(targetStack == nullptr || targetStack->unitSide() == stack->unitSide() || !targetStack->alive())
 					return 100; //bottom priority
@@ -497,6 +501,30 @@ const CStack * BattleActionsController::getStackForHex(const BattleHex & hovered
 	return owner.getBattle()->battleGetStackByPos(hoveredHex, false);
 }
 
+ScriptedActionInfo BattleActionsController::getScriptedAction(PossiblePlayerBattleAction action) const
+{
+	const CStack * stack = owner.stacksController->getActiveStack();
+
+	if(!stack || action.get() != PossiblePlayerBattleAction::SCRIPTED_ACTION)
+		return ScriptedActionInfo();
+
+	return owner.getBattle()->getScriptedAction(stack, action.script());
+}
+
+BattleHexArray BattleActionsController::currentActionAffectedHexes(const BattleHex & hoveredHex)
+{
+	if(possibleActions.empty() || !hoveredHex.isValid())
+		return BattleHexArray();
+
+	PossiblePlayerBattleAction action = selectAction(hoveredHex);
+	ScriptedActionInfo info = getScriptedAction(action);
+
+	if(!info.script || !actionIsLegal(action, hoveredHex))
+		return BattleHexArray();
+
+	return info.script->getAffectedHexes(*owner.getBattle(), owner.stacksController->getActiveStack(), BattleHexArray({hoveredHex}), info.parameters);
+}
+
 void BattleActionsController::actionSetCursor(PossiblePlayerBattleAction action, const BattleHex & targetHex)
 {
 	switch (action.get())
@@ -582,6 +610,20 @@ void BattleActionsController::actionSetCursor(PossiblePlayerBattleAction action,
 		case PossiblePlayerBattleAction::HERO_INFO:
 			ENGINE->cursor().set(Cursor::Combat::HERO);
 			return;
+
+		case PossiblePlayerBattleAction::SCRIPTED_ACTION:
+		{
+			ScriptedActionInfo info = getScriptedAction(action);
+			std::string name;
+			if(info.script)
+				name = info.script->getCursor(*owner.getBattle(), owner.stacksController->getActiveStack(), BattleHexArray({targetHex}), info.parameters);
+
+			if(name.empty())
+				ENGINE->cursor().set(Cursor::Combat::POINTER);
+			else
+				ENGINE->cursor().set(name);
+			return;
+		}
 	}
 	assert(0);
 }
@@ -778,6 +820,16 @@ std::string BattleActionsController::actionGetStatusMessage(PossiblePlayerBattle
 
 		case PossiblePlayerBattleAction::HERO_INFO:
 			return  LIBRARY->generaltexth->translate("core.genrltxt.417"); // "View Hero Stats"
+
+		case PossiblePlayerBattleAction::SCRIPTED_ACTION:
+		{
+			ScriptedActionInfo info = getScriptedAction(action);
+			if(!info.script)
+				return "";
+
+			MetaString message = info.script->getStatusMessage(*owner.getBattle(), owner.stacksController->getActiveStack(), BattleHexArray({targetHex}), info.parameters);
+			return message.toString(&GAME->translator());
+		}
 	}
 	assert(0);
 	return "";
@@ -926,6 +978,15 @@ bool BattleActionsController::actionIsLegal(PossiblePlayerBattleAction action, c
 
 		case PossiblePlayerBattleAction::HEAL:
 			return targetStack && targetStackOwned && targetStack->canBeHealed();
+
+		case PossiblePlayerBattleAction::SCRIPTED_ACTION:
+		{
+			ScriptedActionInfo info = getScriptedAction(action);
+			if(!info.script)
+				return false;
+
+			return info.script->getSelectableHexes(*owner.getBattle(), owner.stacksController->getActiveStack(), info.parameters).contains(targetHex);
+		}
 	}
 
 	assert(0);
@@ -974,6 +1035,13 @@ void BattleActionsController::actionRealize(PossiblePlayerBattleAction action, c
 		case PossiblePlayerBattleAction::SHOOT:
 		{
 			owner.giveCommand(EActionType::SHOOT, targetHex);
+			return;
+		}
+
+		case PossiblePlayerBattleAction::SCRIPTED_ACTION:
+		{
+			const auto * actor = owner.stacksController->getActiveStack();
+			owner.sendCommand(BattleAction::makeScriptedAction(actor, action.script(), BattleHexArray({targetHex})), actor);
 			return;
 		}
 

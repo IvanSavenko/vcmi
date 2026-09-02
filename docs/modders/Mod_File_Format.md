@@ -196,6 +196,12 @@ These are fields that are present only in local mod.json file
 	[
 		"config/templates.json"
 	],
+
+	// List of configuration files with cursors added or changed by this mod
+	"cursors" :
+	[
+		"config/cursors.json"
+	],
 	
 	// Optional, primaly used by translation mods
 	// Defines strings that are translated by mod into base language specified in 'language' field

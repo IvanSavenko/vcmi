@@ -9,6 +9,9 @@
  */
 #pragma once
 
+#include "../filesystem/ResourcePath.h"
+#include "../json/JsonNode.h"
+
 class CModHandler;
 class ModDescription;
 class CContentHandler;
@@ -60,6 +63,13 @@ public:
 	const std::vector<std::string> & getActiveMods() const;
 
 	const ModDescription & getModInfo(const TModID & modId) const;
+
+	/// Merged contents of the files every active mod lists under the given manifest field, in load
+	/// order. Each entry carries the mod that declared it, so an image it names is looked up in that
+	/// mod's filesystem and a problem is reported against its name. `legacyPath` is read from mods
+	/// that declare no such field, for configs that predate the manifest entry; `schemaName`, when
+	/// given, validates every entry of the result.
+	JsonNode assembleModConfigs(const std::string & fieldName, const JsonPath & legacyPath, const std::string & schemaName = {}) const;
 
 	/// load content from all available mods
 	void load();

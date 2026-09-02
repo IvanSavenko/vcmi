@@ -30,6 +30,7 @@ private:
 
 	void testAndAddAction(const std::vector<PossiblePlayerBattleAction> & allActions, const std::vector<PossiblePlayerBattleAction::Actions> & actionFilter, const ImagePath & iconPath, const std::string & descriptionTextID );
 	void testAndAddSpell(const std::vector<PossiblePlayerBattleAction> & allActions, const SpellID & spellFilter );
+	void testAndAddScriptedAction(const std::vector<PossiblePlayerBattleAction> & allActions, const ScriptID & scriptFilter );
 
 	void restoreAllActions();
 	void setActions(int buttonIndex, const std::vector<PossiblePlayerBattleAction> & newActions);

@@ -77,6 +77,9 @@ class BattleActionsController
 	/// returns true if current stack is a spellcaster
 	bool isActiveStackSpellcaster() const;
 
+	/// script and parameters behind a SCRIPTED_ACTION, taken from the bonus of the acting stack
+	ScriptedActionInfo getScriptedAction(PossiblePlayerBattleAction action) const;
+
 public:
 	BattleActionsController(BattleInterface & owner);
 
@@ -99,6 +102,9 @@ public:
 
 	/// returns true if currently selected action allows long weapon reach for melee attacks
 	bool currentActionUsesLongWeapon(const BattleHex & hoveredHex);
+
+	/// hexes the scripted action preferred for this hex would affect, empty when none is preferred
+	BattleHexArray currentActionAffectedHexes(const BattleHex & hoveredHex);
 
 	/// enter targeted spellcasting mode for creature, e.g. via "F" hotkey
 	void enterCreatureCastingMode();
