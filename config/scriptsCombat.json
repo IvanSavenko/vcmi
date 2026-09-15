@@ -53,7 +53,9 @@
 		"patches" : [ ],
 		"priority" : 0,
 		"schema" : {
-			"properties" : {},
+			"properties" : {
+				"offset" : { "type" : "number", "description" : "heroDamage offset for the damage calculation" }
+			},
 			"additionalProperties" : false
 		},
 		"description" : ""

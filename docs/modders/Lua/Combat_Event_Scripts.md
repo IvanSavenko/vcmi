@@ -149,6 +149,10 @@ Scales what a war machine deals by the attack of the hero owning it - only what 
 
 Override `getDamageRange(unit, minDamage, maxDamage)` in a patch to change the formula; it answers the damage the machine ends up with, and the script grants the difference from what the machine deals on its own.
 
+Parameters:
+
+- `offset` - offset added to the hero's attack. defaults to the minimum of 1.
+
 ### arrowTowerDamage
 
 Decides what an arrow tower shoots for from the town it defends, and grants it the same way and at the same moment as the script above. Outside a siege the tower has no town to read and keeps the damage of its creature.
