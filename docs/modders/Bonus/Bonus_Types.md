@@ -1167,9 +1167,17 @@ Affected unit will cast specified spell before his turn (Enchanter)
 
 ### RANDOM_SPELLCASTER
 
-Affected unit can cast randomly selected beneficial spell on its turn (Master Genie)
+DEPRECATED. Configs and saves declaring it are converted to the [genieSpell](../Lua/Combat_Action_Scripts.md#geniespell) combat action script on load, so existing content keeps working, but new content should declare the script directly:
 
-- val - spell mastery level
+```json
+{
+	"type" : "COMBAT_ACTION",
+	"subtype" : "genieSpell",
+	"val" : 2
+}
+```
+
+`val` keeps its meaning, the mastery level the rolled spell is cast at.
 
 ### ADJACENT_SPELLCASTER
 

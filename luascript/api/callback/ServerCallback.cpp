@@ -185,6 +185,17 @@ void ServerCallbackProxy::registerMethods(MethodRegistrar & R)
 		"animation and sound, filters the targets through the spell's own immunity rules, and "
 		"applies its effects with the given magnitude. Casting this way never fires a combat "
 		"event, so a script that casts cannot re-enter itself.");
+	R.function<&ServerCallbackProxy::castSpellAsAction>("castSpellAsAction",
+		{
+			{"battle",     "Battle the spell is cast in."},
+			{"caster",     "Unit casting the spell. It is the caster itself, so the combat log names it."},
+			{"spell",      "Spell to cast."},
+			{"target",     "Units the spell is aimed at."},
+			{"spellLevel", "Mastery level the spell is cast at."}
+		}, {},
+		"Casts a spell the way a creature spending its turn on it does: the cast is announced in "
+		"the combat log, and effects that block active spellcasting stop it. Use this for a combat "
+		"action the player chose, and `castSpell` for a spell an ability triggers on its own.");
 	R.function<&ServerCallbackProxy::applySpellEffects>("applySpellEffects",
 		{
 			{"battle",         "Battle the spell is applied in."},
@@ -241,7 +252,7 @@ void ServerCallbackProxy::applySpellEffects(ServerCallback & object, const IBatt
 		throw std::runtime_error("Attempt to apply effects of an unknown spell!");
 
 	spells::BattleCast cast(cb, &caster, spells::Mode::PASSIVE, spellObject);
-	cast.setSpellLevel(spellLevel);
+	cast.setSpellLevel(std::clamp(spellLevel, 0, 3));
 	cast.setEffectDuration(effectDuration);
 
 	spells::Target destinations;
@@ -265,6 +276,27 @@ void ServerCallbackProxy::castSpell(ServerCallback & object, const IBattleInfoCa
 	spells::AbilityCaster abilityCaster(&caster, 0);
 	spells::BattleCast cast(cb, &abilityCaster, spells::Mode::PASSIVE, spellObject);
 	cast.setEffectValue(effectValue);
+
+	spells::Target destinations;
+	for(const auto * unit : target)
+		if(unit)
+			destinations.emplace_back(unit);
+
+	cast.cast(&object, destinations);
+}
+
+void ServerCallbackProxy::castSpellAsAction(ServerCallback & object, const IBattleInfoCallback & battle, const battle::Unit & caster, const spells::Spell & spell, const std::vector<const battle::Unit *> & target, int spellLevel)
+{
+	const auto * cb = dynamic_cast<const CBattleInfoCallback *>(&battle);
+	if(!cb)
+		throw std::runtime_error("Attempt to cast a spell outside of a battle!");
+
+	const CSpell * spellObject = spell.getId().toSpell();
+	if(!spellObject)
+		throw std::runtime_error("Attempt to cast an unknown spell!");
+
+	spells::BattleCast cast(cb, &caster, spells::Mode::CREATURE_ACTIVE, spellObject);
+	cast.setSpellLevel(spellLevel);
 
 	spells::Target destinations;
 	for(const auto * unit : target)

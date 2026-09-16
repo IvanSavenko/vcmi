@@ -41,7 +41,7 @@
 	"core.bonus.NO_MORALE.description": "{Morale neutrale}\nL'unità è immune agli effetti del morale",
 	"core.bonus.NO_WALL_PENALTY.description": "{Nessuna penalità per le mura}\nDanno pieno durante l'assedio",
 	"core.bonus.PRISM_HEX_ATTACK_BREATH.description": "{Soffio Prisma}\nAttacco Soffio Prisma (tre direzioni)",
-	"core.bonus.RANDOM_SPELLCASTER.description": "{Random spellcaster}\nPuò lanciare un incantesimo casuale",
+	"core.script.genieSpell.description": "{Random spellcaster}\nPuò lanciare un incantesimo casuale",
 	"core.bonus.RANGED_RETALIATION.description": "{Ritorsione a distanza}\nPuò effettuare un contrattacco a distanza",
 	"core.bonus.RECEPTIVE.description": "{Ricettivo}\nNessuna immunità agli incantesimi amichevoli",
 	"core.bonus.RETURN_AFTER_STRIKE.description": "{Attacco e Ritorno}\nRitorna dopo un attacco in mischia",

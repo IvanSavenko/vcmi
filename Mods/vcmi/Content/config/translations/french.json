@@ -58,7 +58,7 @@
 	"core.bonus.NO_MORALE.description": "{Moral neutre}\nLa créature est immunisée contre les effets de moral.",
 	"core.bonus.NO_WALL_PENALTY.description": "{Aucune pénalité de mur}\nDégâts complets pendant le siège.",
 	"core.bonus.PRISM_HEX_ATTACK_BREATH.description": "{Souffle prismatique}\nL'attaque de cette unité touche toutes les unités derrière la cible principale.",
-	"core.bonus.RANDOM_SPELLCASTER.description": "{Lanceur de sorts aléatoire}\nPeut lancer un sort aléatoire bénéfique sur une unité alliée.",
+	"core.script.genieSpell.description": "{Lanceur de sorts aléatoire}\nPeut lancer un sort aléatoire bénéfique sur une unité alliée.",
 	"core.bonus.RANGED_RETALIATION.description": "{Représailles à distance}\nPeut effectuer une contre-attaque à distance.",
 	"core.bonus.RECEPTIVE.description": "{Réceptif}\nPas d'immunité aux sorts amicaux.",
 	"core.bonus.RETURN_AFTER_STRIKE.description": "{Attaque et retour}\nRevient après une attaque au corps à corps.",

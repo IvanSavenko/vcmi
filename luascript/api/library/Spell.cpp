@@ -20,6 +20,7 @@
 #include "../../../lib/battle/Unit.h"
 #include "../../../lib/mapObjects/CGHeroInstance.h"
 #include "../../../lib/spells/CSpell.h"
+#include "../../../lib/spells/ISpellMechanics.h"
 
 namespace scripting::api
 {
@@ -62,6 +63,18 @@ void SpellProxy::registerMethods(MethodRegistrar & R)
 	R.method<&Spell::getLevelPower>("getLevelPower",
 		{{"skillLevel", "Mastery level used to look up the power bonus (0=basic, up to 3=expert)."}}, {},
 		"Returns the spell's per-level power bonus.");
+	R.function<&SpellProxy::canBeCastAt>("canBeCastAt",
+		{
+			{"battle",     "Battle the spell would be cast in."},
+			{"caster",     "Unit whose ability would cast it."},
+			{"target",     "Unit it would be aimed at."},
+			{"spellLevel", "Mastery level it would be cast at, which decides what its effects reach."}
+		},
+		{"True if the cast would go through."},
+		"Whether the caster could cast this spell at that unit as a creature ability right now - "
+		"the target is receptive to it, nothing on the battlefield forbids the school or the level, "
+		"and at least one of its effects would do something. Ask before casting rather than casting "
+		"and finding out, since a cast that changes nothing still spends the turn.");
 	R.function<&SpellProxy::getSchools>("getSchools", {},
 		"Returns the list of magic schools the spell belongs to.");
 	R.function<&SpellProxy::adjustDamage>("adjustDamage",
@@ -94,6 +107,26 @@ int64_t SpellProxy::adjustDamage(const Spell & spell, const IBattleInfoCallback 
 		caster = &actor;
 
 	return owner->adjustRawDamage(caster, &target, rawDamage);
+}
+
+bool SpellProxy::canBeCastAt(const Spell & spell, const IBattleInfoCallback & battle, const battle::Unit & caster, const battle::Unit & target, int spellLevel)
+{
+	const auto * owner = dynamic_cast<const CSpell *>(&spell);
+	const auto * cb = dynamic_cast<const CBattleInfoCallback *>(&battle);
+
+	if(!owner)
+		throw std::runtime_error("Attempt to test castability of an unknown spell!");
+
+	if(!cb)
+		throw std::runtime_error("Attempt to test castability of a spell outside of a battle!");
+
+	spells::BattleCast cast(cb, &caster, spells::Mode::CREATURE_ACTIVE, owner);
+	cast.setSpellLevel(std::clamp(spellLevel, 0, 3));
+
+	spells::Target destination;
+	destination.emplace_back(&target);
+
+	return owner->battleMechanics(&cast)->canBeCastAt(destination);
 }
 
 std::vector<const spells::SpellSchoolType *> SpellProxy::getSchools(const Spell & spell)

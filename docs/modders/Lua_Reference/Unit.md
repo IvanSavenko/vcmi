@@ -182,6 +182,32 @@ Returns the health left of the first creature in the unit stack.
 
 - returns `integer`
 
+### canCast
+
+Whether the unit still has casts of its spellcasting abilities left this battle.
+
+- returns `boolean`
+
+### canShoot
+
+True if the unit has shots left and is not kept from using them by an effect of its own. Knows nothing of the battlefield - see Battle:canShoot for whether it could shoot right now, and isShooter for whether it is a shooter at all.
+
+- returns `boolean`
+
+### isMeleeAttacker
+
+True if the unit can strike in melee at all, which war machines can not.
+
+- returns `boolean`
+
+### willMove
+
+True if the unit still has its turn to come in the given round - it has neither acted nor defended, and nothing holds it in place. A unit that waited still has its turn to come.
+
+- param `turn`: `integer` — 0 for this round; a later round otherwise.
+
+- returns `boolean`
+
 ### isShooter
 
 True if the stack can shoot in general, even if out of ammo. See canShoot to check if unit can shoot right now.

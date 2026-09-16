@@ -33,6 +33,7 @@ public:
 
 	static void registerMethods(MethodRegistrar & R);
 
+	static bool canBeCastAt(const ::spells::Spell & spell, const IBattleInfoCallback & battle, const battle::Unit & caster, const battle::Unit & target, int spellLevel);
 	static std::vector<const spells::SpellSchoolType *> getSchools(const ::spells::Spell & spell);
 	static int64_t adjustDamage(const ::spells::Spell & spell, const IBattleInfoCallback & battle, const battle::Unit & actor, const battle::Unit & target, int64_t rawDamage);
 };

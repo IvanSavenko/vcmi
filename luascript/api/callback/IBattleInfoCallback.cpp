@@ -29,7 +29,9 @@
 #include "../../../lib/battle/CBattleInfoEssentials.h"
 #include "../../../lib/battle/CObstacleInstance.h"
 #include "../../../lib/BattleFieldHandler.h"
+#include "../../../lib/mapObjects/CGHeroInstance.h"
 #include "../../../lib/mapObjects/CGTownInstance.h"
+#include "../../../lib/spells/CSpellHandler.h"
 
 namespace scripting::api
 {
@@ -117,6 +119,17 @@ void IBattleInfoCallbackProxy::registerMethods(MethodRegistrar & R)
 			{"onlyAlive", "Pass true to skip dead-but-resurrectable stacks."}
 		}, {},
 		"Returns the unit covering the given hex, or nil.");
+	R.function<&IBattleInfoCallbackProxy::getHero>("getHero",
+		{{"side", "Side to ask about."}},
+		{"The hero leading that side, or nil."},
+		"Returns the hero leading the given side, or nil when that side is a wandering army or a "
+		"town garrison rather than an army led by a hero.");
+	R.function<&IBattleInfoCallbackProxy::canShoot>("canShoot",
+		{{"unit", "Unit to ask about."}},
+		{"True if the unit could shoot at something right now."},
+		"Whether the unit could shoot this very moment - it is a shooter with ammo left, nothing "
+		"stands next to it, and the tactics phase is over. Unlike `Unit:canShoot` this knows about "
+		"the battlefield, so a shooter hemmed in by enemies answers false.");
 	R.function<&IBattleInfoCallbackProxy::getAllObstacles>("getAllObstacles", {},
 		"Returns all obstacles on the battlefield.");
 	R.function<&IBattleInfoCallbackProxy::getObstaclesOnPos>("getObstaclesOnPos",
@@ -293,6 +306,16 @@ EWallPart IBattleInfoCallbackProxy::hexToWallPart(const IBattleInfoCallback & ob
 BattleHex IBattleInfoCallbackProxy::getTowerShooterHex(const IBattleInfoCallback & object, EWallPart part)
 {
 	return object.getTowerShooterHex(part);
+}
+
+const CGHeroInstance * IBattleInfoCallbackProxy::getHero(const IBattleInfoCallback & object, BattleSide side)
+{
+	return dynamic_cast<const CBattleInfoCallback &>(object).battleGetFightingHero(side);
+}
+
+bool IBattleInfoCallbackProxy::canShoot(const IBattleInfoCallback & object, const battle::Unit & unit)
+{
+	return dynamic_cast<const CBattleInfoCallback &>(object).battleCanShoot(&unit);
 }
 
 int IBattleInfoCallbackProxy::getUnitsIf(lua_State * L)

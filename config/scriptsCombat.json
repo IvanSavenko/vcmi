@@ -167,5 +167,16 @@
 			"additionalProperties" : false
 		},
 		"description" : ""
+	},
+	// the icon is injected by the vcmi mod, which is what ships the artwork
+	"genieSpell" : {
+		"implements" : "combatAction",
+		"script" : "combat/genieSpell",
+		"patches" : [ ],
+		"schema" : {
+			"properties" : {},
+			"additionalProperties" : false
+		},
+		"description" : ""
 	}
 }

@@ -155,6 +155,16 @@ Casts a spell as a passive ability of the caster: announces it so that clients p
 - param `target`: [`Unit[]`](Unit.md) — Units the spell is aimed at.
 - param `effectValue`: `integer` — Magnitude handed to the spell's effects, for spells that take one.
 
+### castSpellAsAction
+
+Casts a spell the way a creature spending its turn on it does: the cast is announced in the combat log, and effects that block active spellcasting stop it. Use this for a combat action the player chose, and `castSpell` for a spell an ability triggers on its own.
+
+- param `battle`: [`Battle`](Battle.md) — Battle the spell is cast in.
+- param `caster`: [`Unit`](Unit.md) — Unit casting the spell. It is the caster itself, so the combat log names it.
+- param `spell`: [`Spell`](Spell.md) — Spell to cast.
+- param `target`: [`Unit[]`](Unit.md) — Units the spell is aimed at.
+- param `spellLevel`: `integer` — Mastery level the spell is cast at.
+
 ### applySpellEffects
 
 Applies the effects of a spell to the given units, and nothing else. Unlike casting the spell, the target list is used as given rather than expanded through the spell's range, magic resistance and magic mirror are not rolled, countering effects are not removed, and no spell animation or battle log entry is produced. Use it for abilities that behave as if the spell were already in effect.

@@ -36,7 +36,10 @@ battle alone, and must not look at anything the owner of the unit cannot see.
 On top of the [shared fields](Script_Types.md#shared-format):
 
 - `icon` - image of the button that offers this action to the player. Required: the player picks
-  actions from a row of buttons, and one without an icon would be blank
+  actions from a row of buttons, and one without an icon would be blank. A script whose artwork
+  lives in another mod may leave it out and let that mod contribute it as a patch
+  (`{ "otherMod:myAction" : { "icon" : "..." } }`), since patches are merged before the entry is
+  validated
 - `description` - text shown to the player, used as the tooltip of that button
 
 ## Functions
@@ -97,6 +100,9 @@ takes:
 return { append = { "myMod.action.devour" }, replaceNumbers = { healed } }
 ```
 
+The script is asked about hexes it refuses as well as ones it accepts, so answer with why the aim is
+no good rather than leaving the bar blank - the targeting rules that decide it are the script's own.
+
 It is returned unresolved on purpose, so that each client renders it in its own language and the
 numbers and names inside it decline correctly. Do not build the line by concatenating a translated
 string with a number: the word order and grammatical agreement of other languages are not the ones
@@ -117,6 +123,53 @@ offers this action and that the target is one `getSelectableHexes` answered with
 Whether a unit offers the action at all is decided by whether it carries the bonus, not by the
 script. `getSelectableHexes` decides only whether the action can be used *right now*. An ability that
 should disappear entirely under some condition belongs behind a bonus limiter instead.
+
+## Built-in scripts
+
+### genieSpell
+
+Casts a beneficial spell on another allied unit, picked at random among those that would actually
+help it, the way a master genie does. Replaces the `RANDOM_SPELLCASTER` bonus, and ships with the
+repertoire of the H3 master genie.
+
+Which spell is rolled is settled in `execute`, on the server, so that every client is told the same
+one. Only hexes where at least one spell is left to gain are offered, so the roll never draws from an
+empty list. A spell already in effect on the subject is skipped, and so is one the spell's own rules
+refuse - `canBeCastAt` answers most of it, and only the rules below need more than that.
+
+Parameters:
+
+- `val` - mastery level the rolled spell is cast at
+
+#### Changing the repertoire
+
+The list is built by `addSpell` calls at the bottom of the script, the same way the damage calculator
+builds its factors, so a patch may add to it, take from it, or change when one of its spells counts:
+
+```lua
+--- Mod feature: the genie may also lay a shield of thorns, but only on somebody being hit
+function Script:subjectIsSurrounded(battle, caster, subject)
+    return #battle:getUnitsIf(function(other)
+        return other:getOwner() ~= subject:getOwner() and subject:getSurroundingHexes():contains(other:getPosition())
+    end) > 0
+end
+
+Script:addSpell("myMod:thornShield", "subjectIsSurrounded")
+Script:removeSpell("slayer")
+
+return Script
+```
+
+`addSpell(spell, condition)` takes the *name* of the condition method rather than the method itself,
+so that a patch stacked later can override it and be the one that runs. The condition is called as
+`self:condition(battle, caster, subject)` and answers whether the spell is worth casting; leave it
+out for a spell that always is. The conditions of the shipped list - `enemyCanShoot`,
+`enemyFightsInMelee`, `enemyHasKing`, `enemyHasSpellbook`, `subjectIsHurt`, `subjectHasTurnLeft`,
+`subjectCanShoot`, `subjectFightsInMelee` - are ordinary methods and can be overridden the same way,
+as is `threatensInMelee(battle, unit)`, which decides what counts as a melee threat.
+
+A patch never changes the list of the script it extends: the first `addSpell` or `removeSpell` copies
+it, so a mod extending `genieSpell` does not alter the genie of the base game.
 
 ## Nothing may re-enter an action
 

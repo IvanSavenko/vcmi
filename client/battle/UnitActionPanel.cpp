@@ -140,7 +140,17 @@ void UnitActionPanel::testAndAddScriptedAction(const std::vector<PossiblePlayerB
 	MetaString tooltip;
 	tooltip.appendTextID(description.descriptionTextID);
 
-	auto button = std::make_shared<CToggleButton>(Point(2, 7 + 50 * index), AnimationPath::builtin("battleUnitAction"), CButton::tooltip(tooltip.toString(&GAME->translator())), callback);
+	// an ability description is "{name}\ndescription" - the status bar has room for the name alone,
+	// while the right-click box takes the whole thing and renders the braces as its heading
+	std::string help = tooltip.toString(&GAME->translator());
+	std::string hover = help;
+	auto opening = help.find('{');
+	auto closing = help.find('}');
+
+	if(opening != std::string::npos && closing != std::string::npos && closing > opening)
+		hover = help.substr(opening + 1, closing - opening - 1);
+
+	auto button = std::make_shared<CToggleButton>(Point(2, 7 + 50 * index), AnimationPath::builtin("battleUnitAction"), CButton::tooltip(hover, help), callback);
 	button->setOverlay(std::make_shared<CPicture>(description.icon));
 	button->setHighlightedBorderColor(Colors::WHITE);
 	button->setAllowDeselection(true);
@@ -156,7 +166,6 @@ void UnitActionPanel::setPossibleActions(const std::vector<PossiblePlayerBattleA
 	static const std::vector actionsMove = { PossiblePlayerBattleAction::MOVE_STACK };
 	static const std::vector actionsInfo = { PossiblePlayerBattleAction::CREATURE_INFO, PossiblePlayerBattleAction::HERO_INFO };
 	static const std::vector actionsShoot = { PossiblePlayerBattleAction::SHOOT };
-	static const std::vector actionsGenie = { PossiblePlayerBattleAction::RANDOM_GENIE_SPELL };
 	static const std::vector actionsAttack = { PossiblePlayerBattleAction::ATTACK, PossiblePlayerBattleAction::WALK_AND_ATTACK };
 	static const std::vector actionsReturn = { PossiblePlayerBattleAction::ATTACK_AND_RETURN };
 	static const std::vector actionsAttackLongWeapon = { PossiblePlayerBattleAction::LONG_WEAPON_ATTACK };
@@ -165,7 +174,6 @@ void UnitActionPanel::setPossibleActions(const std::vector<PossiblePlayerBattleA
 	testAndAddAction(newActions, actionsReturn, ImagePath::builtin("battle/actionReturn"), "vcmi.battle.action.return");
 	testAndAddAction(newActions, actionsAttack, ImagePath::builtin("battle/actionAttack"), "vcmi.battle.action.attack");
 	testAndAddAction(newActions, actionsShoot, ImagePath::builtin("battle/actionShoot"), "vcmi.battle.action.shoot");
-	testAndAddAction(newActions, actionsGenie, ImagePath::builtin("battle/actionGenie"), "vcmi.battle.action.genie");
 	testAndAddAction(newActions, actionsAttackLongWeapon, ImagePath::builtin("battle/actionLongWeapon"), "vcmi.battle.action.attackLongWeapon");
 
 	// one button per script, so a unit offering two variants of an ability gets one button each

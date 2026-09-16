@@ -282,6 +282,16 @@ function Battle:getDefendedTown() end
 ---@return Unit
 function Battle:getUnitByPos(hex, onlyAlive) end
 
+---Returns the hero leading the given side, or nil when that side is a wandering army or a town garrison rather than an army led by a hero.
+---@param side BattleSide # Side to ask about.
+---@return HeroInstance # The hero leading that side, or nil.
+function Battle:getHero(side) end
+
+---Whether the unit could shoot this very moment - it is a shooter with ammo left, nothing stands next to it, and the tactics phase is over. Unlike `Unit:canShoot` this knows about the battlefield, so a shooter hemmed in by enemies answers false.
+---@param unit Unit # Unit to ask about.
+---@return boolean # True if the unit could shoot at something right now.
+function Battle:canShoot(unit) end
+
 ---Returns all obstacles on the battlefield.
 ---@return Obstacle[]
 function Battle:getAllObstacles() end
@@ -524,6 +534,14 @@ function BattleServer:rollCombatAbility(battle, actor, percentageChance) end
 ---@param target Unit[] # Units the spell is aimed at.
 ---@param effectValue integer # Magnitude handed to the spell's effects, for spells that take one.
 function BattleServer:castSpell(battle, caster, spell, target, effectValue) end
+
+---Casts a spell the way a creature spending its turn on it does: the cast is announced in the combat log, and effects that block active spellcasting stop it. Use this for a combat action the player chose, and `castSpell` for a spell an ability triggers on its own.
+---@param battle Battle # Battle the spell is cast in.
+---@param caster Unit # Unit casting the spell. It is the caster itself, so the combat log names it.
+---@param spell Spell # Spell to cast.
+---@param target Unit[] # Units the spell is aimed at.
+---@param spellLevel integer # Mastery level the spell is cast at.
+function BattleServer:castSpellAsAction(battle, caster, spell, target, spellLevel) end
 
 ---Applies the effects of a spell to the given units, and nothing else. Unlike casting the spell, the target list is used as given rather than expanded through the spell's range, magic resistance and magic mirror are not rolled, countering effects are not removed, and no spell animation or battle log entry is produced. Use it for abilities that behave as if the spell were already in effect.
 ---@param battle Battle # Battle the spell is applied in.
@@ -1435,6 +1453,14 @@ function Spell:getBasePower() end
 ---@return integer
 function Spell:getLevelPower(skillLevel) end
 
+---Whether the caster could cast this spell at that unit as a creature ability right now - the target is receptive to it, nothing on the battlefield forbids the school or the level, and at least one of its effects would do something. Ask before casting rather than casting and finding out, since a cast that changes nothing still spends the turn.
+---@param battle Battle # Battle the spell would be cast in.
+---@param caster Unit # Unit whose ability would cast it.
+---@param target Unit # Unit it would be aimed at.
+---@param spellLevel integer # Mastery level it would be cast at, which decides what its effects reach.
+---@return boolean # True if the cast would go through.
+function Spell:canBeCastAt(battle, caster, target, spellLevel) end
+
 ---Returns the list of magic schools the spell belongs to.
 ---@return SpellSchool[]
 function Spell:getSchools() end
@@ -1758,6 +1784,23 @@ function Unit:getCount() end
 ---Returns the health left of the first creature in the unit stack.
 ---@return integer
 function Unit:getFirstHPleft() end
+
+---Whether the unit still has casts of its spellcasting abilities left this battle.
+---@return boolean
+function Unit:canCast() end
+
+---True if the unit has shots left and is not kept from using them by an effect of its own. Knows nothing of the battlefield - see Battle:canShoot for whether it could shoot right now, and isShooter for whether it is a shooter at all.
+---@return boolean
+function Unit:canShoot() end
+
+---True if the unit can strike in melee at all, which war machines can not.
+---@return boolean
+function Unit:isMeleeAttacker() end
+
+---True if the unit still has its turn to come in the given round - it has neither acted nor defended, and nothing holds it in place. A unit that waited still has its turn to come.
+---@param turn integer # 0 for this round; a later round otherwise.
+---@return boolean
+function Unit:willMove(turn) end
 
 ---True if the stack can shoot in general, even if out of ammo. See canShoot to check if unit can shoot right now.
 ---@return boolean

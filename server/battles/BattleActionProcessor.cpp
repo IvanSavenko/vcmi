@@ -517,49 +517,17 @@ bool BattleActionProcessor::doUnitSpellAction(const CBattleInfoCallback & battle
 	if (!canStackAct(battle, stack))
 		return false;
 
-	std::shared_ptr<const Bonus> randSpellcaster = stack->getBonus(Selector::type()(BonusType::RANDOM_SPELLCASTER));
 	std::shared_ptr<const Bonus> spellcaster = stack->getBonus(Selector::typeSubtype(BonusType::SPELLCASTER, BonusSubtypeID(spellID)));
 
-	if (!spellcaster && !randSpellcaster)
+	if (!spellcaster)
 	{
 		gameHandler->complain("That stack can't cast spells!");
 		return false;
 	}
 
-	if (randSpellcaster)
-	{
-		if (target.size() != 1)
-		{
-			gameHandler->complain("Invalid target for random spellcaster!");
-			return false;
-		}
-
-		const battle::Unit * subject = target[0].unitValue;
-		if (target[0].unitValue == nullptr)
-			subject = battle.battleGetStackByPos(target[0].hexValue, true);
-
-		if (subject == nullptr)
-		{
-			gameHandler->complain("Invalid target for random spellcaster!");
-			return false;
-		}
-
-		spellID = battle.getRandomBeneficialSpell(gameHandler->getRandomGenerator(), stack, subject);
-
-		if (spellID == SpellID::NONE)
-		{
-			gameHandler->complain("That stack can't cast spells!");
-			return false;
-		}
-	}
-
 	const CSpell * spell = SpellID(spellID).toSpell();
 	spells::BattleCast parameters(&battle, stack, spells::Mode::CREATURE_ACTIVE, spell);
-	int32_t spellLvl = 0;
-	if(spellcaster)
-		vstd::amax(spellLvl, spellcaster->val);
-	if(randSpellcaster)
-		vstd::amax(spellLvl, randSpellcaster->val);
+	int32_t spellLvl = std::max(0, spellcaster->val);
 	//Magic Plains raises level of spells cast by creatures; must match the client-side preview in BattleActionsController
 	if(spell->getLevel() > 0)
 		vstd::amax(spellLvl, stack->valOfBonuses(BonusType::MAGIC_SCHOOL_SKILL, BonusSubtypeID(SpellSchool::ANY)));

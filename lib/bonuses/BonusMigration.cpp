@@ -42,6 +42,15 @@ ScriptID resolveScript(const std::string & name)
 
 using NameMapping = std::pair<std::string_view, std::string_view>;
 
+/// A retired bonus type, and what it becomes: the bonus type that now carries it, and the script
+/// that implements it.
+struct RetiredAbility
+{
+	std::string_view retired;
+	std::string_view bonusType;
+	std::string_view script;
+};
+
 /// What `name` maps to, or an empty view when the table does not mention it. These tables are a
 /// handful of entries each, read once per bonus at load, so a linear scan is what they are worth.
 std::string_view lookup(std::span<const NameMapping> table, std::string_view name)
@@ -51,18 +60,29 @@ std::string_view lookup(std::span<const NameMapping> table, std::string_view nam
 	return entry == table.end() ? std::string_view() : entry->second;
 }
 
-/// Name of the script each retired bonus type is now implemented by.
-constexpr std::array<NameMapping, 9> retiredAbilities = {{
-	{ "LIFE_DRAIN",       "lifeDrain" },
-	{ "REBIRTH",          "rebirth" },
-	{ "SOUL_STEAL",       "soulSteal" },
-	{ "TRANSMUTATION",    "transmutation" },
-	{ "SUMMON_GUARDIANS", "summonGuardians" },
-	{ "ENCHANTED",        "enchanted" },
-	{ "FIRE_SHIELD",      "fireShield" },
-	{ "DESTRUCTION",      "destruction" },
-	{ "DEATH_STARE",      "deathStare" },
+/// What each retired bonus type is now: a bonus that runs a script, and which script that is. The
+/// bonus type is named rather than assumed, because a retired ability may become a reaction to
+/// combat events or an action its bearer may take, and those are different bonuses.
+constexpr std::array<RetiredAbility, 10> retiredAbilities = {{
+	{ "LIFE_DRAIN",         "COMBAT_EVENT_TRIGGER", "lifeDrain" },
+	{ "REBIRTH",            "COMBAT_EVENT_TRIGGER", "rebirth" },
+	{ "SOUL_STEAL",         "COMBAT_EVENT_TRIGGER", "soulSteal" },
+	{ "TRANSMUTATION",      "COMBAT_EVENT_TRIGGER", "transmutation" },
+	{ "SUMMON_GUARDIANS",   "COMBAT_EVENT_TRIGGER", "summonGuardians" },
+	{ "ENCHANTED",          "COMBAT_EVENT_TRIGGER", "enchanted" },
+	{ "FIRE_SHIELD",        "COMBAT_EVENT_TRIGGER", "fireShield" },
+	{ "DESTRUCTION",        "COMBAT_EVENT_TRIGGER", "destruction" },
+	{ "DEATH_STARE",        "COMBAT_EVENT_TRIGGER", "deathStare" },
+	{ "RANDOM_SPELLCASTER", "COMBAT_ACTION",        "genieSpell" },
 }};
+
+/// The entry retiring `name`, or nothing when it is not retired.
+const RetiredAbility * retirementOf(std::string_view name)
+{
+	auto entry = std::ranges::find(retiredAbilities, name, &RetiredAbility::retired);
+
+	return entry == retiredAbilities.end() ? nullptr : &*entry;
+}
 
 /// Situation each of the old death stare subtypes stood for.
 constexpr std::array<NameMapping, 6> deathStareSituations = {{
@@ -135,10 +155,12 @@ bool BonusMigration::migrateBonus(const JsonNode & ability, JsonNode & migrated)
 	// NOTE: NONEVIL_ALIGNMENT_MIX is also deprecated, but can not be converted here - it maps to two
 	// ALIGNMENT_MIX bonuses. It is handled by CArmedInstance instead
 
-	std::string_view script = lookup(retiredAbilities, withoutScope(ability["type"].String()));
+	const RetiredAbility * retirement = retirementOf(withoutScope(ability["type"].String()));
 
-	if(script.empty())
+	if(!retirement)
 		return false;
+
+	std::string_view script = retirement->script;
 
 	int value = ability["val"].Integer();
 
@@ -192,7 +214,7 @@ bool BonusMigration::migrateBonus(const JsonNode & ability, JsonNode & migrated)
 
 	// everything else the config says - duration, limiters, icon, description - still applies
 	migrated = ability;
-	migrated["type"].String() = "COMBAT_EVENT_TRIGGER";
+	migrated["type"].String() = std::string(retirement->bonusType);
 	migrated["subtype"].String() = std::string(script);
 
 	if(script == "enchanted")
@@ -217,6 +239,7 @@ bool BonusMigration::migrateCombatAbility(Bonus & bonus)
 {
 	std::string scriptName;
 	JsonNode parameters;
+	BonusType targetType = BonusType::COMBAT_EVENT_TRIGGER;
 
 	switch(bonus.type)
 	{
@@ -272,6 +295,11 @@ bool BonusMigration::migrateCombatAbility(Bonus & bonus)
 			bonus.val = 0; // enchanted has no magnitude, its old value was a packed level
 			break;
 
+		case BonusType::UNUSED_RANDOM_SPELLCASTER:
+			scriptName = "genieSpell";
+			targetType = BonusType::COMBAT_ACTION; // an action its bearer takes, not a reaction
+			break;
+
 		default:
 			return false;
 	}
@@ -286,7 +314,7 @@ bool BonusMigration::migrateCombatAbility(Bonus & bonus)
 		return false;
 	}
 
-	bonus.type = BonusType::COMBAT_EVENT_TRIGGER;
+	bonus.type = targetType;
 	bonus.subtype = BonusSubtypeID(script);
 	bonus.parameters = std::make_shared<BonusParameters>(parameters);
 

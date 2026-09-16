@@ -14,6 +14,33 @@
 		"icon" : "battle/actionAttack",
 		"description" : "{Probe Strike}\nHits the target and everything standing next to it."
 	},
+	// extends the script the game ships rather than copying it, which is what makes the repertoire
+	// it strips the real one
+	"geniePrecisionOnly" : {
+		"implements" : "combatAction",
+		"script" : "combat/geniePrecisionOnly",
+		"patches" : [ ],
+		"schema" : {
+			"properties" : {},
+			"additionalProperties" : false
+		},
+		"icon" : "battle/actionAttack",
+		"description" : "{Probe Genie}\nCasts precision, and only precision."
+	},
+	"genieSingleSpell" : {
+		"implements" : "combatAction",
+		"script" : "combat/genieSingleSpell",
+		"patches" : [ ],
+		"schema" : {
+			"required" : ["only"],
+			"properties" : {
+				"only" : { "type" : "string", "description" : "json key of the only spell this genie may cast" }
+			},
+			"additionalProperties" : false
+		},
+		"icon" : "battle/actionAttack",
+		"description" : "{Probe Genie}\nCasts one named spell, and only that one."
+	},
 	"battleWideAction" : {
 		"implements" : "combatAction",
 		"script" : "combat/battleWideAction",

@@ -60,6 +60,7 @@ public:
 	static void refreshBattleUnits(ServerCallback & object, const IBattleInfoCallback & battle);
 	static void showBattleAnimation(ServerCallback & object, const IBattleInfoCallback & battle, const std::vector<battle::Destination> & target, const std::string & animation, const std::string & sound, double transparency, std::optional<bool> deferred);
 	static void castSpell(ServerCallback & object, const IBattleInfoCallback & battle, const battle::Unit & caster, const spells::Spell & spell, const std::vector<const battle::Unit *> & target, int64_t effectValue);
+	static void castSpellAsAction(ServerCallback & object, const IBattleInfoCallback & battle, const battle::Unit & caster, const spells::Spell & spell, const std::vector<const battle::Unit *> & target, int spellLevel);
 	static int rngInt(ServerCallback & object, int low, int high);
 	static int rngBinomial(ServerCallback & object, int trials, double chance);
 	static int healUnit(lua_State * L);

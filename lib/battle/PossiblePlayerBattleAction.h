@@ -31,7 +31,6 @@ public:
 		HEAL,
 		WALK_AND_SPELLCAST,
 
-		RANDOM_GENIE_SPELL,   // random spell on a friendly creature
 
 		NO_LOCATION,          // massive spells that affect every possible target, automatic casts
 		ANY_LOCATION,

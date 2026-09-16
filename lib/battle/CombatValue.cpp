@@ -611,12 +611,15 @@ double CombatValue::offenseMultiplier(const ACreature & creature)
 
 	result *= 1.0 + unit->valOfBonuses(BonusType::DOUBLE_DAMAGE_CHANCE) / 100.0;
 
-	// only one spell is cast per turn, however many the creature knows. A random spellcaster names no
-	// spell, so it is priced at the same level as an ability that belongs to no school
+	// only one spell is cast per turn, however many the creature knows
 	int bestSpellLevel = 0;
-	for(auto type : {BonusType::SPELLCASTER, BonusType::RANDOM_SPELLCASTER})
-		for(const auto & bonus : *unit->getBonusesOfType(type))
-			bestSpellLevel = std::max(bestSpellLevel, spellLevelOf(bonus->subtype));
+	for(const auto & bonus : *unit->getBonusesOfType(BonusType::SPELLCASTER))
+		bestSpellLevel = std::max(bestSpellLevel, spellLevelOf(bonus->subtype));
+
+	// a random cast names no spell, so it is priced at the same level as an ability that belongs to no school
+	const ScriptID genieSpellScript(ScriptID::decode("genieSpell"));
+	if(unit->hasBonusOfType(BonusType::COMBAT_ACTION, genieSpellScript))
+		bestSpellLevel = std::max(bestSpellLevel, spellLevelOf(genieSpellScript));
 
 	result *= 1.0 + castWeight * bestSpellLevel;
 

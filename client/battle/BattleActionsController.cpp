@@ -359,9 +359,6 @@ void BattleActionsController::reorderPossibleActionsPriority(const CStack * stac
 				return 100; //bottom priority
 
 				break;
-			case PossiblePlayerBattleAction::RANDOM_GENIE_SPELL:
-				return 2;
-				break;
 			case PossiblePlayerBattleAction::SCRIPTED_ACTION:
 				return 3;
 				break;
@@ -576,7 +573,6 @@ void BattleActionsController::actionSetCursor(PossiblePlayerBattleAction action,
 		case PossiblePlayerBattleAction::AIMED_SPELL_CREATURE:
 		case PossiblePlayerBattleAction::ANY_LOCATION:
 		case PossiblePlayerBattleAction::WALK_AND_SPELLCAST:
-		case PossiblePlayerBattleAction::RANDOM_GENIE_SPELL:
 		case PossiblePlayerBattleAction::FREE_LOCATION:
 		case PossiblePlayerBattleAction::OBSTACLE:
 			ENGINE->cursor().set(Cursor::Spellcast::SPELL);
@@ -633,7 +629,6 @@ void BattleActionsController::actionSetCursorBlocked(PossiblePlayerBattleAction 
 	switch (action.get())
 	{
 		case PossiblePlayerBattleAction::AIMED_SPELL_CREATURE:
-		case PossiblePlayerBattleAction::RANDOM_GENIE_SPELL:
 		case PossiblePlayerBattleAction::TELEPORT:
 		case PossiblePlayerBattleAction::SACRIFICE:
 		case PossiblePlayerBattleAction::FREE_LOCATION:
@@ -762,9 +757,6 @@ std::string BattleActionsController::actionGetStatusMessage(PossiblePlayerBattle
 			return prepareSpellEffectText(27, *spellEffectValue, spell->getNameTranslated(), targetStack->getName());
 		}
 
-		case PossiblePlayerBattleAction::RANDOM_GENIE_SPELL: //we assume that teleport / sacrifice will never be available as random spell
-			return formatWithStackName("core.genrltxt.301", targetStack); //Cast a spell on %s
-
 		case PossiblePlayerBattleAction::TELEPORT:
 		{
 			if(!selectedStack) // Phase 1: hovering over unit to teleport
@@ -840,9 +832,6 @@ std::string BattleActionsController::actionGetStatusMessageBlocked(PossiblePlaye
 	switch (action.get())
 	{
 		case PossiblePlayerBattleAction::AIMED_SPELL_CREATURE:
-		case PossiblePlayerBattleAction::RANDOM_GENIE_SPELL:
-			return LIBRARY->generaltexth->allTexts[23];
-			break;
 		case PossiblePlayerBattleAction::TELEPORT:
 			if(!selectedStack)
 				return LIBRARY->generaltexth->allTexts[23];
@@ -859,6 +848,10 @@ std::string BattleActionsController::actionGetStatusMessageBlocked(PossiblePlaye
 			text.replaceName(action.spell());
 			return text.toString(&GAME->translator());
 		}
+		// the script is asked about a hex it refuses too, so that it can say why rather than leave
+		// the bar blank - it already knows whether it accepts the aim
+		case PossiblePlayerBattleAction::SCRIPTED_ACTION:
+			return actionGetStatusMessage(action, targetHex);
 		default:
 			return "";
 	}
@@ -942,14 +935,6 @@ bool BattleActionsController::actionIsLegal(PossiblePlayerBattleAction action, c
 
 		case PossiblePlayerBattleAction::AIMED_SPELL_CREATURE:
 			return !selectedStack && targetStack && isCastingPossibleHere(action.spell().toSpell(), nullptr, targetHex);
-
-		case PossiblePlayerBattleAction::RANDOM_GENIE_SPELL:
-			if(targetStack && targetStackOwned && targetStack != owner.stacksController->getActiveStack() && targetStack->alive()) //only positive spells for other allied creatures
-			{
-				SpellID spellID = owner.getBattle()->getRandomBeneficialSpell(CRandomGenerator::getDefault(), owner.stacksController->getActiveStack(), targetStack);
-				return spellID != SpellID::NONE;
-			}
-			return false;
 
 		case PossiblePlayerBattleAction::TELEPORT:
 			if(!selectedStack)
@@ -1122,7 +1107,6 @@ void BattleActionsController::actionRealize(PossiblePlayerBattleAction action, c
 		}
 		case PossiblePlayerBattleAction::AIMED_SPELL_CREATURE:
 		case PossiblePlayerBattleAction::ANY_LOCATION:
-		case PossiblePlayerBattleAction::RANDOM_GENIE_SPELL: //we assume that teleport / sacrifice will never be available as random spell
 		case PossiblePlayerBattleAction::OBSTACLE:
 		case PossiblePlayerBattleAction::FREE_LOCATION:
 		{

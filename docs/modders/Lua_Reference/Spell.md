@@ -102,6 +102,17 @@ Returns the spell's per-level power bonus.
 
 - returns `integer`
 
+### canBeCastAt
+
+Whether the caster could cast this spell at that unit as a creature ability right now - the target is receptive to it, nothing on the battlefield forbids the school or the level, and at least one of its effects would do something. Ask before casting rather than casting and finding out, since a cast that changes nothing still spends the turn.
+
+- param `battle`: [`Battle`](Battle.md) — Battle the spell would be cast in.
+- param `caster`: [`Unit`](Unit.md) — Unit whose ability would cast it.
+- param `target`: [`Unit`](Unit.md) — Unit it would be aimed at.
+- param `spellLevel`: `integer` — Mastery level it would be cast at, which decides what its effects reach.
+
+- returns `boolean` — True if the cast would go through.
+
 ### getSchools
 
 Returns the list of magic schools the spell belongs to.

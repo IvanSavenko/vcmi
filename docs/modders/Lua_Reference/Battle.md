@@ -119,6 +119,22 @@ Returns the unit covering the given hex, or nil.
 
 - returns [`Unit`](Unit.md)
 
+### getHero
+
+Returns the hero leading the given side, or nil when that side is a wandering army or a town garrison rather than an army led by a hero.
+
+- param `side`: [`BattleSide`](BattleSide.md) — Side to ask about.
+
+- returns [`HeroInstance`](HeroInstance.md) — The hero leading that side, or nil.
+
+### canShoot
+
+Whether the unit could shoot this very moment - it is a shooter with ammo left, nothing stands next to it, and the tactics phase is over. Unlike `Unit:canShoot` this knows about the battlefield, so a shooter hemmed in by enemies answers false.
+
+- param `unit`: [`Unit`](Unit.md) — Unit to ask about.
+
+- returns `boolean` — True if the unit could shoot at something right now.
+
 ### getAllObstacles
 
 Returns all obstacles on the battlefield.

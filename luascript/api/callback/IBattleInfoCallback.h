@@ -18,8 +18,11 @@
 
 struct CObstacleInstance;
 class CBattleInfoCallback;
+class CGHeroInstance;
 class CGTownInstance;
 class Creature;
+
+namespace spells { class Spell; }
 
 namespace scripting::api
 {
@@ -52,6 +55,8 @@ public:
 	static bool hasFortifications(const IBattleInfoCallback & object);
 	static bool hasMoat(const IBattleInfoCallback & object);
 	static bool hasNativeStack(const IBattleInfoCallback & object, BattleSide side);
+	static const CGHeroInstance * getHero(const IBattleInfoCallback & object, BattleSide side);
+	static bool canShoot(const IBattleInfoCallback & object, const battle::Unit & unit);
 	static BattleHexArray getAllPossibleHexes(const IBattleInfoCallback & object);
 	static std::optional<int> getWallState(const IBattleInfoCallback & object, EWallPart part);
 	static bool isWallPartAttackable(const IBattleInfoCallback & object, EWallPart part);

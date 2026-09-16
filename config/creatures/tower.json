@@ -339,15 +339,16 @@
 				"type" : "CASTS",
 				"val" : 3
 			},
+			"randomSpellcaster" :
+			{
+				"type" : "COMBAT_ACTION",
+				"subtype" : "genieSpell",
+				"val" : 2
+			},
 			"spellsLength" :
 			{
 				"type" : "CREATURE_ENCHANT_POWER",
 				"val" : 5
-			},
-			"randomSpellcaster" :
-			{
-				"type" : "RANDOM_SPELLCASTER",
-				"val" : 2
 			},
 			"hateEfreet" :
 			{

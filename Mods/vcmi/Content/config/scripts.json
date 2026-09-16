@@ -1,0 +1,6 @@
+// Button artwork for scripted actions of the base install, shipped here because the icons are.
+{
+	"core:genieSpell" : {
+		"icon" : "battle/actionGenie"
+	}
+}
