@@ -63,7 +63,7 @@ std::string_view lookup(std::span<const NameMapping> table, std::string_view nam
 /// What each retired bonus type is now: a bonus that runs a script, and which script that is. The
 /// bonus type is named rather than assumed, because a retired ability may become a reaction to
 /// combat events or an action its bearer may take, and those are different bonuses.
-constexpr std::array<RetiredAbility, 10> retiredAbilities = {{
+constexpr std::array<RetiredAbility, 11> retiredAbilities = {{
 	{ "LIFE_DRAIN",          "COMBAT_EVENT_TRIGGER", "lifeDrain" },
 	{ "REBIRTH",             "COMBAT_EVENT_TRIGGER", "rebirth" },
 	{ "SOUL_STEAL",          "COMBAT_EVENT_TRIGGER", "soulSteal" },
@@ -74,6 +74,7 @@ constexpr std::array<RetiredAbility, 10> retiredAbilities = {{
 	{ "DESTRUCTION",         "COMBAT_EVENT_TRIGGER", "destruction" },
 	{ "DEATH_STARE",         "COMBAT_EVENT_TRIGGER", "deathStare" },
 	{ "RANDOM_SPELLCASTER",  "COMBAT_ACTION",        "genieSpell" },
+	{ "RETURN_AFTER_STRIKE", "COMBAT_ACTION",        "attackAndReturn" },
 }};
 
 /// The entry retiring `name`, or nothing when it is not retired.
@@ -297,6 +298,11 @@ bool BonusMigration::migrateCombatAbility(Bonus & bonus)
 
 		case BonusType::UNUSED_RANDOM_SPELLCASTER:
 			scriptName = "genieSpell";
+			targetType = BonusType::COMBAT_ACTION; // an action its bearer takes, not a reaction
+			break;
+
+		case BonusType::UNUSED_RETURN_AFTER_STRIKE:
+			scriptName = "attackAndReturn";
 			targetType = BonusType::COMBAT_ACTION; // an action its bearer takes, not a reaction
 			break;
 

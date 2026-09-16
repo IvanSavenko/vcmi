@@ -111,7 +111,7 @@ TEST_F(CombatEventTriggerTest, deathAndTheEndOfAnActionReachEvenTheUnitTheAction
 	EXPECT_EQ(markersOf(attacker), markerActionFinished) << "two attacks, one action";
 }
 
-/// Verifies separate movement events for approach and RETURN_AFTER_STRIKE
+/// Verifies separate movement events for the approach and the step back after a strike
 TEST_F(CombatEventTriggerTest, theStepBackAfterStrikingIsAnnouncedAsAMove)
 {
 	constexpr int attackFromHex = leftHex + 3;
@@ -123,7 +123,8 @@ TEST_F(CombatEventTriggerTest, theStepBackAfterStrikingIsAnnouncedAsAMove)
 	CStack * attacker = addStack(BattleSide::ATTACKER, creatureByName("core:blackDragon"), BattleHex(leftHex), stackCount);
 	addStack(BattleSide::DEFENDER, creatureByName("core:pikeman"), BattleHex(targetHex), stackCount);
 
-	attacker->addNewBonus(std::make_shared<Bonus>(BonusDuration::PERMANENT, BonusType::RETURN_AFTER_STRIKE, BonusSource::OTHER, 0, BonusSourceID()));
+	const ScriptID script = scriptByName("core:attackAndReturn");
+	attacker->addNewBonus(std::make_shared<Bonus>(BonusDuration::PERMANENT, BonusType::COMBAT_ACTION, BonusSource::OTHER, 0, BonusSourceID(), BonusSubtypeID(script)));
 
 	// Keep the attacker alive for the return movement.
 	blockRetaliation(attacker);
@@ -132,7 +133,7 @@ TEST_F(CombatEventTriggerTest, theStepBackAfterStrikingIsAnnouncedAsAMove)
 
 	beginCombat();
 
-	ASSERT_TRUE(attackFrom(attacker, BattleHex(targetHex), BattleHex(attackFromHex)));
+	ASSERT_TRUE(useScriptedAction(attacker, script, BattleHexArray({BattleHex(targetHex), BattleHex(attackFromHex)})));
 	ASSERT_EQ(attacker->getPosition(), BattleHex(leftHex)) << "the scenario is about the step back";
 
 	EXPECT_EQ(markersOf(attacker), 2 * markerMove) << "the walk in and the step back are both moves";

@@ -894,7 +894,7 @@ void Verify(const State * state) // NOSONAR - function used for debugging only
 								ensureValueMatch(vf, cstack->hasBonusOfType(BonusType::ATTACKS_ALL_ADJACENT), "HEX.STACK_FLAGS1.ALL_AROUND_ATTACK");
 								break;
 							case SF1::RETURN_AFTER_STRIKE:
-								ensureValueMatch(vf, cstack->hasBonusOfType(BonusType::RETURN_AFTER_STRIKE), "HEX.STACK_FLAGS1.RETURN_AFTER_STRIKE");
+								ensureValueMatch(vf, hasCombatScript(cstack, "attackAndReturn"), "HEX.STACK_FLAGS1.RETURN_AFTER_STRIKE");
 								break;
 							case SF1::ENEMY_DEFENCE_REDUCTION:
 								ensureValueMatch(vf, cstack->hasBonusOfType(BonusType::ENEMY_DEFENCE_REDUCTION), "HEX.STACK_FLAGS1.ENEMY_DEFENCE_REDUCTION");

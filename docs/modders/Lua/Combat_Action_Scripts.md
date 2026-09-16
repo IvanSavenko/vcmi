@@ -212,7 +212,7 @@ it, so a mod extending `genieSpell` does not alter the genie of the base game.
 ### attackAndReturn
 
 Walks up to an enemy, strikes it and flies back to where it started, the way a harpy does. Replaces
-the `RETURN_AFTER_STRIKE` bonus.
+the `RETURN_AFTER_STRIKE` bonus, which is converted to this script on load.
 
 The attack itself is the engine's, so the script owns none of the rules about first strike, multiple
 blows or retaliation. What it owns is the return, and the one subtlety in it: a unit slowed while

@@ -44,7 +44,7 @@
 	"core.script.genieSpell.description": "{Random spellcaster}\nPuò lanciare un incantesimo casuale",
 	"core.bonus.RANGED_RETALIATION.description": "{Ritorsione a distanza}\nPuò effettuare un contrattacco a distanza",
 	"core.bonus.RECEPTIVE.description": "{Ricettivo}\nNessuna immunità agli incantesimi amichevoli",
-	"core.bonus.RETURN_AFTER_STRIKE.description": "{Attacco e Ritorno}\nRitorna dopo un attacco in mischia",
+	"core.script.attackAndReturn.description": "{Attacco e Ritorno}\nRitorna dopo un attacco in mischia",
 	"core.bonus.REVENGE.description": "{Vendetta}\nInfligge danni extra in base alla salute persa dell'attaccante in battaglia",
 	"core.bonus.SHOOTER.description": "{A distanza}\nL'unità può attaccare a distanza",
 	"core.bonus.SHOOTS_ALL_ADJACENT.description": "{Tiro a raggio totale}\nGli attacchi a distanza di questa unità colpiscono tutti i bersagli in una piccola area",

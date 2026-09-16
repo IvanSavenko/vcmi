@@ -323,8 +323,6 @@ std::vector<PossiblePlayerBattleAction> CBattleInfoCallback::getClientActionsFor
 		}
 		if(battleCanShoot(stack))
 			allowedActionList.push_back(PossiblePlayerBattleAction::SHOOT);
-		if(stack->hasBonusOfType(BonusType::RETURN_AFTER_STRIKE))
-			allowedActionList.push_back(PossiblePlayerBattleAction::ATTACK_AND_RETURN);
 		if(stack->hasBonusOfType(BonusType::LONG_WEAPON))
 			allowedActionList.push_back(PossiblePlayerBattleAction::LONG_WEAPON_ATTACK);
 

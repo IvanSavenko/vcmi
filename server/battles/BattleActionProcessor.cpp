@@ -311,9 +311,6 @@ bool BattleActionProcessor::doAttackAction(const CBattleInfoCallback & battle, c
 		return false;
 	}
 
-	BattleHex startingPos = stack->getPosition();
-	int beforeAttackSpeed = stack->getMovementRange(0);
-
 	const auto movementResult = moveStack(battle, ba.stackNumber, attackPos);
 
 	logGlobal->trace("%s will attack %s", stack->nodeName(), destinationStack->nodeName());
@@ -352,23 +349,6 @@ bool BattleActionProcessor::doAttackAction(const CBattleInfoCallback & battle, c
 	}
 
 	performAttackSequence(battle, stack, destinationStack, destinationTile, movementResult.distance, longWeaponAttack);
-
-	//return
-	if(stack->hasBonusOfType(BonusType::RETURN_AFTER_STRIKE)
-		&& !stack->hasBonusOfType(BonusType::NOT_ACTIVE)
-		&& !stack->hasBonusOfType(BonusType::BIND_EFFECT)
-		&& target.size() == 3
-		&& startingPos != stack->getPosition()
-		&& startingPos == target.at(2).hexValue
-		&& stack->alive())
-	{
-		assert(stack->unitId() == ba.stackNumber);
-		int afterAttackSpeed = stack->getMovementRange(0);
-		std::pair<BattleHexArray, int> path = battle.getPath(stack->getPosition(), startingPos, stack);
-		size_t maxReachbleIndex = std::max(0, beforeAttackSpeed - afterAttackSpeed);
-		if(maxReachbleIndex < path.first.size())
-			moveStack(battle, ba.stackNumber, path.first[maxReachbleIndex]);
-	}
 
 	// attacking without moving still triggers the obstacle the unit stands on (e.g. moat damage);
 	// units that moved into the obstacle were already charged during the movement above

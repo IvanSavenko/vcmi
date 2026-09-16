@@ -80,7 +80,7 @@ class JsonNode;
 	BONUS_NAME(MANA_DRAIN) /*value - spell points per turn*/ \
 	BONUS_NAME(UNUSED_LIFE_DRAIN) /*DEPRECATED, kept so that old configs and saves still convert*/\
 	BONUS_NAME(DOUBLE_DAMAGE_CHANCE) /*value in %, eg. dread knight*/ \
-	BONUS_NAME(RETURN_AFTER_STRIKE)						\
+	BONUS_NAME(UNUSED_RETURN_AFTER_STRIKE) /*DEPRECATED, kept so that old configs and saves still convert*/\
 	BONUS_NAME(SPELLCASTER) /*subtype - spell id, value - level of school, additional info - weighted chance. use SPECIFIC_SPELL_POWER, CREATURE_SPELL_POWER or CREATURE_ENCHANT_POWER for calculating the power*/ \
 	BONUS_NAME(CATAPULT)								\
 	BONUS_NAME(ENEMY_DEFENCE_REDUCTION) /*in % (value) eg. behemots*/ \

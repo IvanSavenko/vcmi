@@ -41,7 +41,7 @@ BattleAction BattleAction::makeDefend(const battle::Unit * stack)
 	return ba;
 }
 
-BattleAction BattleAction::makeMeleeAttack(const battle::Unit * stack, const BattleHex & destination, const BattleHex & attackFrom, bool returnAfterAttack)
+BattleAction BattleAction::makeMeleeAttack(const battle::Unit * stack, const BattleHex & destination, const BattleHex & attackFrom)
 {
 	BattleAction ba;
 	ba.side = stack->unitSide(); //FIXME: will it fail if stack mind controlled?
@@ -49,13 +49,11 @@ BattleAction BattleAction::makeMeleeAttack(const battle::Unit * stack, const Bat
 	ba.stackNumber = stack->unitId();
 	ba.aimToHex(attackFrom);
 	ba.aimToHex(destination);
-	if(returnAfterAttack && stack->hasBonusOfType(BonusType::RETURN_AFTER_STRIKE))
-		ba.aimToHex(stack->getPosition());
 	return ba;
 }
 
 /// This is for cases where target hex does not matter (for example berserk spell) and we did not calculate it (for example we only calculated closest attackable hex of two hex unit)
-BattleAction BattleAction::makeMeleeAttack(const battle::Unit * stack, const battle::Unit * target, const BattleHex & attackFrom, bool returnAfterAttack)
+BattleAction BattleAction::makeMeleeAttack(const battle::Unit * stack, const battle::Unit * target, const BattleHex & attackFrom)
 {
 	BattleAction ba;
 	ba.side = stack->unitSide(); //FIXME: will it fail if stack mind controlled?
@@ -63,8 +61,6 @@ BattleAction BattleAction::makeMeleeAttack(const battle::Unit * stack, const bat
 	ba.stackNumber = stack->unitId();
 	ba.aimToHex(attackFrom);
 	ba.aimToUnit(target);
-	if(returnAfterAttack && stack->hasBonusOfType(BonusType::RETURN_AFTER_STRIKE))
-		ba.aimToHex(stack->getPosition());
 	return ba;
 }
 

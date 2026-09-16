@@ -80,7 +80,8 @@
 			},
 			"strikeAndReturn" :
 			{
-				"type" : "RETURN_AFTER_STRIKE"
+				"type" : "COMBAT_ACTION",
+				"subtype" : "attackAndReturn"
 			}
 		},
 		"upgrades": ["harpyHag"],
@@ -113,7 +114,8 @@
 			},
 			"strikeAndReturn" :
 			{
-				"type" : "RETURN_AFTER_STRIKE"
+				"type" : "COMBAT_ACTION",
+				"subtype" : "attackAndReturn"
 			},
 			"noRetaliation" :
 			{

@@ -800,7 +800,14 @@ If this bonus is not present, the unit will always use the alternative attack an
 
 ### RETURN_AFTER_STRIKE
 
-Affected unit can return to his starting location after attack (Harpies)
+DEPRECATED. Configs and saves declaring it are converted to the [attackAndReturn](../Lua/Combat_Action_Scripts.md#attackandreturn) combat action script on load, so existing content keeps working, but new content should declare the script directly:
+
+```json
+{
+	"type" : "COMBAT_ACTION",
+	"subtype" : "attackAndReturn"
+}
+```
 
 ### ENEMY_DEFENCE_REDUCTION
 

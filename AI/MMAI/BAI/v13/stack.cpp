@@ -76,7 +76,7 @@ namespace
 
 bool runsCombatScript(const Bonus & bonus, const std::string & script)
 {
-	if(bonus.type != BonusType::COMBAT_EVENT_TRIGGER)
+	if(bonus.type != BonusType::COMBAT_EVENT_TRIGGER && bonus.type != BonusType::COMBAT_ACTION)
 		return false;
 
 	auto scriptID = combatScriptID(script);
@@ -91,7 +91,8 @@ bool hasCombatScript(const CStack * cstack, const std::string & script)
 	if(scriptID == ScriptID::NONE)
 		return false;
 
-	return cstack->hasBonus(Selector::typeSubtype(BonusType::COMBAT_EVENT_TRIGGER, BonusSubtypeID(scriptID)));
+	return cstack->hasBonus(Selector::typeSubtype(BonusType::COMBAT_EVENT_TRIGGER, BonusSubtypeID(scriptID)))
+		|| cstack->hasBonus(Selector::typeSubtype(BonusType::COMBAT_ACTION, BonusSubtypeID(scriptID)));
 }
 
 // static
@@ -325,9 +326,6 @@ void Stack::processBonuses()
 			case BonusType::ATTACKS_ALL_ADJACENT:
 				setflag(F1::ALL_AROUND_ATTACK);
 				break;
-			case BonusType::RETURN_AFTER_STRIKE:
-				setflag(F1::RETURN_AFTER_STRIKE);
-				break;
 			case BonusType::ENEMY_DEFENCE_REDUCTION:
 				setflag(F1::ENEMY_DEFENCE_REDUCTION);
 				break;
@@ -336,6 +334,10 @@ void Stack::processBonuses()
 					setflag(F1::LIFE_DRAIN);
 				else if(runsCombatScript(*bonus, "deathStare"))
 					setflag(F1::DEATH_STARE);
+				break;
+			case BonusType::COMBAT_ACTION:
+				if(runsCombatScript(*bonus, "attackAndReturn"))
+					setflag(F1::RETURN_AFTER_STRIKE);
 				break;
 			case BonusType::DOUBLE_DAMAGE_CHANCE:
 				setflag(F1::DOUBLE_DAMAGE_CHANCE);

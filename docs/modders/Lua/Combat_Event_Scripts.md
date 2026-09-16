@@ -136,7 +136,7 @@ The complete sequence also executes for counterattacks, additional attacks and a
 
 ### Moves
 
-A move is a move action, movement before a melee attack or adjacent spell cast, or return movement from `RETURN_AFTER_STRIKE`. Return movement is a separate move. No movement events execute when the unit remains on its current hex.
+A move is a move action, movement before a melee attack or adjacent spell cast, or the step back after a strike. The step back is a separate move. No movement events execute when the unit remains on its current hex.
 
 Every `onBeforeMove` has a matching `onAfterMove`, including movement cancelled after a handler changes the unit or destination. Movement events preceding an attack execute before attack count is calculated, so `ADDITIONAL_ATTACK` granted by them applies to the current attack.
 

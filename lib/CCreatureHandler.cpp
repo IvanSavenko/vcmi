@@ -1064,7 +1064,7 @@ void CCreatureHandler::loadStackExp(Bonus & b, BonusList & bl, CLegacyConfigPars
 			case 'A':
 				b.type = BonusType::ATTACKS_ALL_ADJACENT; break;
 			case 'b':
-				b.type = BonusType::RETURN_AFTER_STRIKE; break;
+				b.type = BonusType::UNUSED_RETURN_AFTER_STRIKE; break;
 			case 'B':
 				b.type = BonusType::TWO_HEX_ATTACK_BREATH; break;
 			case 'c':

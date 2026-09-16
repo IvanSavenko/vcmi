@@ -274,12 +274,9 @@ void BattleEvaluator::evaluateScriptedAction(const CStack * stack, PossibleScrip
 		if(localUnit->unitOwner() != cb->getBattle(battleID)->getPlayerID())
 			healthDiff = -healthDiff;
 
-		if(healthDiff < 0)
-		{
-			action.value = -1;
-			return; //do not harm own units at all
-		}
-
+		// losses of our own count against the gain rather than ruling the action out: an action that
+		// attacks pays for itself in retaliation, and is still worth taking when it deals more than
+		// it takes
 		totalGain += healthDiff;
 	}
 

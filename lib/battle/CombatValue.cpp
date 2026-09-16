@@ -701,7 +701,8 @@ double CombatValue::survivalMultiplier(const ACreature & creature)
 	const ScriptID rebirthScript(ScriptID::decode("rebirth"));
 	result *= 1.0 + unit->valOfBonuses(BonusType::COMBAT_EVENT_TRIGGER, rebirthScript) / 100.0;
 
-	if(unit->hasBonusOfType(BonusType::RETURN_AFTER_STRIKE))
+	const ScriptID attackAndReturnScript(ScriptID::decode("attackAndReturn"));
+	if(unit->hasBonusOfType(BonusType::COMBAT_ACTION, attackAndReturnScript))
 		result *= 1.10;
 
 	return result;
