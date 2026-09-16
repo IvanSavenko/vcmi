@@ -51,6 +51,22 @@ bool ServerSpellCastEnvironment::rollCombatAbility(const IBattleInfoCallback & b
 	return gh->randomizer->rollCombatAbility(army->id, percentageChance);
 }
 
+int ServerSpellCastEnvironment::walkUnit(const IBattleInfoCallback & battle, const battle::Unit & unit, const BattleHex & destination)
+{
+	const auto * cb = dynamic_cast<const CBattleInfoCallback *>(&battle);
+	if(!cb)
+		return 0;
+
+	return gh->battles->walkUnit(*cb, unit, destination);
+}
+
+void ServerSpellCastEnvironment::performAttack(const IBattleInfoCallback & battle, const battle::Unit & attacker, const battle::Unit & defender, const BattleHex & targetHex, int distance)
+{
+	const auto * cb = dynamic_cast<const CBattleInfoCallback *>(&battle);
+	if(cb)
+		gh->battles->performAttack(*cb, attacker, defender, targetHex, distance);
+}
+
 void ServerSpellCastEnvironment::apply(CPackForClient & pack)
 {
 	gh->sendAndApply(pack);

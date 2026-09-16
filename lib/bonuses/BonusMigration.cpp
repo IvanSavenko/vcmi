@@ -64,16 +64,16 @@ std::string_view lookup(std::span<const NameMapping> table, std::string_view nam
 /// bonus type is named rather than assumed, because a retired ability may become a reaction to
 /// combat events or an action its bearer may take, and those are different bonuses.
 constexpr std::array<RetiredAbility, 10> retiredAbilities = {{
-	{ "LIFE_DRAIN",         "COMBAT_EVENT_TRIGGER", "lifeDrain" },
-	{ "REBIRTH",            "COMBAT_EVENT_TRIGGER", "rebirth" },
-	{ "SOUL_STEAL",         "COMBAT_EVENT_TRIGGER", "soulSteal" },
-	{ "TRANSMUTATION",      "COMBAT_EVENT_TRIGGER", "transmutation" },
-	{ "SUMMON_GUARDIANS",   "COMBAT_EVENT_TRIGGER", "summonGuardians" },
-	{ "ENCHANTED",          "COMBAT_EVENT_TRIGGER", "enchanted" },
-	{ "FIRE_SHIELD",        "COMBAT_EVENT_TRIGGER", "fireShield" },
-	{ "DESTRUCTION",        "COMBAT_EVENT_TRIGGER", "destruction" },
-	{ "DEATH_STARE",        "COMBAT_EVENT_TRIGGER", "deathStare" },
-	{ "RANDOM_SPELLCASTER", "COMBAT_ACTION",        "genieSpell" },
+	{ "LIFE_DRAIN",          "COMBAT_EVENT_TRIGGER", "lifeDrain" },
+	{ "REBIRTH",             "COMBAT_EVENT_TRIGGER", "rebirth" },
+	{ "SOUL_STEAL",          "COMBAT_EVENT_TRIGGER", "soulSteal" },
+	{ "TRANSMUTATION",       "COMBAT_EVENT_TRIGGER", "transmutation" },
+	{ "SUMMON_GUARDIANS",    "COMBAT_EVENT_TRIGGER", "summonGuardians" },
+	{ "ENCHANTED",           "COMBAT_EVENT_TRIGGER", "enchanted" },
+	{ "FIRE_SHIELD",         "COMBAT_EVENT_TRIGGER", "fireShield" },
+	{ "DESTRUCTION",         "COMBAT_EVENT_TRIGGER", "destruction" },
+	{ "DEATH_STARE",         "COMBAT_EVENT_TRIGGER", "deathStare" },
+	{ "RANDOM_SPELLCASTER",  "COMBAT_ACTION",        "genieSpell" },
 }};
 
 /// The entry retiring `name`, or nothing when it is not retired.

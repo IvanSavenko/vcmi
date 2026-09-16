@@ -21,11 +21,13 @@
 
 #include "../lib/battle/CBattleInfoCallback.h"
 #include "../lib/battle/Unit.h"
+#include "../lib/combatScripts/ICombatActionCallback.h"
 
 namespace scripting
 {
 
 static const std::string GET_SELECTABLE_HEXES = "getSelectableHexes";
+static const std::string VALIDATE_TARGETS = "validateTargets";
 static const std::string GET_AFFECTED_HEXES = "getAffectedHexes";
 static const std::string GET_CURSOR = "getCursor";
 static const std::string GET_STATUS_MESSAGE = "getStatusMessage";
@@ -50,6 +52,11 @@ BattleHexArray LuaCombatActionScript::getSelectableHexes(const CBattleInfoCallba
 	return contextOf(battle)->callMethod<BattleHexArray>(GET_SELECTABLE_HEXES, parameters, &battle, unit, BattleHexArray());
 }
 
+bool LuaCombatActionScript::validateTargets(const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const
+{
+	return contextOf(battle)->callMethod<bool>(VALIDATE_TARGETS, parameters, &battle, unit, targets);
+}
+
 BattleHexArray LuaCombatActionScript::getAffectedHexes(const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const
 {
 	return contextOf(battle)->callMethod<BattleHexArray>(GET_AFFECTED_HEXES, parameters, &battle, unit, targets, BattleHexArray());
@@ -65,9 +72,9 @@ MetaString LuaCombatActionScript::getStatusMessage(const CBattleInfoCallback & b
 	return contextOf(battle)->callMethod<api::LuaMetaString>(GET_STATUS_MESSAGE, parameters, &battle, unit, targets).toMetaString();
 }
 
-void LuaCombatActionScript::execute(ServerCallback * server, const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const
+void LuaCombatActionScript::execute(ServerCallback * server, ICombatActionCallback * actions, const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const
 {
-	contextOf(battle)->callMethod<void>(EXECUTE, parameters, server, &battle, unit, targets);
+	contextOf(battle)->callMethod<void>(EXECUTE, parameters, server, actions, &battle, unit, targets);
 }
 
 }

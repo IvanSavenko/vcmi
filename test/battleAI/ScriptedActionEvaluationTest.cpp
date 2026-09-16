@@ -88,7 +88,7 @@ public:
 			return {};
 		}
 
-		info.script->execute(state.getServerCallback(), state, simulatedActor, BattleHexArray({target}), info.parameters);
+		info.script->execute(state.getServerCallback(), state.getCombatActionCallback(), state, simulatedActor, BattleHexArray({target}), info.parameters);
 
 		auto after = healthOf(state, units);
 

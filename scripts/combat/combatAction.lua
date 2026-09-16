@@ -12,6 +12,11 @@ Script.type = "combatAction"
 --- be aimed at, leaving it empty when the action is unavailable this turn. The server validates an
 --- incoming action against it. An action with nothing to aim at is aimed at its own bearer, so it
 --- answers with the bearer's own position.
+--- `validateTargets(battle, unit, targets)` says whether aiming the action this way is legal. The
+--- first target is already checked against getSelectableHexes; anything past it comes from the
+--- client unchecked, so the default answers false unless there is exactly one. An action wanting
+--- more - a melee action letting the owner pick which side to approach from, say - overrides this
+--- and checks them itself.
 --- `getAffectedHexes(battle, unit, targets, hexes)` fills and returns `hexes` with the tiles the
 --- action would affect, which is what the player sees shaded while hovering.
 --- `getCursor(battle, unit, targets)` returns the name of a cursor declared in config/cursors.json,
@@ -19,7 +24,9 @@ Script.type = "combatAction"
 --- `getStatusMessage(battle, unit, targets)` returns the status bar line as a MetaString, so that
 --- each client renders it in its own language.
 ---
---- `execute(server, battle, unit, targets)` carries the action out, and runs on the server only.
+--- `execute(server, actions, battle, unit, targets)` carries the action out, and runs on the server
+--- only. `server` is what every kind of script has - damaging, healing, casting - while `actions`
+--- carries walking and attacking, which only an action may ask for.
 ---
 --- In all of them `targets` holds the hexes the owner aimed at, the first being the one the action
 --- was aimed at. `hexes` arrives empty and is the only way to build such a list.
@@ -30,6 +37,10 @@ Script.type = "combatAction"
 
 function Script:getSelectableHexes(battle, unit, hexes)
 	return hexes
+end
+
+function Script:validateTargets(battle, unit, targets)
+	return targets:size() == 1
 end
 
 function Script:getAffectedHexes(battle, unit, targets, hexes)
@@ -44,7 +55,7 @@ function Script:getStatusMessage(battle, unit, targets)
 	return {}
 end
 
-function Script:execute(server, battle, unit, targets)
+function Script:execute(server, actions, battle, unit, targets)
 end
 
 return Script

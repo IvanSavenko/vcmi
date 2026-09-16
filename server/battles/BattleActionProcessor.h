@@ -40,6 +40,7 @@ class Spell;
 /// Processes incoming battle action queries and applies requested action(s)
 class BattleActionProcessor : boost::noncopyable
 {
+public:
 	struct MovementResult
 	{
 		/// Number of traversed hexes; undefined for flying units
@@ -49,6 +50,17 @@ class BattleActionProcessor : boost::noncopyable
 		/// The destination or request was invalid
 		bool invalidRequest;
 	};
+
+	/// Moving and attacking as the engine does them, below the action that normally asks for either.
+	/// Public because a scripted combat action is carried out by calling them rather than by asking
+	/// for an action, which is what keeps such a script from re-entering action dispatch.
+	MovementResult moveStack(const CBattleInfoCallback & battle, int stack, BattleHex dest);
+
+	/// Runs one melee attack to completion: first strike, every attacker hit, the retaliation,
+	/// and expiry of bonuses that last for the sequence.
+	void performAttackSequence(const CBattleInfoCallback & battle, const CStack * attacker, const CStack * defender, const BattleHex & targetHex, int distance, bool longWeaponAttack);
+
+private:
 
 	BattleProcessor * owner;
 	CGameHandler * gameHandler;
@@ -115,12 +127,7 @@ class BattleActionProcessor : boost::noncopyable
 		bool counter = false;
 	};
 
-	MovementResult moveStack(const CBattleInfoCallback & battle, int stack, BattleHex dest);
 	void makeAttack(const CBattleInfoCallback & battle, const CStack * attacker, const CStack * defender, const AttackDescriptor & attack);
-
-	/// Runs one melee attack to completion: first strike, every attacker hit, the retaliation,
-	/// and expiry of bonuses that last for the sequence.
-	void performAttackSequence(const CBattleInfoCallback & battle, const CStack * attacker, const CStack * defender, const BattleHex & targetHex, int distance, bool longWeaponAttack);
 
 	/// Rolls luck, Death Blow and Ballista double damage
 	void rollAttackFlags(const CBattleInfoCallback & battle, const CStack * attacker, BattleAttack & bat) const;

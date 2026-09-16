@@ -234,7 +234,7 @@ function Script:getStatusMessage(battle, unit, targets)
 	}
 end
 
-function Script:execute(server, battle, unit, targets)
+function Script:execute(server, actions, battle, unit, targets)
 	local subject = self:getSubject(battle, unit, targets:at(1))
 	if not subject then return end
 

@@ -63,6 +63,7 @@ public:
 	static BattleHex wallPartToBattleHex(const IBattleInfoCallback & object, EWallPart part);
 	static EWallPart hexToWallPart(const IBattleInfoCallback & object, BattleHex hex);
 	static BattleHex getTowerShooterHex(const IBattleInfoCallback & object, EWallPart part);
+	static BattleHexArray getPath(const IBattleInfoCallback & object, BattleHex start, BattleHex destination, const battle::Unit & unit);
 };
 
 }

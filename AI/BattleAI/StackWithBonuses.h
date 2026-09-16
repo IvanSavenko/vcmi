@@ -16,6 +16,7 @@
 
 #include "../../lib/bonuses/Bonus.h"
 #include "../../lib/battle/BattleProxy.h"
+#include "../../lib/combatScripts/ICombatActionCallback.h"
 #include "../../lib/battle/CUnitState.h"
 
 class HypotheticBattle;
@@ -170,11 +171,12 @@ public:
 	}
 
 	ServerCallback * getServerCallback();
+	ICombatActionCallback * getCombatActionCallback();
 	const scripting::Pool & getScriptContextPool() const override;
 
 private:
 
-	class HypotheticServerCallback : public ServerCallback
+	class HypotheticServerCallback : public ServerCallback, public ICombatActionCallback
 	{
 	public:
 		HypotheticServerCallback(HypotheticBattle * owner_);
@@ -194,6 +196,11 @@ private:
 		void apply(StacksInjured & pack) override;
 		void apply(BattleObstaclesChanged & pack) override;
 		void apply(CatapultAttack & pack) override;
+
+		/// The AI can not run either the way the server does - both live there - so it estimates
+		/// them, which is what every other speculative attack it makes already does.
+		int walkUnit(const IBattleInfoCallback & battle, const battle::Unit & unit, const BattleHex & destination) override;
+		void performAttack(const IBattleInfoCallback & battle, const battle::Unit & attacker, const battle::Unit & defender, const BattleHex & targetHex, int distance) override;
 	private:
 		HypotheticBattle * owner;
 		RNGStub rngStub;

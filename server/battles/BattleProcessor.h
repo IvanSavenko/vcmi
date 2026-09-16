@@ -12,6 +12,7 @@
 #include "../../lib/constants/EntityIdentifiers.h"
 #include "../../lib/constants/Enumerations.h"
 #include "../../lib/battle/BattleSide.h"
+#include "../../lib/battle/BattleHex.h"
 
 class CGHeroInstance;
 class CGTownInstance;
@@ -79,6 +80,12 @@ public:
 
 	/// Processing of incoming battle action netpack
 	bool makePlayerBattleAction(const BattleID & battleID, PlayerColor player, const BattleAction & ba);
+
+	/// Primitives a scripted combat action is carried out with. They sit below a battle action
+	/// rather than being one, so running them cannot re-enter action dispatch.
+	int walkUnit(const CBattleInfoCallback & battle, const battle::Unit & unit, const BattleHex & destination);
+	void performAttack(const CBattleInfoCallback & battle, const battle::Unit & attacker, const battle::Unit & defender, const BattleHex & targetHex, int distance);
+
 	/// Dispatches one combat event to the given unit
 	void processBattleEventTriggers(const CBattleInfoCallback & battle, CombatEventType event, const battle::Unit * target, const battle::Unit * secondary);
 	/// Dispatches SPELL_HIT to all affected units after a deliberate cast

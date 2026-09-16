@@ -54,5 +54,13 @@
 		},
 		"icon" : "battle/actionAttack",
 		"description" : "{Probe Blast}\nHits every enemy on the battlefield."
+	},
+	"recursionProbe" : {
+		"implements" : "combatEvent",
+		"script" : "combat/recursionProbe",
+		"patches" : [ ],
+		"priority" : 0,
+		"schema" : { "properties" : { }, "additionalProperties" : false },
+		"description" : ""
 	}
 }

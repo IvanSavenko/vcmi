@@ -159,7 +159,7 @@ TEST_F(GenieSpellTest, SimulatesOnTheAiCopyOfTheBattleRatherThanOnTheRealOne)
 	ScriptedActionInfo info = state.getScriptedAction(state.battleGetUnitByID(genie->unitId()), script());
 	ASSERT_NE(info.script, nullptr);
 
-	info.script->execute(state.getServerCallback(), state, state.battleGetUnitByID(genie->unitId()), BattleHexArray({BattleHex(allyHex)}), info.parameters);
+	info.script->execute(state.getServerCallback(), state.getCombatActionCallback(), state, state.battleGetUnitByID(genie->unitId()), BattleHexArray({BattleHex(allyHex)}), info.parameters);
 
 	// the AI values an action by running it and looking at what changed, so the cast has to reach
 	// the simulated ally and no further

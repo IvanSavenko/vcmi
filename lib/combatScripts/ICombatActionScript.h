@@ -14,6 +14,8 @@
 #include "../json/JsonNode.h"
 #include "../texts/MetaString.h"
 
+class ICombatActionCallback;
+
 class CBattleInfoCallback;
 class ServerCallback;
 
@@ -35,6 +37,12 @@ public:
 	/// anything the client cannot see.
 	virtual BattleHexArray getSelectableHexes(const CBattleInfoCallback & battle, const battle::Unit * unit, const JsonNode & parameters) const = 0;
 
+	/// Whether aiming the action this way is legal. `targets` holds what the owner aimed at, its
+	/// first entry already checked against getSelectableHexes. The base script answers false for any
+	/// target beyond the first, so an action receives more than one only by saying that it wants to -
+	/// the extra ones arrive from the client and are otherwise unchecked.
+	virtual bool validateTargets(const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const = 0;
+
 	/// Hexes the action would affect if used as aimed, which is what the player sees shaded. May be
 	/// empty for an action with nothing to show.
 	virtual BattleHexArray getAffectedHexes(const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const = 0;
@@ -47,8 +55,9 @@ public:
 	virtual MetaString getStatusMessage(const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const = 0;
 
 	/// Carries the action out. `targets` is what the owner aimed at, its first entry being the hex
-	/// the action was aimed at.
-	virtual void execute(ServerCallback * server, const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const = 0;
+	/// the action was aimed at. `actions` carries moving and attacking, which only an action may ask
+	/// for - see ICombatActionCallback for why they are not on `server`.
+	virtual void execute(ServerCallback * server, ICombatActionCallback * actions, const CBattleInfoCallback & battle, const battle::Unit * unit, const BattleHexArray & targets, const JsonNode & parameters) const = 0;
 };
 
 /// One scripted action a unit offers, resolved from the bonus granting it.

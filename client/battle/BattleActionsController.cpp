@@ -1026,7 +1026,22 @@ void BattleActionsController::actionRealize(PossiblePlayerBattleAction action, c
 		case PossiblePlayerBattleAction::SCRIPTED_ACTION:
 		{
 			const auto * actor = owner.stacksController->getActiveStack();
-			owner.sendCommand(BattleAction::makeScriptedAction(actor, action.script(), BattleHexArray({targetHex})), actor);
+			ScriptedActionInfo info = getScriptedAction(action);
+
+			// an action that strikes in melee wants to know which side the owner is approaching
+			// from, which only the mouse knows. It is offered rather than assumed: a script that
+			// does not want it refuses the second target and gets the aim alone
+			BattleHexArray targets({targetHex});
+			BattleHex approach = findAttackFromHex(owner, actor, targetHex, false);
+
+			if(info.script && approach.isValid() && approach != targetHex)
+			{
+				BattleHexArray withApproach({targetHex, approach});
+				if(info.script->validateTargets(*owner.getBattle(), actor, withApproach, info.parameters))
+					targets = withApproach;
+			}
+
+			owner.sendCommand(BattleAction::makeScriptedAction(actor, action.script(), targets), actor);
 			return;
 		}
 

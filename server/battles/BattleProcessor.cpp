@@ -409,6 +409,22 @@ void BattleProcessor::setBattleResult(const CBattleInfoCallback & battle, EBattl
 	actionsProcessor->forgetPendingDeaths(battleID);
 }
 
+int BattleProcessor::walkUnit(const CBattleInfoCallback & battle, const battle::Unit & unit, const BattleHex & destination)
+{
+	return actionsProcessor->moveStack(battle, unit.unitId(), destination).distance;
+}
+
+void BattleProcessor::performAttack(const CBattleInfoCallback & battle, const battle::Unit & attacker, const battle::Unit & defender, const BattleHex & targetHex, int distance)
+{
+	const CStack * attackerStack = battle.battleGetStackByID(attacker.unitId());
+	const CStack * defenderStack = battle.battleGetStackByID(defender.unitId());
+
+	// a long weapon reaches over an empty hex, which is a property of where the two stand rather
+	// than something the script asks for - the same call the engine's own attack action makes
+	if(attackerStack && defenderStack)
+		actionsProcessor->performAttackSequence(battle, attackerStack, defenderStack, targetHex, distance, battle.isLongWeaponAttack(attackerStack, defenderStack));
+}
+
 bool BattleProcessor::makeAutomaticBattleAction(const CBattleInfoCallback & battle, const BattleAction &ba)
 {
 	return actionsProcessor->makeAutomaticBattleAction(battle, ba);

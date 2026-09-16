@@ -10,10 +10,11 @@
 #pragma once
 
 #include "../lib/spells/ISpellMechanics.h"
+#include "../lib/combatScripts/ICombatActionCallback.h"
 
 class CGameHandler;
 
-class ServerSpellCastEnvironment : public SpellCastEnvironment
+class ServerSpellCastEnvironment : public SpellCastEnvironment, public ICombatActionCallback
 {
 public:
 	ServerSpellCastEnvironment(CGameHandler * gh);
@@ -34,6 +35,9 @@ public:
 	void apply(StacksInjured & pack) override;
 	void apply(BattleObstaclesChanged & pack) override;
 	void apply(CatapultAttack & pack) override;
+
+	int walkUnit(const IBattleInfoCallback & battle, const battle::Unit & unit, const BattleHex & destination) override;
+	void performAttack(const IBattleInfoCallback & battle, const battle::Unit & attacker, const battle::Unit & defender, const BattleHex & targetHex, int distance) override;
 
 	void spellHasHit(const CBattleInfoCallback & battle, const spells::Spell & spell, const battle::Unit * casterUnit, const std::vector<std::shared_ptr<const battle::CUnitState>> & unitsBefore) override;
 

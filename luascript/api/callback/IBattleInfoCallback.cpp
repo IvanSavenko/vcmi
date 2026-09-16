@@ -160,6 +160,15 @@ void IBattleInfoCallbackProxy::registerMethods(MethodRegistrar & R)
 	R.function<&IBattleInfoCallbackProxy::hexToWallPart>("hexToWallPart",
 		{{"hex", "Hex to look up."}}, {},
 		"Returns the wall section corresponding to the given battle hex.");
+	R.function<&IBattleInfoCallbackProxy::getPath>("getPath",
+		{
+			{"start",       "Hex the unit starts from."},
+			{"destination", "Hex it is to reach."},
+			{"unit",        "Unit whose movement model the path follows."}
+		}, {},
+		"Hexes the unit would cross on its way, the destination first and the hex next to the start "
+		"last, so that stopping short of the destination means taking a later entry. Empty when it "
+		"can not get there at all.");
 	R.function<&IBattleInfoCallbackProxy::getTowerShooterHex>("getTowerShooterHex",
 		{{"part", "Wall section whose tower-shooter hex is queried."}}, {},
 		"Returns the hex used by the tower shooter for the given wall section.");
@@ -301,6 +310,12 @@ BattleHex IBattleInfoCallbackProxy::wallPartToBattleHex(const IBattleInfoCallbac
 EWallPart IBattleInfoCallbackProxy::hexToWallPart(const IBattleInfoCallback & object, BattleHex hex)
 {
 	return object.battleHexToWallPart(hex);
+}
+
+BattleHexArray IBattleInfoCallbackProxy::getPath(const IBattleInfoCallback & object, BattleHex start, BattleHex destination, const battle::Unit & unit)
+{
+	const auto & cb = dynamic_cast<const CBattleInfoCallback &>(object);
+	return cb.getPath(start, destination, &unit).first;
 }
 
 BattleHex IBattleInfoCallbackProxy::getTowerShooterHex(const IBattleInfoCallback & object, EWallPart part)

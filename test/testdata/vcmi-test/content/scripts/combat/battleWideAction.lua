@@ -10,7 +10,7 @@ function Script:getSelectableHexes(battle, unit, hexes)
 	return hexes
 end
 
-function Script:execute(server, battle, unit, targets)
+function Script:execute(server, actions, battle, unit, targets)
 	for _, other in ipairs(battle:getUnitsIf(function(candidate)
 		return candidate:isAlive() and candidate:getSide() ~= unit:getSide()
 	end)) do

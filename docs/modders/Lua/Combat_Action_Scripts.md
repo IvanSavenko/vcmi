@@ -50,10 +50,11 @@ local Script = setmetatable({}, {__index = Base})
 Script.__index = Script
 
 function Script:getSelectableHexes(battle, unit, hexes) ... return hexes end
+function Script:validateTargets(battle, unit, targets) ... end
 function Script:getAffectedHexes(battle, unit, targets, hexes) ... return hexes end
 function Script:getCursor(battle, unit, targets) ... end
 function Script:getStatusMessage(battle, unit, targets) ... end
-function Script:execute(server, battle, unit, targets) ... end
+function Script:execute(server, actions, battle, unit, targets) ... end
 
 return Script
 ```
@@ -72,6 +73,29 @@ rather than as a hint.
 
 An action with nothing to aim at - affecting only its bearer, or the whole battlefield - answers with
 the bearer's own position, and ignores `targets` in `execute`.
+
+### validateTargets(battle, unit, targets)
+
+Whether aiming the action this way is legal. The first target is already checked against
+`getSelectableHexes`; anything past it comes from the owner's client and nothing else looks at it, so
+the default answers false unless there is exactly one target.
+
+An action that wants more overrides this and checks them itself. A melee action letting the owner
+pick which side to approach from is the case this exists for - the side comes from where the mouse
+sits inside the target hex, which only the client knows, so it has to be sent and therefore has to be
+checked:
+
+```lua
+function Script:validateTargets(battle, unit, targets)
+    if targets:size() == 1 then return true end
+    if targets:size() ~= 2 then return false end
+    -- targets[2] has to be a hex this unit could really strike targets[1] from
+end
+```
+
+The client offers the extra target rather than assuming it: it builds the longer list, asks this
+function, and sends the aim alone if the answer is no. Both sides therefore decide with the same
+function and cannot disagree.
 
 ### getAffectedHexes(battle, unit, targets, hexes)
 
@@ -112,11 +136,24 @@ Register the identifiers the script names in a translation file of the mod, the 
 piece of text is. A message whose text comes from the bonus rather than from the script belongs in a
 parameter listed in `stringRegistrations`.
 
-### execute(server, battle, unit, targets)
+### execute(server, actions, battle, unit, targets)
 
 Carries the action out. The only function of the five that runs on the server, and so the only one
 that may change anything. It is reached only after the server has confirmed that the unit really
 offers this action and that the target is one `getSelectableHexes` answered with.
+
+Two callbacks rather than one. `server` is the one every kind of script holds - damaging, healing,
+casting, adding bonuses. `actions` carries the two things only an action may ask for:
+
+```lua
+local distance = actions:walkUnit(battle, unit, hex)
+actions:performAttack(battle, unit, victim, hex, distance)
+```
+
+`walkUnit` walks a path, triggering whatever the unit crosses, and answers how far it got - which may
+be short of where it was headed, so check where the unit ended up if that matters. `performAttack`
+runs a whole melee attack the way the engine does: first strike, every blow the attacker is entitled
+to, and the retaliation. A script asking for one owns none of those rules.
 
 ## An empty list is not the same as no button
 
@@ -171,8 +208,26 @@ as is `threatensInMelee(battle, unit)`, which decides what counts as a melee thr
 A patch never changes the list of the script it extends: the first `addSpell` or `removeSpell` copies
 it, so a mod extending `genieSpell` does not alter the genie of the base game.
 
-## Nothing may re-enter an action
 
-`execute` may damage, move, heal and cast, and those may in turn set off combat event scripts. What
-it may not do is start another action - there is no binding for that, deliberately, so that the chain
-stays at most one step deep.
+### attackAndReturn
+
+Walks up to an enemy, strikes it and flies back to where it started, the way a harpy does. Replaces
+the `RETURN_AFTER_STRIKE` bonus.
+
+The attack itself is the engine's, so the script owns none of the rules about first strike, multiple
+blows or retaliation. What it owns is the return, and the one subtlety in it: a unit slowed while
+attacking does not make it all the way home, so the flight back is shortened by however much movement
+it lost.
+
+The owner may pick which side to approach the victim from, which the action takes as a second target.
+
+## Why walking and attacking are kept apart
+
+An attack sets off [combat event scripts](Combat_Event_Scripts.md) - that is what fire shield and
+death stare are. Those hold a `server` of their own, and if `performAttack` lived on it, a reaction
+could ask for another attack from inside the attack that woke it, and that one would wake it again,
+without end.
+
+So the two live on `actions`, which only a combat action is ever handed. The chain is therefore at
+most action -> attack -> reaction, and a reaction has no way to extend it. An action cannot start
+another action either, for the same reason: there is no binding for it.

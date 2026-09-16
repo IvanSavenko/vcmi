@@ -262,7 +262,7 @@ void BattleEvaluator::evaluateScriptedAction(const CStack * stack, PossibleScrip
 		return;
 	}
 
-	info.script->execute(state.getServerCallback(), state, state.battleGetUnitByID(stack->unitId()), BattleHexArray({action.target}), info.parameters);
+	info.script->execute(state.getServerCallback(), state.getCombatActionCallback(), state, state.battleGetUnitByID(stack->unitId()), BattleHexArray({action.target}), info.parameters);
 
 	int64_t totalGain = 0;
 

@@ -54,6 +54,7 @@ set(lualib_SRCS
 		api/callback/AdventureServer.cpp
 		api/callback/IGameInfoCallback.cpp
 		api/Registry.cpp
+		api/callback/CombatActionCallback.cpp
 		api/callback/ServerCallback.cpp
 )
 
@@ -121,6 +122,7 @@ set(lualib_HDRS
 		api/Registry.h
 		api/SerializableRegistar.h
 		api/SignatureOf.h
+		api/callback/CombatActionCallback.h
 		api/callback/ServerCallback.h
 )
 

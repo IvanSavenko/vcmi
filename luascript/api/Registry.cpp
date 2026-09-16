@@ -49,6 +49,7 @@
 #include "library/HeroType.h"
 #include "library/ResourceType.h"
 #include "callback/AdventureServer.h"
+#include "callback/CombatActionCallback.h"
 #include "callback/ServerCallback.h"
 #include "library/Services.h"
 #include "library/Skill.h"
@@ -90,6 +91,7 @@ Registry::Registry()
 	registerPrivate<IBattleInfoCallbackProxy>();
 	registerPrivate<IGameInfoCallbackProxy>();
 	registerPrivate<ServerCallbackProxy>();
+	registerPrivate<CombatActionCallbackProxy>();
 	registerPrivate<AdventureServerProxy>();
 
 	registerPrivate<MapObjectProxy>();

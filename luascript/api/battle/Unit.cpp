@@ -118,6 +118,9 @@ void UnitProxy::registerMethods(MethodRegistrar & R)
 		"Returns the Creature type of the units in this stack.");
 	R.method<&Unit::unitBaseAmount, Unit>("getBaseAmount", {},
 		"Returns the initial number of creatures this stack had at battle start.");
+	R.function<&UnitProxy::getMovementRange>("getMovementRange", {},
+		"How far the unit may travel this turn, which is what a return to its starting hex is "
+		"measured against.");
 	R.function<&UnitProxy::getHexes>("getHexes", {},
 		"Returns the list of hexes currently occupied by the unit.");
 	R.function<&UnitProxy::getSurroundingHexes>("getSurroundingHexes", {},
@@ -148,6 +151,11 @@ std::optional<std::string> UnitProxy::getTurretPart(const Unit & unit)
 		case BattleHex::CASTLE_BOTTOM_TOWER:  return "lower";
 		default:                              return std::nullopt;
 	}
+}
+
+int UnitProxy::getMovementRange(const Unit & unit)
+{
+	return unit.getMovementRange(0);
 }
 
 BattleHexArray UnitProxy::getHexes(const Unit & unit)

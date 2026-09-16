@@ -297,9 +297,14 @@ bool BattleTestFixture::move(const CStack * stack, const BattleHex & destination
 
 bool BattleTestFixture::useScriptedAction(const CStack * stack, const ScriptID & actionScript, const BattleHex & target)
 {
+	return useScriptedAction(stack, actionScript, BattleHexArray({target}));
+}
+
+bool BattleTestFixture::useScriptedAction(const CStack * stack, const ScriptID & actionScript, const BattleHexArray & targets)
+{
 	battle()->activeStack = stack->unitId();
 
-	BattleAction action = BattleAction::makeScriptedAction(stack, actionScript, BattleHexArray({target}));
+	BattleAction action = BattleAction::makeScriptedAction(stack, actionScript, targets);
 	return gameHandler->battles->makePlayerBattleAction(BattleID(0), battle()->sideToPlayer(stack->unitSide()), action);
 }
 

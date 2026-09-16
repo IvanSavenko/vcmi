@@ -59,7 +59,7 @@ function Script:getStatusMessage(battle, unit, targets)
 	return { append = { "vcmi-test.action.probeStrike" }, replaceNumbers = { count } }
 end
 
-function Script:execute(server, battle, unit, targets)
+function Script:execute(server, actions, battle, unit, targets)
 	for _, victim in pairs(self:getVictims(battle, unit, targets:at(1))) do
 		server:damageUnit(battle, victim, self.damage)
 	end

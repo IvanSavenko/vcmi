@@ -224,3 +224,26 @@ TEST_F(ScriptedActionTest, fallsBackToTheBaseClassForFeedback)
 
 	EXPECT_EQ(info.script->getStatusMessage(*battle(), actor, targets, info.parameters).toString(LIBRARY->generaltexth.get()), "");
 }
+
+/// Walking and attacking are handed only to a combat action. A reaction to a combat event holds an
+/// ordinary server callback, which does not carry them - so an attack cannot ask for another attack
+/// from inside itself, which used to run until the stack gave out.
+TEST_F(ScriptedActionTest, aReactionCanNotAskForAnAttack)
+{
+	startGame();
+	startBattle();
+
+	CStack * attacker = addStack(BattleSide::ATTACKER, creatureByName("core:pikeman"), BattleHex(attackerHex), 100);
+	CStack * defender = addStack(BattleSide::DEFENDER, creatureByName("core:pikeman"), BattleHex(attackerHex + 1), 100);
+	ASSERT_NE(attacker, nullptr);
+
+	auto bonus = std::make_shared<Bonus>(BonusDuration::PERMANENT, BonusType::COMBAT_EVENT_TRIGGER, BonusSource::OTHER, 0, BonusSourceID(), BonusSubtypeID(scriptByName("vcmi-test:recursionProbe")));
+	attacker->addNewBonus(bonus);
+
+	beginCombat();
+
+	const int64_t before = defender->getAvailableHealth();
+
+	ASSERT_TRUE(attack(attacker, defender->getPosition()));
+	EXPECT_LT(defender->getAvailableHealth(), before) << "the attack itself must still happen";
+}

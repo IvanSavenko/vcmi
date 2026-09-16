@@ -478,6 +478,11 @@ ServerCallback * HypotheticBattle::getServerCallback()
 	return serverCallback.get();
 }
 
+ICombatActionCallback * HypotheticBattle::getCombatActionCallback()
+{
+	return serverCallback.get();
+}
+
 const scripting::Pool & HypotheticBattle::getScriptContextPool() const
 {
 	return subject->getBattle()->getScriptContextPool();
@@ -557,6 +562,43 @@ void HypotheticBattle::HypotheticServerCallback::apply(BattleObstaclesChanged & 
 {
 	BattleStatePackVisitor visitor(*owner);
 	pack.visit(visitor);
+}
+
+int HypotheticBattle::HypotheticServerCallback::walkUnit(const IBattleInfoCallback & battle, const battle::Unit & unit, const BattleHex & destination)
+{
+	auto distances = owner->battleGetDistances(&unit, unit.getPosition());
+	int distance = destination.isValid() ? distances[destination.toInt()] : 0;
+
+	BattleStackMoved pack;
+	pack.battleID = owner->getBattle()->getBattleID();
+	pack.stack = unit.unitId();
+	pack.distance = distance;
+	pack.teleporting = false;
+	pack.tilesToMove = BattleHexArray({destination});
+	apply(pack);
+
+	return distance;
+}
+
+void HypotheticBattle::HypotheticServerCallback::performAttack(const IBattleInfoCallback & battle, const battle::Unit & attacker, const battle::Unit & defender, const BattleHex & targetHex, int distance)
+{
+	// the middle of the damage range, matching RNGStub - the point is a comparable number, not a
+	// faithful replay of an attack the AI is only considering
+	const auto average = [](const DamageEstimation & estimation)
+	{
+		return (estimation.damage.min + estimation.damage.max) / 2;
+	};
+
+	BattleAttackInfo attack(&attacker, &defender, distance, false);
+	int64_t dealt = average(owner->battleEstimateDamage(attack, nullptr)) * attacker.getTotalAttacks(false);
+	owner->getForUpdate(defender.unitId())->damage(dealt);
+
+	if(defender.ableToRetaliate() && !attacker.hasBonusOfType(BonusType::BLOCKS_RETALIATION) && !attacker.isInvincible())
+	{
+		BattleAttackInfo retaliation(&defender, &attacker, 0, false);
+		int64_t taken = average(owner->battleEstimateDamage(retaliation, nullptr));
+		owner->getForUpdate(attacker.unitId())->damage(taken);
+	}
 }
 
 void HypotheticBattle::HypotheticServerCallback::apply(CatapultAttack & pack)

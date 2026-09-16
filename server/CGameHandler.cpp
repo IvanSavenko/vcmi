@@ -14,6 +14,8 @@
 #include "TurnTimerHandler.h"
 #include "ServerNetPackVisitors.h"
 #include "ServerSpellCastEnvironment.h"
+
+#include "../lib/combatScripts/ICombatActionCallback.h"
 #include "TurnStartVisitScheduler.h"
 #include "battles/BattleProcessor.h"
 #include "processors/HeroPoolProcessor.h"
@@ -587,6 +589,12 @@ CGameHandler::~CGameHandler() = default;
 ServerCallback * CGameHandler::spellcastEnvironment() const
 {
 	return spellEnv.get();
+}
+
+ICombatActionCallback * CGameHandler::combatActionCallback() const
+{
+	// the same object under its other interface - it is the server, and the server can do both
+	return dynamic_cast<ServerSpellCastEnvironment *>(spellEnv.get());
 }
 
 void CGameHandler::init(StartInfo *si, Load::ProgressAccumulator & progressTracking)

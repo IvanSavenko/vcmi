@@ -21,6 +21,7 @@
 struct SideInBattle;
 class IMarket;
 class SpellCastEnvironment;
+class ICombatActionCallback;
 class CCommanderInstance;
 class EVictoryLossCheckResult;
 class CRandomGenerator;
@@ -89,6 +90,7 @@ public:
 	const GameCb * game() const override;
 	IGameServer & gameServer() const;
 	ServerCallback * spellcastEnvironment() const;
+	ICombatActionCallback * combatActionCallback() const;
 
 	bool isBlockedByQueries(const CPackForServer *pack, PlayerColor player);
 	bool isAllowedExchange(ObjectInstanceID id1, ObjectInstanceID id2);

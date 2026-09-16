@@ -116,6 +116,7 @@
 	"core.script.destruction.description": "{Destruction}\nHas a ${val}% chance to kill additional creatures after attacking.",
 	"core.script.enchanted.description": "{Enchanted}\nPermanently affected by ${spell}.",
 	"core.script.fireShield.description": "{Fire Shield}\nReflects ${val}% of melee damage back to the attacker.",
+	"vcmi.script.attackAndReturn.description": "{Strike and Return}\nThe unit returns to its initial position after performing a melee attack.",
 	"core.script.lifeDrain.description": "{Life Drain}\nRestores health equal to ${val}% of damage dealt.",
 	"core.script.rebirth.description": "{Rebirth}\nAfter death, ${val}% of this stack rises again.",
 	"core.script.soulSteal.description": "{Soul Steal}\nGains ${val} new creatures for each enemy killed.",

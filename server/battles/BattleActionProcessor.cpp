@@ -573,7 +573,15 @@ bool BattleActionProcessor::doScriptedAction(const CBattleInfoCallback & battle,
 		return false;
 	}
 
-	action.script->execute(gameHandler->spellcastEnvironment(), battle, stack, targets, action.parameters);
+	// everything past the first target is whatever the client chose to send, so the script that
+	// asked for it is what decides whether it is legal
+	if (!action.script->validateTargets(battle, stack, targets, action.parameters))
+	{
+		gameHandler->complain("Invalid targets for scripted action!");
+		return false;
+	}
+
+	action.script->execute(gameHandler->spellcastEnvironment(), gameHandler->combatActionCallback(), battle, stack, targets, action.parameters);
 	return true;
 }
 
@@ -1655,9 +1663,10 @@ void BattleActionProcessor::runEventTriggers(const CBattleInfoCallback & battle,
 {
 	std::ranges::stable_sort(pending, {}, &PendingTrigger::priority);
 
-	// Combat events are only fired from battle actions, and neither the script API nor the spell
-	// casts below can start one - both only emit netpacks. Adding a binding that re-enters this
-	// class (making a unit attack or move) would make this recursive and need a depth guard.
+	// Nothing here can re-enter this class. The script API a reaction holds emits netpacks and casts
+	// spells, and walking and attacking - the two things that would come back through here - are on
+	// ICombatActionCallback instead, which only a combat action is handed. That is what bounds the
+	// chain at action -> attack -> reaction, so no depth guard is needed.
 	for (const auto & trigger : pending)
 	{
 		// an earlier reaction may have removed either unit - transmutation replaces the stack it
