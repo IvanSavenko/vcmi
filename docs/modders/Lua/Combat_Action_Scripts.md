@@ -155,6 +155,16 @@ be short of where it was headed, so check where the unit ended up if that matter
 runs a whole melee attack the way the engine does: first strike, every blow the attacker is entitled
 to, and the retaliation. A script asking for one owns none of those rules.
 
+### Helpers of the base class
+
+Two methods every action inherits, for the common case of an action that has to stand next to what it
+is aimed at:
+
+- `hexToReach(battle, unit, target)` - hex the unit has to stand on to touch `target`, preferring the
+  one it already stands on, or nil when it can reach none
+- `isHexToReachFrom(battle, unit, target, hex)` - whether `hex` is one such hex, which is what
+  `validateTargets` checks a second target against
+
 ## An empty list is not the same as no button
 
 Whether a unit offers the action at all is decided by whether it carries the bonus, not by the
