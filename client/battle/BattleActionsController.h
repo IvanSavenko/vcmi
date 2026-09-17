@@ -83,6 +83,25 @@ class BattleActionsController
 	/// Side of the target the mouse names, when the script accepts being aimed that way
 	BattleHex scriptedApproachHex(const ScriptedActionInfo & info, const CStack * actor, const BattleHex & targetHex);
 
+	/// What the scripted actions of the active stack answer, kept because the battlefield asks for
+	/// some of it once per rendered frame while every answer costs a call into the script. Dropped
+	/// whenever the action list is rebuilt, and the hovered answers whenever the mouse moves on.
+	struct ScriptedActionCache
+	{
+		std::map<ScriptID, BattleHexArray> selectableHexes;
+		BattleHex hoveredHex = BattleHex::INVALID;
+		BattleHexArray affectedHexes;
+		BattleHex movementTarget = BattleHex::INVALID;
+	};
+
+	ScriptedActionCache scriptedCache;
+
+	/// Hexes the action may be aimed at, answered by the script once per action list
+	const BattleHexArray & scriptedSelectableHexes(const ScriptedActionInfo & info, const ScriptID & script);
+
+	/// Recomputes the answers that depend on where the mouse is, when it has moved since the last one
+	void answerScriptedHoverQuestions(const BattleHex & hoveredHex);
+
 public:
 	BattleActionsController(BattleInterface & owner);
 
@@ -144,4 +163,7 @@ public:
 
 	/// resets possible actions to original state
 	void resetCurrentStackPossibleActions();
+
+	/// Forgets what the scripts of the active stack answered, which the next question asks again
+	void dropScriptedActionCache();
 };

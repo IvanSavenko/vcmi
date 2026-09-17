@@ -234,6 +234,7 @@ void BattleActionsController::endCastingSpell()
 	if(owner.stacksController->getActiveStack())
 	{
 		possibleActions = getPossibleActionsForStack(owner.stacksController->getActiveStack()); //restore actions after they were cleared
+		dropScriptedActionCache();
 		owner.windowObject->setPossibleActions(possibleActions);
 	}
 
@@ -306,6 +307,7 @@ void BattleActionsController::enterCreatureCastingMode()
 	}
 
 	possibleActions = getPossibleActionsForStack(owner.stacksController->getActiveStack());
+	dropScriptedActionCache();
 
 	auto actionFilterPredicate = [](const PossiblePlayerBattleAction x)
 	{
@@ -432,6 +434,7 @@ void BattleActionsController::castThisSpell(SpellID spellID)
 	else
 	{
 		possibleActions.clear();
+		dropScriptedActionCache();
 		possibleActions.push_back (spellSelMode); //only this one action can be performed at the moment
 		ENGINE->fakeMouseMove();//update cursor
 	}
@@ -496,18 +499,51 @@ ScriptedActionInfo BattleActionsController::getScriptedAction(PossiblePlayerBatt
 	return owner.getBattle()->getScriptedAction(stack, action.script());
 }
 
-BattleHexArray BattleActionsController::currentActionAffectedHexes(const BattleHex & hoveredHex)
+void BattleActionsController::dropScriptedActionCache()
 {
-	if(possibleActions.empty() || !hoveredHex.isValid())
-		return BattleHexArray();
+	scriptedCache = ScriptedActionCache();
+}
 
+const BattleHexArray & BattleActionsController::scriptedSelectableHexes(const ScriptedActionInfo & info, const ScriptID & script)
+{
+	auto cached = scriptedCache.selectableHexes.find(script);
+
+	if(cached == scriptedCache.selectableHexes.end())
+		cached = scriptedCache.selectableHexes.emplace(script, info.script->getSelectableHexes(*owner.getBattle(), owner.stacksController->getActiveStack(), info.parameters)).first;
+
+	return cached->second;
+}
+
+void BattleActionsController::answerScriptedHoverQuestions(const BattleHex & hoveredHex)
+{
+	if(scriptedCache.hoveredHex == hoveredHex)
+		return;
+
+	scriptedCache.hoveredHex = hoveredHex;
+	scriptedCache.affectedHexes = BattleHexArray();
+	scriptedCache.movementTarget = BattleHex::INVALID;
+
+	if(possibleActions.empty() || !hoveredHex.isValid())
+		return;
+
+	const CStack * actor = owner.stacksController->getActiveStack();
 	PossiblePlayerBattleAction action = selectAction(hoveredHex);
 	ScriptedActionInfo info = getScriptedAction(action);
 
-	if(!info.script || !actionIsLegal(action, hoveredHex))
-		return BattleHexArray();
+	if(!actor || !info.script || !actionIsLegal(action, hoveredHex))
+		return;
 
-	return info.script->getAffectedHexes(*owner.getBattle(), owner.stacksController->getActiveStack(), BattleHexArray({hoveredHex}), info.parameters);
+	scriptedCache.affectedHexes = info.script->getAffectedHexes(*owner.getBattle(), actor, BattleHexArray({hoveredHex}), info.parameters);
+
+	if(!heroSpellToCast)
+		scriptedCache.movementTarget = scriptedApproachHex(info, actor, hoveredHex);
+}
+
+BattleHexArray BattleActionsController::currentActionAffectedHexes(const BattleHex & hoveredHex)
+{
+	answerScriptedHoverQuestions(hoveredHex);
+
+	return scriptedCache.affectedHexes;
 }
 
 void BattleActionsController::actionSetCursor(PossiblePlayerBattleAction action, const BattleHex & targetHex)
@@ -931,7 +967,8 @@ bool BattleActionsController::actionIsLegal(PossiblePlayerBattleAction action, c
 			if(!info.script)
 				return false;
 
-			return info.script->getSelectableHexes(*owner.getBattle(), owner.stacksController->getActiveStack(), info.parameters).contains(targetHex);
+			// asked for every action of every hex while the cursor moves, so the script answers once
+			return scriptedSelectableHexes(info, action.script()).contains(targetHex);
 		}
 	}
 
@@ -1284,6 +1321,7 @@ void BattleActionsController::activateStack()
 		tryActivateStackSpellcasting(s);
 
 		possibleActions = getPossibleActionsForStack(s);
+		dropScriptedActionCache();
 		owner.windowObject->setPossibleActions(possibleActions);
 	}
 }
@@ -1343,17 +1381,9 @@ bool BattleActionsController::currentActionSpellcasting(const BattleHex & hovere
 
 BattleHex BattleActionsController::currentActionMovementTarget(const BattleHex & hoveredHex)
 {
-	if (heroSpellToCast || possibleActions.empty() || !hoveredHex.isValid())
-		return BattleHex::INVALID;
+	answerScriptedHoverQuestions(hoveredHex);
 
-	const CStack * actor = owner.stacksController->getActiveStack();
-	PossiblePlayerBattleAction action = selectAction(hoveredHex);
-	ScriptedActionInfo info = getScriptedAction(action);
-
-	if (!actor || !info.script || !actionIsLegal(action, hoveredHex))
-		return BattleHex::INVALID;
-
-	return scriptedApproachHex(info, actor, hoveredHex);
+	return scriptedCache.movementTarget;
 }
 
 BattleHex BattleActionsController::scriptedApproachHex(const ScriptedActionInfo & info, const CStack * actor, const BattleHex & targetHex)
@@ -1390,9 +1420,11 @@ const std::vector<PossiblePlayerBattleAction> & BattleActionsController::getPoss
 void BattleActionsController::setPriorityActions(const std::vector<PossiblePlayerBattleAction> & actions)
 {
 	possibleActions = actions;
+	dropScriptedActionCache();
 }
 
 void BattleActionsController::resetCurrentStackPossibleActions()
 {
 	possibleActions = getPossibleActionsForStack(owner.stacksController->getActiveStack());
+	dropScriptedActionCache();
 }
