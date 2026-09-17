@@ -66,10 +66,14 @@ function Script:hexToReach(battle, unit, target)
 		return unit:getPosition()
 	end
 
+	--- this turn, not eventually: a target the unit could only walk to over several turns is one it
+	--- cannot act on now
+	local reachable = battle:getReachableHexes(unit)
 	local around = target:getSurroundingHexes()
+
 	for i = 1, around:size() do
 		local hex = around:at(i)
-		if battle:isAccessibleForUnit(unit, hex) then
+		if reachable:contains(hex) then
 			return hex
 		end
 	end
@@ -84,7 +88,7 @@ function Script:isHexToReachFrom(battle, unit, target, hex)
 
 	for i = 1, around:size() do
 		if around:at(i) == hex then
-			return hex == unit:getPosition() or battle:isAccessibleForUnit(unit, hex)
+			return hex == unit:getPosition() or battle:getReachableHexes(unit):contains(hex)
 		end
 	end
 

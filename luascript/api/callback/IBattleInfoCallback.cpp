@@ -58,6 +58,10 @@ void IBattleInfoCallbackProxy::registerMethods(MethodRegistrar & R)
 			{"hex",  "Hex to test for reachability."}
 		}, {},
 		"True if the given hex is reachable by the given unit either on current turn or on any future turns.");
+	R.function<&IBattleInfoCallbackProxy::getReachableHexes>("getReachableHexes",
+		{{"unit", "Unit whose movement model is consulted."}}, {},
+		"Hexes the unit can move to on this turn, which is what an action deciding where it may walk "
+		"has to ask - 'isAccessibleForUnit' answers for any turn, not for this one.");
 	R.function<&IBattleInfoCallbackProxy::isAccessibleForNewUnit>("isAccessibleForNewUnit",
 		{
 			{"hex",      "Hex the unit would be placed on. For a double-wide creature this is its front hex."},
@@ -178,6 +182,12 @@ bool IBattleInfoCallbackProxy::isAccessibleForUnit(const IBattleInfoCallback & o
 {
 	const auto & cb = dynamic_cast<const CBattleInfoCallback &>(object);
 	return cb.getAccessibility(&unit).accessible(hex, &unit);
+}
+
+BattleHexArray IBattleInfoCallbackProxy::getReachableHexes(const IBattleInfoCallback & object, const battle::Unit & unit)
+{
+	const auto & cb = dynamic_cast<const CBattleInfoCallback &>(object);
+	return cb.battleGetAvailableHexes(&unit, false);
 }
 
 bool IBattleInfoCallbackProxy::isAccessibleForNewUnit(const IBattleInfoCallback & object, BattleHex hex, const Creature & creature, BattleSide side)

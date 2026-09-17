@@ -16,6 +16,7 @@ Auto-generated from C++ host bindings via `vcmiserver --export-lua-docs`. Do not
 - [BonusList](BonusList.md)
 - [Building](Building.md)
 - [Calendar](Calendar.md)
+- [CombatActionCallback](CombatActionCallback.md)
 - [Component](Component.md)
 - [Creature](Creature.md)
 - [Enums](Enums.md)

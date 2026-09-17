@@ -23,6 +23,9 @@ public:
 	static constexpr int originHex = leftHex;
 	static constexpr int attackFromHex = leftHex + 3;
 	static constexpr int targetHex = leftHex + 4;
+
+	/// Across the field and several rows up, further than any of these creatures walks in one turn.
+	static constexpr int farHex = GameConstants::BFIELD_WIDTH + 15;
 };
 
 TEST_F(AttackSequenceTest, anOrdinaryAttackerStaysWhereItStruck)
@@ -94,6 +97,30 @@ TEST_F(AttackSequenceTest, scriptedReturnEndsWhereTheEngineWouldHave)
 
 	EXPECT_LT(defender->getAvailableHealth(), healthBefore) << "the scripted attack dealt no damage";
 	EXPECT_EQ(attacker->getPosition(), BattleHex(originHex)) << "the attacker did not fly back";
+}
+
+/// A victim the unit cannot walk up to must not be offered at all. Offering one costs the owner the
+/// turn: the action is accepted, the script finds nowhere to strike from, and nothing happens.
+TEST_F(AttackSequenceTest, refusesAVictimItCanNotReach)
+{
+	startGame();
+	startBattle();
+
+	CStack * attacker = addStack(BattleSide::ATTACKER, creatureByName("core:harpy"), BattleHex(originHex), attackerCount);
+	CStack * defender = addStack(BattleSide::DEFENDER, creatureByName("core:pikeman"), BattleHex(farHex), defenderCount);
+	ASSERT_NE(attacker, nullptr);
+	ASSERT_NE(defender, nullptr);
+
+	beginCombat();
+
+	const ScriptID script = scriptByName("core:attackAndReturn");
+	ScriptedActionInfo info = battle()->getScriptedAction(attacker, script);
+	ASSERT_NE(info.script, nullptr);
+
+	EXPECT_FALSE(info.script->getSelectableHexes(*battle(), attacker, info.parameters).contains(BattleHex(farHex)))
+		<< "a victim beyond the unit's reach was offered as a target";
+	EXPECT_FALSE(useScriptedAction(attacker, script, BattleHex(farHex)));
+	EXPECT_EQ(attacker->getPosition(), BattleHex(originHex));
 }
 
 /// The owner picks which side to approach from, so the action takes a second target. It has to be

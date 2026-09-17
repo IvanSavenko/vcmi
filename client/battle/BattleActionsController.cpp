@@ -521,7 +521,7 @@ void BattleActionsController::answerScriptedHoverQuestions(const BattleHex & hov
 
 	scriptedCache.hoveredHex = hoveredHex;
 	scriptedCache.affectedHexes = BattleHexArray();
-	scriptedCache.movementTarget = BattleHex::INVALID;
+	scriptedCache.approachHex = BattleHex::INVALID;
 
 	if(possibleActions.empty() || !hoveredHex.isValid())
 		return;
@@ -536,7 +536,14 @@ void BattleActionsController::answerScriptedHoverQuestions(const BattleHex & hov
 	scriptedCache.affectedHexes = info.script->getAffectedHexes(*owner.getBattle(), actor, BattleHexArray({hoveredHex}), info.parameters);
 
 	if(!heroSpellToCast)
-		scriptedCache.movementTarget = scriptedApproachHex(info, actor, hoveredHex);
+		scriptedCache.approachHex = scriptedApproachHex(info, actor, hoveredHex);
+}
+
+BattleHex BattleActionsController::currentActionApproachHex(const BattleHex & hoveredHex)
+{
+	answerScriptedHoverQuestions(hoveredHex);
+
+	return scriptedCache.approachHex;
 }
 
 BattleHexArray BattleActionsController::currentActionAffectedHexes(const BattleHex & hoveredHex)
@@ -544,6 +551,26 @@ BattleHexArray BattleActionsController::currentActionAffectedHexes(const BattleH
 	answerScriptedHoverQuestions(hoveredHex);
 
 	return scriptedCache.affectedHexes;
+}
+
+void BattleActionsController::setMeleeAttackCursor(const BattleHex & targetHex)
+{
+	static const std::map<BattleHex::EDir, Cursor::Combat> sectorCursor = {
+		{BattleHex::TOP_LEFT,     Cursor::Combat::HIT_SOUTHEAST},
+		{BattleHex::TOP_RIGHT,    Cursor::Combat::HIT_SOUTHWEST},
+		{BattleHex::RIGHT,        Cursor::Combat::HIT_WEST     },
+		{BattleHex::BOTTOM_RIGHT, Cursor::Combat::HIT_NORTHWEST},
+		{BattleHex::BOTTOM_LEFT,  Cursor::Combat::HIT_NORTHEAST},
+		{BattleHex::LEFT,         Cursor::Combat::HIT_EAST     },
+		{BattleHex::TOP,          Cursor::Combat::HIT_SOUTH    },
+		{BattleHex::BOTTOM,       Cursor::Combat::HIT_NORTH    }
+	};
+
+	auto direction = owner.fieldController->selectAttackDirection(targetHex);
+
+	assert(sectorCursor.count(direction) > 0);
+	if (sectorCursor.count(direction))
+		ENGINE->cursor().set(sectorCursor.at(direction));
 }
 
 void BattleActionsController::actionSetCursor(PossiblePlayerBattleAction action, const BattleHex & targetHex)
@@ -565,26 +592,8 @@ void BattleActionsController::actionSetCursor(PossiblePlayerBattleAction action,
 		case PossiblePlayerBattleAction::ATTACK:
 		case PossiblePlayerBattleAction::LONG_WEAPON_ATTACK:
 		case PossiblePlayerBattleAction::WALK_AND_ATTACK:
-		{
-			static const std::map<BattleHex::EDir, Cursor::Combat> sectorCursor = {
-				{BattleHex::TOP_LEFT,     Cursor::Combat::HIT_SOUTHEAST},
-				{BattleHex::TOP_RIGHT,    Cursor::Combat::HIT_SOUTHWEST},
-				{BattleHex::RIGHT,        Cursor::Combat::HIT_WEST     },
-				{BattleHex::BOTTOM_RIGHT, Cursor::Combat::HIT_NORTHWEST},
-				{BattleHex::BOTTOM_LEFT,  Cursor::Combat::HIT_NORTHEAST},
-				{BattleHex::LEFT,         Cursor::Combat::HIT_EAST     },
-				{BattleHex::TOP,          Cursor::Combat::HIT_SOUTH    },
-				{BattleHex::BOTTOM,       Cursor::Combat::HIT_NORTH    }
-			};
-
-			auto direction = owner.fieldController->selectAttackDirection(targetHex);
-
-			assert(sectorCursor.count(direction) > 0);
-			if (sectorCursor.count(direction))
-				ENGINE->cursor().set(sectorCursor.at(direction));
-
+			setMeleeAttackCursor(targetHex);
 			return;
-		}
 
 		case PossiblePlayerBattleAction::SHOOT:
 			if (owner.getBattle()->battleHasShootingPenalty(owner.stacksController->getActiveStack(), targetHex))
@@ -636,10 +645,12 @@ void BattleActionsController::actionSetCursor(PossiblePlayerBattleAction action,
 			if(info.script)
 				name = info.script->getCursor(*owner.getBattle(), owner.stacksController->getActiveStack(), BattleHexArray({targetHex}), info.parameters);
 
-			if(name.empty())
-				ENGINE->cursor().set(Cursor::Combat::POINTER);
-			else
+			if(!name.empty())
 				ENGINE->cursor().set(name);
+			else if(currentActionApproachHex(targetHex).isValid())
+				setMeleeAttackCursor(targetHex); // acts from a side of its target, so the arrow still says which
+			else
+				ENGINE->cursor().set(Cursor::Combat::POINTER);
 			return;
 		}
 	}
@@ -666,6 +677,43 @@ void BattleActionsController::actionSetCursorBlocked(PossiblePlayerBattleAction 
 	assert(0);
 }
 
+std::string BattleActionsController::meleeAttackStatusMessage(const BattleHex & targetHex, bool allowLongWeapon)
+{
+	const CStack * targetStack = getStackForHex(targetHex);
+
+	if(!targetStack)
+		return "";
+
+	const auto * attacker = owner.stacksController->getActiveStack();
+	BattleHex attackFromHex = findAttackFromHex(owner, attacker, targetHex, allowLongWeapon);
+	assert(attackFromHex.isValid());
+	if(!attackFromHex.isValid())
+		return "";
+	int distance = attacker->position.isValid() ? owner.getBattle()->battleGetDistances(attacker, attacker->getPosition())[attackFromHex.toInt()] : 0;
+	DamageEstimation retaliation;
+	BattleAttackInfo attackInfo(attacker, targetStack, distance, false);
+	attackInfo.attackerPos = attackFromHex;
+	DamageEstimation estimation = owner.getBattle()->battleEstimateDamage(attackInfo, &retaliation);
+	estimation.kills.max = std::min<int64_t>(estimation.kills.max, targetStack->getCount());
+	estimation.kills.min = std::min<int64_t>(estimation.kills.min, targetStack->getCount());
+	bool enemyMayBeKilled = estimation.kills.max == targetStack->getCount();
+
+	// breath and other multi-hex attacks also strike extra units - add their kills to the prediction
+	// (getAttackedBattleUnits excludes the directly-attacked hex, so the main target is handled above)
+	for(const auto * splashTarget : owner.getBattle()->getAttackedCreatures(attacker, targetHex, false, attackFromHex).first)
+	{
+		if(splashTarget == targetStack || splashTarget == attacker)
+			continue;
+		BattleAttackInfo splashInfo(attacker, splashTarget, distance, false);
+		splashInfo.attackerPos = attackFromHex;
+		DamageEstimation splash = owner.getBattle()->battleEstimateDamage(splashInfo, nullptr);
+		estimation.kills.min += std::min<int64_t>(splash.kills.min, splashTarget->getCount());
+		estimation.kills.max += std::min<int64_t>(splash.kills.max, splashTarget->getCount());
+	}
+
+	return formatMeleeAttack(estimation, targetStack->getName()) + "\n" + formatRetaliation(retaliation, enemyMayBeKilled);
+}
+
 std::string BattleActionsController::actionGetStatusMessage(PossiblePlayerBattleAction action, const BattleHex & targetHex)
 {
 	const CStack * targetStack = getStackForHex(targetHex);
@@ -688,37 +736,7 @@ std::string BattleActionsController::actionGetStatusMessage(PossiblePlayerBattle
 		case PossiblePlayerBattleAction::ATTACK:
 		case PossiblePlayerBattleAction::LONG_WEAPON_ATTACK:
 		case PossiblePlayerBattleAction::WALK_AND_ATTACK:
-			{
-				const auto * attacker = owner.stacksController->getActiveStack();
-				bool allowLongWeapon = action.get() == PossiblePlayerBattleAction::LONG_WEAPON_ATTACK;
-				BattleHex attackFromHex = findAttackFromHex(owner, attacker, targetHex, allowLongWeapon);
-				assert(attackFromHex.isValid());
-				if(!attackFromHex.isValid())
-					return "";
-				int distance = attacker->position.isValid() ? owner.getBattle()->battleGetDistances(attacker, attacker->getPosition())[attackFromHex.toInt()] : 0;
-				DamageEstimation retaliation;
-				BattleAttackInfo attackInfo(attacker, targetStack, distance, false);
-				attackInfo.attackerPos = attackFromHex;
-				DamageEstimation estimation = owner.getBattle()->battleEstimateDamage(attackInfo, &retaliation);
-				estimation.kills.max = std::min<int64_t>(estimation.kills.max, targetStack->getCount());
-				estimation.kills.min = std::min<int64_t>(estimation.kills.min, targetStack->getCount());
-				bool enemyMayBeKilled = estimation.kills.max == targetStack->getCount();
-
-				// breath and other multi-hex attacks also strike extra units - add their kills to the prediction
-				// (getAttackedBattleUnits excludes the directly-attacked hex, so the main target is handled above)
-				for(const auto * splashTarget : owner.getBattle()->getAttackedCreatures(attacker, targetHex, false, attackFromHex).first)
-				{
-					if(splashTarget == targetStack || splashTarget == attacker)
-						continue;
-					BattleAttackInfo splashInfo(attacker, splashTarget, distance, false);
-					splashInfo.attackerPos = attackFromHex;
-					DamageEstimation splash = owner.getBattle()->battleEstimateDamage(splashInfo, nullptr);
-					estimation.kills.min += std::min<int64_t>(splash.kills.min, splashTarget->getCount());
-					estimation.kills.max += std::min<int64_t>(splash.kills.max, splashTarget->getCount());
-				}
-
-				return formatMeleeAttack(estimation, targetStack->getName()) + "\n" + formatRetaliation(retaliation, enemyMayBeKilled);
-			}
+			return meleeAttackStatusMessage(targetHex, action.get() == PossiblePlayerBattleAction::LONG_WEAPON_ATTACK);
 
 		case PossiblePlayerBattleAction::SHOOT:
 		{
@@ -829,7 +847,14 @@ std::string BattleActionsController::actionGetStatusMessage(PossiblePlayerBattle
 				return "";
 
 			MetaString message = info.script->getStatusMessage(*owner.getBattle(), owner.stacksController->getActiveStack(), BattleHexArray({targetHex}), info.parameters);
-			return message.toString(&GAME->translator());
+			std::string text = message.toString(&GAME->translator());
+
+			// an action that strikes from a side of its target and says nothing of its own gets what
+			// the engine says of an attack, estimated damage and retaliation included
+			if(text.empty() && currentActionApproachHex(targetHex).isValid())
+				return meleeAttackStatusMessage(targetHex, false);
+
+			return text;
 		}
 	}
 	assert(0);
@@ -1381,16 +1406,21 @@ bool BattleActionsController::currentActionSpellcasting(const BattleHex & hovere
 
 BattleHex BattleActionsController::currentActionMovementTarget(const BattleHex & hoveredHex)
 {
-	answerScriptedHoverQuestions(hoveredHex);
+	const CStack * actor = owner.stacksController->getActiveStack();
+	BattleHex approach = currentActionApproachHex(hoveredHex);
 
-	return scriptedCache.movementTarget;
+	// an action reaching its target from where the unit already stands moves it nowhere
+	if(!actor || approach == actor->getPosition())
+		return BattleHex::INVALID;
+
+	return approach;
 }
 
 BattleHex BattleActionsController::scriptedApproachHex(const ScriptedActionInfo & info, const CStack * actor, const BattleHex & targetHex)
 {
 	BattleHex approach = findAttackFromHex(owner, actor, targetHex, false);
 
-	if (!approach.isValid() || approach == actor->getPosition())
+	if (!approach.isValid())
 		return BattleHex::INVALID;
 
 	BattleHexArray withApproach({targetHex, approach});

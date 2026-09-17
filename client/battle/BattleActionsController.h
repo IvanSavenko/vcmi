@@ -91,7 +91,7 @@ class BattleActionsController
 		std::map<ScriptID, BattleHexArray> selectableHexes;
 		BattleHex hoveredHex = BattleHex::INVALID;
 		BattleHexArray affectedHexes;
-		BattleHex movementTarget = BattleHex::INVALID;
+		BattleHex approachHex = BattleHex::INVALID;
 	};
 
 	ScriptedActionCache scriptedCache;
@@ -101,6 +101,15 @@ class BattleActionsController
 
 	/// Recomputes the answers that depend on where the mouse is, when it has moved since the last one
 	void answerScriptedHoverQuestions(const BattleHex & hoveredHex);
+
+	/// Side of its target the current scripted action would act from, invalid when it is not one that does
+	BattleHex currentActionApproachHex(const BattleHex & hoveredHex);
+
+	/// Status bar line the engine shows for a melee attack, estimated damage and retaliation included
+	std::string meleeAttackStatusMessage(const BattleHex & targetHex, bool allowLongWeapon);
+
+	/// Points the cursor at the side of the target the mouse names
+	void setMeleeAttackCursor(const BattleHex & targetHex);
 
 public:
 	BattleActionsController(BattleInterface & owner);

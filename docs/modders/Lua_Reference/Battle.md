@@ -35,6 +35,14 @@ True if the given hex is reachable by the given unit either on current turn or o
 
 - returns `boolean`
 
+### getReachableHexes
+
+Hexes the unit can move to on this turn, which is what an action deciding where it may walk has to ask - 'isAccessibleForUnit' answers for any turn, not for this one.
+
+- param `unit`: [`Unit`](Unit.md) — Unit whose movement model is consulted.
+
+- returns [`BattleHexArray`](BattleHexArray.md)
+
 ### isAccessibleForNewUnit
 
 True if a unit of the given creature could be placed on the given hex. Use before summoning a unit; unlike `isAccessibleForUnit` it needs no existing unit to ask about.
@@ -207,6 +215,16 @@ Returns the wall section corresponding to the given battle hex.
 - param `hex`: [`BattleHex`](BattleHex.md) — Hex to look up.
 
 - returns [`WallPart`](WallPart.md)
+
+### getPath
+
+Hexes the unit would cross on its way, the destination first and the hex next to the start last, so that stopping short of the destination means taking a later entry. Empty when it can not get there at all.
+
+- param `start`: [`BattleHex`](BattleHex.md) — Hex the unit starts from.
+- param `destination`: [`BattleHex`](BattleHex.md) — Hex it is to reach.
+- param `unit`: [`Unit`](Unit.md) — Unit whose movement model the path follows.
+
+- returns [`BattleHexArray`](BattleHexArray.md)
 
 ### getTowerShooterHex
 

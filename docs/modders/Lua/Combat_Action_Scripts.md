@@ -155,13 +155,23 @@ be short of where it was headed, so check where the unit ended up if that matter
 runs a whole melee attack the way the engine does: first strike, every blow the attacker is entitled
 to, and the retaliation. A script asking for one owns none of those rules.
 
+### What an action that acts from up close gets for free
+
+An action whose `validateTargets` accepts a second target is one that walks up to a side of what it is
+aimed at, and the client treats it as melee-shaped. Such an action inherits the engine's attack
+feedback for anything it does not answer itself: the directional cursor naming the side it would
+strike from when `getCursor` returns `""`, and the attack status line with its estimated damage and
+retaliation when `getStatusMessage` returns nothing. An action that wants neither says so by refusing
+the second target.
+
 ### Helpers of the base class
 
 Two methods every action inherits, for the common case of an action that has to stand next to what it
 is aimed at:
 
 - `hexToReach(battle, unit, target)` - hex the unit has to stand on to touch `target`, preferring the
-  one it already stands on, or nil when it can reach none
+  one it already stands on, or nil when it cannot reach any **this turn**. `getSelectableHexes` has to
+  use it, or the owner is offered a target the action cannot act on and loses the turn to it
 - `isHexToReachFrom(battle, unit, target, hex)` - whether `hex` is one such hex, which is what
   `validateTargets` checks a second target against
 

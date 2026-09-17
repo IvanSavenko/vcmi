@@ -223,6 +223,11 @@ function Battle:getUnitsIf(predicate) end
 ---@return boolean
 function Battle:isAccessibleForUnit(unit, hex) end
 
+---Hexes the unit can move to on this turn, which is what an action deciding where it may walk has to ask - 'isAccessibleForUnit' answers for any turn, not for this one.
+---@param unit Unit # Unit whose movement model is consulted.
+---@return BattleHexArray
+function Battle:getReachableHexes(unit) end
+
 ---True if a unit of the given creature could be placed on the given hex. Use before summoning a unit; unlike `isAccessibleForUnit` it needs no existing unit to ask about.
 ---@param hex BattleHex # Hex the unit would be placed on. For a double-wide creature this is its front hex.
 ---@param creature Creature # Creature that would be placed there.
@@ -338,6 +343,13 @@ function Battle:wallPartToBattleHex(part) end
 ---@param hex BattleHex # Hex to look up.
 ---@return WallPart
 function Battle:hexToWallPart(hex) end
+
+---Hexes the unit would cross on its way, the destination first and the hex next to the start last, so that stopping short of the destination means taking a later entry. Empty when it can not get there at all.
+---@param start BattleHex # Hex the unit starts from.
+---@param destination BattleHex # Hex it is to reach.
+---@param unit Unit # Unit whose movement model the path follows.
+---@return BattleHexArray
+function Battle:getPath(start, destination, unit) end
 
 ---Returns the hex used by the tower shooter for the given wall section.
 ---@param part WallPart # Wall section whose tower-shooter hex is queried.
@@ -727,6 +739,25 @@ function Calendar:getDaysInMonth() end
 ---Returns the number of weeks in a month.
 ---@return integer # Configured number of weeks per month.
 function Calendar:getWeeksInMonth() end
+
+---Moving and attacking, as the engine does them when a unit acts. Handed only to a combat action script, and deliberately absent from the server callback every other kind of script holds: an attack wakes combat event scripts, and one of those asking for another attack from inside it would never end.
+---@class CombatActionCallback
+local CombatActionCallback = {}
+
+---Walks the unit along a path to the destination the way a move action does, triggering whatever it crosses, and answers how far it got. That may be short of the destination when something stopped it, so a script that cares has to check where the unit ended up. Unlike server:moveUnit, which places the unit on a hex without it travelling there.
+---@param battle Battle # Battle in which the unit walks.
+---@param unit Unit # Unit to walk.
+---@param destination BattleHex # Hex to walk to.
+---@return integer
+function CombatActionCallback:walkUnit(battle, unit, destination) end
+
+---Runs one melee attack to its end - first strike, every blow the attacker is entitled to, the retaliation - exactly as the engine runs the attack of a unit. The attack rules stay with the engine, so a script asking for one does not have to know any of them.
+---@param battle Battle # Battle the attack happens in.
+---@param attacker Unit # Unit making the attack.
+---@param defender Unit # Unit being attacked.
+---@param targetHex BattleHex # Hex the blow lands on.
+---@param distance integer # Hexes the attacker travelled to reach it, which a charge scales with.
+function CombatActionCallback:performAttack(battle, attacker, defender, targetHex, distance) end
 
 ---Descriptor for an icon shown in a message window (a creature, artifact, resource, skill, ... with an optional amount). `type` selects the kind and `subType` the specific entity.
 ---@class Component
@@ -1834,6 +1865,10 @@ function Unit:getCreature() end
 ---Returns the initial number of creatures this stack had at battle start.
 ---@return integer
 function Unit:getBaseAmount() end
+
+---How far the unit may travel this turn, which is what a return to its starting hex is measured against.
+---@return integer
+function Unit:getMovementRange() end
 
 ---Returns the list of hexes currently occupied by the unit.
 ---@return BattleHexArray

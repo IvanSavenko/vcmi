@@ -258,6 +258,12 @@ Returns the initial number of creatures this stack had at battle start.
 
 - returns `integer`
 
+### getMovementRange
+
+How far the unit may travel this turn, which is what a return to its starting hex is measured against.
+
+- returns `integer`
+
 ### getHexes
 
 Returns the list of hexes currently occupied by the unit.

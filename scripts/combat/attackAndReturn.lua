@@ -9,10 +9,18 @@ Script.__index = Script
 --- slowed while attacking does not make it all the way home, so the flight back is shortened by
 --- however much movement it lost.
 
+--- An enemy this unit could really walk up to and strike. Being reachable is part of it: offering a
+--- victim the unit cannot get to spends the owner's turn on an attack that never lands.
+function Script:isVictim(battle, unit, other)
+	return other:isAlive()
+		and other:isValidTarget(false)
+		and not other:isInvincible()
+		and other:getSide() ~= unit:getSide()
+		and self:hexToReach(battle, unit, other) ~= nil
+end
+
 function Script:getSelectableHexes(battle, unit, hexes)
-	for _, other in ipairs(battle:getUnitsIf(function(candidate)
-		return candidate:isAlive() and candidate:isValidTarget(false) and candidate:getSide() ~= unit:getSide()
-	end)) do
+	for _, other in ipairs(battle:getUnitsIf(function(candidate) return self:isVictim(battle, unit, candidate) end)) do
 		local occupied = other:getHexes()
 		for i = 1, occupied:size() do
 			hexes:insert(occupied:at(i))
