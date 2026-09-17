@@ -516,21 +516,30 @@ const BattleHexArray & BattleActionsController::scriptedSelectableHexes(const Sc
 
 void BattleActionsController::answerScriptedHoverQuestions(const BattleHex & hoveredHex)
 {
-	if(scriptedCache.hoveredHex == hoveredHex)
+	const CStack * actor = owner.stacksController->getActiveStack();
+	std::optional<uint32_t> actorID;
+	if(actor)
+		actorID = actor->unitId();
+
+	// the answers belong to one unit aiming at one hex, so both are what they are kept against
+	if(scriptedCache.hoveredHex == hoveredHex && scriptedCache.actorID == actorID)
 		return;
 
 	scriptedCache.hoveredHex = hoveredHex;
+	scriptedCache.actorID = actorID;
 	scriptedCache.affectedHexes = BattleHexArray();
 	scriptedCache.approachHex = BattleHex::INVALID;
 
-	if(possibleActions.empty() || !hoveredHex.isValid())
+	// the battlefield is drawn while no unit is acting too - between turns, and during the animation
+	// of an action, which deactivates the unit that asked for it. There is nothing to answer then,
+	// and asking would reach selectAction without a unit to select for.
+	if(!actor || possibleActions.empty() || !hoveredHex.isValid())
 		return;
 
-	const CStack * actor = owner.stacksController->getActiveStack();
 	PossiblePlayerBattleAction action = selectAction(hoveredHex);
 	ScriptedActionInfo info = getScriptedAction(action);
 
-	if(!actor || !info.script || !actionIsLegal(action, hoveredHex))
+	if(!info.script || !actionIsLegal(action, hoveredHex))
 		return;
 
 	scriptedCache.affectedHexes = info.script->getAffectedHexes(*owner.getBattle(), actor, BattleHexArray({hoveredHex}), info.parameters);

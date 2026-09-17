@@ -90,6 +90,7 @@ class BattleActionsController
 	{
 		std::map<ScriptID, BattleHexArray> selectableHexes;
 		BattleHex hoveredHex = BattleHex::INVALID;
+		std::optional<uint32_t> actorID;
 		BattleHexArray affectedHexes;
 		BattleHex approachHex = BattleHex::INVALID;
 	};
