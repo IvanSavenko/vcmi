@@ -75,13 +75,18 @@ public:
 	}
 
 	/// Runs the action against the simulated battle and answers the health lost in it, per unit.
-	std::map<uint32_t, int64_t> simulate(HypotheticBattle & state, const BattleHex & target)
+	std::map<uint32_t, int64_t> simulate(HypotheticBattle & state, const BattleHex & target, const CStack * acting = nullptr, const ScriptID & actionScript = ScriptID())
 	{
 		const battle::Units units = battle()->battleGetUnitsIf([](const battle::Unit *){ return true; });
 		auto before = healthOf(state, units);
 
-		const battle::Unit * simulatedActor = state.battleGetUnitByID(actor->unitId());
-		ScriptedActionInfo info = state.getScriptedAction(simulatedActor, script);
+		const CStack * unit = acting ? acting : actor;
+		const ScriptID & used = actionScript.hasValue() ? actionScript : script;
+
+		// the copy the simulation mutates, which is what a script that walks and then looks at where
+		// it ended up has to be handed
+		const battle::Unit * simulatedActor = state.getForUpdate(unit->unitId()).get();
+		ScriptedActionInfo info = state.getScriptedAction(simulatedActor, used);
 		if(!info.script)
 		{
 			ADD_FAILURE() << "unit does not offer the scripted action";
@@ -141,4 +146,28 @@ TEST_F(ScriptedActionEvaluationTest, aimCatchingTwoUnitsIsWorthMoreThanOne)
 	EXPECT_EQ(total(lostOnPair), 2 * damagePerVictim);
 	EXPECT_EQ(total(lostOnLone), damagePerVictim);
 	EXPECT_GT(total(lostOnPair), total(lostOnLone));
+}
+
+/// An action that walks before it acts only does anything if the unit it is handed is the one the
+/// simulation moves. Hand it the unit of the real battle - which is what the callback answers with
+/// while nothing has changed it yet - and the script sees itself still standing where it started,
+/// concludes it never arrived, and does nothing. The AI then values the ability at zero and never
+/// takes it.
+TEST_F(ScriptedActionEvaluationTest, aWalkingActionReachesItsVictimInTheSimulation)
+{
+	startGame();
+	startBattle();
+
+	CStack * harpy = addStack(BattleSide::ATTACKER, creatureByName("core:harpy"), BattleHex(actorHex), 20);
+	CStack * victim = addStack(BattleSide::DEFENDER, creatureByName("core:pikeman"), BattleHex(aimedHex), 50);
+	ASSERT_NE(harpy, nullptr);
+	ASSERT_NE(victim, nullptr);
+
+	beginCombat();
+
+	auto state = makeHypotheticBattle();
+	auto lost = simulate(*state, BattleHex(aimedHex), harpy, scriptByName("core:attackAndReturn"));
+
+	EXPECT_GT(lost[victim->unitId()], 0) << "the simulated attack never landed";
+	EXPECT_EQ(state->battleGetUnitByID(harpy->unitId())->getPosition(), BattleHex(actorHex)) << "the simulated harpy did not fly back";
 }

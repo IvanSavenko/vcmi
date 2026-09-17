@@ -238,3 +238,4 @@ TEST_F(BattleEvaluatorSpellTest, DeclinesMagicDefenceAgainstAnEnemyWithoutMagic)
 	EXPECT_FALSE(action.has_value());
 }
 }
+

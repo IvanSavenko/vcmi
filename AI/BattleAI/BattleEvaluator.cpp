@@ -254,7 +254,13 @@ void BattleEvaluator::evaluateScriptedAction(const CStack * stack, PossibleScrip
 	for(const auto & unit : all)
 		healthOfStack[unit->unitId()] = unit->getAvailableHealth();
 
-	ScriptedActionInfo info = state.getScriptedAction(state.battleGetUnitByID(stack->unitId()), action.script);
+	// the copy the simulation mutates, rather than the unit of the real battle that
+	// battleGetUnitByID answers with while nothing has changed it yet. A script that walks and then
+	// checks where it ended up would otherwise be reading the position it started from, and conclude
+	// that it never arrived
+	const battle::Unit * simulatedActor = state.getForUpdate(stack->unitId()).get();
+
+	ScriptedActionInfo info = state.getScriptedAction(simulatedActor, action.script);
 
 	if(!info.script)
 	{
@@ -262,7 +268,7 @@ void BattleEvaluator::evaluateScriptedAction(const CStack * stack, PossibleScrip
 		return;
 	}
 
-	info.script->execute(state.getServerCallback(), state.getCombatActionCallback(), state, state.battleGetUnitByID(stack->unitId()), BattleHexArray({action.target}), info.parameters);
+	info.script->execute(state.getServerCallback(), state.getCombatActionCallback(), state, simulatedActor, BattleHexArray({action.target}), info.parameters);
 
 	int64_t totalGain = 0;
 
