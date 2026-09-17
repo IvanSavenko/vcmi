@@ -488,25 +488,20 @@ BattleHexArray BattleFieldController::getHighlightedHexesForMovementTarget()
 
 	bool canReach = owner.getBattle()->battleCanAttackHex(availableHexes, stack, hoveredHex);
 	bool canAttack = canReach && (owner.getBattle()->battleCanAttackUnit(stack, hoveredStack));
-	bool adjacentSpellCaster = stack->hasBonusOfType(BonusType::ADJACENT_SPELLCASTER) && stack->canCast();
-	bool canCastAdjacentSpell = false;
-	if (canReach && adjacentSpellCaster && hoveredStack)
-	{
-		spells::Mode mode = owner.actionsController->getCurrentCastMode();
-		auto * spell = owner.actionsController->getCurrentSpell(hoveredHex);
-		auto * caster = owner.actionsController->getCurrentSpellcaster();
-		if(caster && spell)
-		{
-			spells::Target target;
-			target.emplace_back(hoveredStack);
-			target.emplace_back(hoveredHex);
 
-			spells::BattleCast event(owner.getBattle().get(), caster, mode, spell);
-			canCastAdjacentSpell = spell->battleMechanics(&event)->canBeCastAt(target);
-		}
+	// a scripted action that walks up to its target names the hex it would stop on, which is the
+	// only way to know it for an action that does something other than attack from there
+	BattleHex scriptedApproach = owner.actionsController->currentActionMovementTarget(hoveredHex);
+
+	if(scriptedApproach.isValid())
+	{
+		if(stack->doubleWide())
+			return {scriptedApproach, stack->occupiedHex(scriptedApproach)};
+
+		return {scriptedApproach};
 	}
 
-	if(canAttack || canCastAdjacentSpell)
+	if(canAttack)
 	{
 		const bool allowLongWeapon = owner.actionsController->currentActionUsesLongWeapon(hoveredHex);
 		BattleHex fromHex = owner.getBattle()->fromWhichHexAttack(stack, hoveredHex, selectAttackDirection(hoveredHex), allowLongWeapon);
@@ -675,25 +670,23 @@ void BattleFieldController::showHighlightedHexes(Canvas & canvas)
 
 
 	BattleHexArray hoveredMouseHexes;
-	if(hoveredHex != BattleHex::INVALID && owner.actionsController->currentActionWalkAndCast(getHoveredHex()))
+
+	// a scripted action decides its own shaded area, which is the only thing that knows what it hits
+	BattleHexArray scriptedHexes = owner.actionsController->currentActionAffectedHexes(hoveredHex);
+
+	if(!scriptedHexes.empty())
 	{
-		hoveredMouseHexes = hoveredSpellHexes;
+		hoveredMouseHexes = scriptedHexes;
+
+		// plus wherever it would walk to, so that an action acting from up close shows both
 		for(const auto & hex : useMoveRangeForMouse ? hoveredMoveHexes : hoveredMouseHex)
-		{
 			hoveredMouseHexes.insert(hex);
-		}
 	}
 	else
 	{
-		// a scripted action decides its own shaded area, which is the only thing that knows what it hits
-		BattleHexArray scriptedHexes = owner.actionsController->currentActionAffectedHexes(hoveredHex);
-
-		if(!scriptedHexes.empty())
-			hoveredMouseHexes = scriptedHexes;
-		else
-			hoveredMouseHexes = useSpellRangeForMouse
-				? hoveredSpellHexes
-				: ( useMoveRangeForMouse ? hoveredMoveHexes : hoveredMouseHex);
+		hoveredMouseHexes = useSpellRangeForMouse
+			? hoveredSpellHexes
+			: ( useMoveRangeForMouse ? hoveredMoveHexes : hoveredMouseHex);
 	}
 
 	for(int hex = 0; hex < GameConstants::BFIELD_SIZE; ++hex)

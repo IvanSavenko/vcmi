@@ -2,7 +2,7 @@
 	"artifact.core.orbOfVulnerability.bonus.noResistance": "{Pažeidžiamumo Rutulys}\nPanaikina natūralų atsparumą magijai visoms būtybėms mūšio lauke.",
 	"core.bonus.ADDITIONAL_ATTACK.description": "{Papildomi puolimai}\nŠio dalinio papildomų puolimų skaičius: ${val}",
 	"core.bonus.ADDITIONAL_RETALIATION.description": "{Papildomi atsakomieji puolimai}\nŠio dalinio papildomų atsakų skaičius: ${val}",
-	"core.bonus.ADJACENT_SPELLCASTER.description": "{Gretimas burtininkas}\nŠiam vienetui leidžiamas burtas ${subtype.spell} stovint šalia savo taikinio.",
+	"core.script.adjacentSpellcast.description": "{Gretimas burtininkas}\nŠiam vienetui leidžiamas burtas ${subtype.spell} stovint šalia savo taikinio.",
 	"core.bonus.ALWAYS_MAXIMUM_DAMAGE.description": "{Didžiausia žala}\nŠis dalinys visada padaro didžiausią galimą žalą.",
 	"core.bonus.ATTACKS_ALL_ADJACENT.description": "{Atakos aplink}\nŠis dalinys atakuoja visus priešus, esančius šalia pagrindinio taikinio.",
 	"core.bonus.BLOCKS_RANGED_RETALIATION.description": "{Be nuotolinio atsako}\nPriešai negali daryti atsakomųjų atakų šio vieneto nuotolinėms atakoms.",

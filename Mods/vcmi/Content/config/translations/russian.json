@@ -2,7 +2,7 @@
 	"artifact.core.orbOfVulnerability.bonus.noResistance": "{Сфера Уязвимости}\nОтменяет естественное сопротивление магии у всех существ на поле боя.",
 	"core.bonus.ADDITIONAL_ATTACK.description": "{Дополнительные атаки}\nОтряд может атаковать дополнительно ${val} раз(а)",
 	"core.bonus.ADDITIONAL_RETALIATION.description": "{Дополнительные ответные атаки}\nОтвечает на атаку дополнительно ${val} раз",
-	"core.bonus.ADJACENT_SPELLCASTER.description": "{Соседний Заклинатель}\nОтряд может произнести ${subtype.spell}, стоя рядом с целью",
+	"core.script.adjacentSpellcast.description": "{Соседний Заклинатель}\nОтряд может произнести ${subtype.spell}, стоя рядом с целью",
 	"core.bonus.ALWAYS_MAXIMUM_DAMAGE.description": "{Максимальный урон}\nЭтот отряд всегда наносит максимально возможный урон",
 	"core.bonus.ATTACKS_ALL_ADJACENT.description": "{Круговой удар}\nАтакует всех соседних врагов в дополнение к основной цели",
 	"core.bonus.BLOCKS_RANGED_RETALIATION.description": "{Безответная стрельба}\nВраги не могут ответить на дальнобойную атаку этого отряда",

@@ -28,7 +28,6 @@ public:
 		SHOOT,
 		CATAPULT,
 		HEAL,
-		WALK_AND_SPELLCAST,
 
 
 		NO_LOCATION,          // massive spells that affect every possible target, automatic casts
@@ -51,7 +50,7 @@ public:
 	bool spellcast() const
 	{
 		return action == ANY_LOCATION || action == NO_LOCATION || action == OBSTACLE || action == TELEPORT ||
-			   action == SACRIFICE || action == FREE_LOCATION || action == AIMED_SPELL_CREATURE || action == WALK_AND_SPELLCAST;
+			   action == SACRIFICE || action == FREE_LOCATION || action == AIMED_SPELL_CREATURE;
 	}
 
 	Actions get() const

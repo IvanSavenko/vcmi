@@ -2,7 +2,7 @@
 	"artifact.core.orbOfVulnerability.bonus.noResistance": "{Koule zranitelnosti}\nRuší přirozenou magickou odolnost všech bytostí na bojišti.",
 	"core.bonus.ADDITIONAL_ATTACK.description": "{Další útoky}\nTato jednotka může zaútočit ještě ${val}x.",
 	"core.bonus.ADDITIONAL_RETALIATION.description": "{Další odvety}\nTato jednotka může provést ještě ${val} odvet(y).",
-	"core.bonus.ADJACENT_SPELLCASTER.description": "{Kouzlení zblízka}\nTato jednotka může seslat ${subtype.spell}, pokud stojí vedle cíle.",
+	"core.script.adjacentSpellcast.description": "{Kouzlení zblízka}\nTato jednotka může seslat ${subtype.spell}, pokud stojí vedle cíle.",
 	"core.bonus.ALWAYS_MAXIMUM_DAMAGE.description": "{Maximální poškození}\nTato jednotka vždy způsobuje maximální možné poškození.",
 	"core.bonus.ATTACKS_ALL_ADJACENT.description": "{Útok na všechny kolem}\nTato jednotka zasáhne všechny nepřátele sousedící s primárním cílem.",
 	"core.bonus.BLOCKS_RANGED_RETALIATION.description": "{Bez střelecké odvety}\nNepřátelé nemohou oplatit střelecký útok této jednotky.",

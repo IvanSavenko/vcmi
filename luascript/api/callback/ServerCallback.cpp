@@ -296,7 +296,12 @@ void ServerCallbackProxy::castSpellAsAction(ServerCallback & object, const IBatt
 		throw std::runtime_error("Attempt to cast an unknown spell!");
 
 	spells::BattleCast cast(cb, &caster, spells::Mode::CREATURE_ACTIVE, spellObject);
-	cast.setSpellLevel(spellLevel);
+
+	// Magic Plains raises every spell a creature casts to expert, whoever asked for the cast
+	int32_t level = spellLevel;
+	if(spellObject->getLevel() > 0)
+		vstd::amax(level, caster.valOfBonuses(BonusType::MAGIC_SCHOOL_SKILL, BonusSubtypeID(SpellSchool::ANY)));
+	cast.setSpellLevel(level);
 
 	spells::Target destinations;
 	for(const auto * unit : target)
@@ -304,6 +309,9 @@ void ServerCallbackProxy::castSpellAsAction(ServerCallback & object, const IBatt
 			destinations.emplace_back(unit);
 
 	cast.cast(&object, destinations);
+
+	// the cast is the unit's action, so abilities reacting to one of its own casts get their turn
+	object.unitHasCast(*cb, spell, &caster);
 }
 
 void ServerCallbackProxy::showBattleAnimation(ServerCallback & object, const IBattleInfoCallback & battle, const std::vector<battle::Destination> & target, const std::string & animation, const std::string & sound, double transparency, std::optional<bool> deferred)

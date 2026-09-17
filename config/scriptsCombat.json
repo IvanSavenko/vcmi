@@ -168,6 +168,21 @@
 		},
 		"description" : ""
 	},
+	// no icon, so the action gets no button of its own - the spell it casts is what varies between
+	// the abilities using it, and one shared icon would name none of them
+	"adjacentSpellcast" : {
+		"implements" : "combatAction",
+		"script" : "combat/adjacentSpellcast",
+		"patches" : [ ],
+		"schema" : {
+			"required" : ["spell"],
+			"properties" : {
+				"spell" : { "type" : "string", "entity" : "spell", "description" : "spell cast on the unit walked up to" }
+			},
+			"additionalProperties" : false
+		},
+		"description" : ""
+	},
 	// the icons of both actions below are injected by the vcmi mod, which is what ships the artwork
 	"attackAndReturn" : {
 		"implements" : "combatAction",

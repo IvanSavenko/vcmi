@@ -63,7 +63,7 @@ std::string_view lookup(std::span<const NameMapping> table, std::string_view nam
 /// What each retired bonus type is now: a bonus that runs a script, and which script that is. The
 /// bonus type is named rather than assumed, because a retired ability may become a reaction to
 /// combat events or an action its bearer may take, and those are different bonuses.
-constexpr std::array<RetiredAbility, 11> retiredAbilities = {{
+constexpr std::array<RetiredAbility, 12> retiredAbilities = {{
 	{ "LIFE_DRAIN",          "COMBAT_EVENT_TRIGGER", "lifeDrain" },
 	{ "REBIRTH",             "COMBAT_EVENT_TRIGGER", "rebirth" },
 	{ "SOUL_STEAL",          "COMBAT_EVENT_TRIGGER", "soulSteal" },
@@ -75,6 +75,7 @@ constexpr std::array<RetiredAbility, 11> retiredAbilities = {{
 	{ "DEATH_STARE",         "COMBAT_EVENT_TRIGGER", "deathStare" },
 	{ "RANDOM_SPELLCASTER",  "COMBAT_ACTION",        "genieSpell" },
 	{ "RETURN_AFTER_STRIKE", "COMBAT_ACTION",        "attackAndReturn" },
+	{ "ADJACENT_SPELLCASTER","COMBAT_ACTION",        "adjacentSpellcast" },
 }};
 
 /// The entry retiring `name`, or nothing when it is not retired.
@@ -205,6 +206,11 @@ bool BonusMigration::migrateBonus(const JsonNode & ability, JsonNode & migrated)
 		if(!ability["addInfo"].isNull())
 			parameters["spell"] = ability["addInfo"];
 	}
+	else if(script == "adjacentSpellcast")
+	{
+		// the spell moves into a parameter, while val keeps meaning the mastery level it is cast at
+		parameters["spell"] = ability["subtype"];
+	}
 	else if(script == "enchanted")
 	{
 		// enchanted packs a mastery level and a flag rather than a magnitude, so val is unused
@@ -304,6 +310,12 @@ bool BonusMigration::migrateCombatAbility(Bonus & bonus)
 		case BonusType::UNUSED_RETURN_AFTER_STRIKE:
 			scriptName = "attackAndReturn";
 			targetType = BonusType::COMBAT_ACTION; // an action its bearer takes, not a reaction
+			break;
+
+		case BonusType::UNUSED_ADJACENT_SPELLCASTER:
+			scriptName = "adjacentSpellcast";
+			targetType = BonusType::COMBAT_ACTION; // an action its bearer takes, not a reaction
+			parameters["spell"].String() = jsonKeyOf(bonus.subtype.as<SpellID>().toEntity(LIBRARY));
 			break;
 
 		default:

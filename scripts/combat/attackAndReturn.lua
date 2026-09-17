@@ -31,14 +31,7 @@ function Script:validateTargets(battle, unit, targets)
 	local victim = battle:getUnitByPos(targets:at(1), true)
 	if not victim then return false end
 
-	local around = victim:getSurroundingHexes()
-	for i = 1, around:size() do
-		if around:at(i) == targets:at(2) then
-			return battle:isAccessibleForUnit(unit, targets:at(2))
-		end
-	end
-
-	return false
+	return self:isHexToReachFrom(battle, unit, victim, targets:at(2))
 end
 
 function Script:getAffectedHexes(battle, unit, targets, hexes)
@@ -54,7 +47,7 @@ function Script:execute(server, actions, battle, unit, targets)
 	if not victim then return end
 
 	--- the owner's chosen side when it sent one, otherwise whatever this unit can reach
-	local attackFrom = targets:size() > 1 and targets:at(2) or self:hexToStrikeFrom(battle, unit, victim)
+	local attackFrom = targets:size() > 1 and targets:at(2) or self:hexToReach(battle, unit, victim)
 	if not attackFrom then return end
 
 	local distance = 0
@@ -77,23 +70,6 @@ function Script:execute(server, actions, battle, unit, targets)
 	if lost < path:size() then
 		actions:walkUnit(battle, unit, path:at(lost + 1))
 	end
-end
-
---- Hex the unit can strike the victim from, preferring to stay where it is.
-function Script:hexToStrikeFrom(battle, unit, victim)
-	if battle:isMeleeAttackPossible(unit, victim) then
-		return unit:getPosition()
-	end
-
-	local around = victim:getSurroundingHexes()
-	for i = 1, around:size() do
-		local hex = around:at(i)
-		if battle:isAccessibleForUnit(unit, hex) then
-			return hex
-		end
-	end
-
-	return nil
 end
 
 return Script

@@ -161,7 +161,6 @@ private:
 	bool doDefendAction(const CBattleInfoCallback & battle, const BattleAction & ba);
 	bool doAttackAction(const CBattleInfoCallback & battle, const BattleAction & ba);
 	bool doScriptedAction(const CBattleInfoCallback & battle, const BattleAction & ba);
-	bool doWalkAndSpellcastAction(const CBattleInfoCallback & battle, const BattleAction & ba);
 	bool doShootAction(const CBattleInfoCallback & battle, const BattleAction & ba);
 	bool doCatapultAction(const CBattleInfoCallback & battle, const BattleAction & ba);
 	bool doUnitSpellAction(const CBattleInfoCallback & battle, const BattleAction & ba);

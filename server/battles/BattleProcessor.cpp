@@ -443,6 +443,13 @@ void BattleProcessor::spellHasHit(const CBattleInfoCallback & battle, const spel
 	actionsProcessor->processSpellHitTriggers(battle, spell, casterUnit, unitsBefore);
 }
 
+void BattleProcessor::unitHasCast(const CBattleInfoCallback & battle, const spells::Spell & spell, const battle::Unit * casterUnit)
+{
+	CombatEventPayload payload;
+	payload.spell = &spell;
+	actionsProcessor->processBattleEventTriggers(battle, CombatEventType::UNIT_SPELLCAST, casterUnit, nullptr, payload);
+}
+
 void BattleProcessor::noteDeaths(const CBattleInfoCallback & battle, const std::vector<BattleStackAttacked> & casualties)
 {
 	actionsProcessor->noteDeaths(battle, casualties);

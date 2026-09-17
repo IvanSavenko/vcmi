@@ -90,6 +90,8 @@ public:
 	void processBattleEventTriggers(const CBattleInfoCallback & battle, CombatEventType event, const battle::Unit * target, const battle::Unit * secondary);
 	/// Dispatches SPELL_HIT to all affected units after a deliberate cast
 	void spellHasHit(const CBattleInfoCallback & battle, const spells::Spell & spell, const battle::Unit * casterUnit, const std::vector<std::shared_ptr<const battle::CUnitState>> & unitsBefore);
+	/// Announces that a unit cast a spell as its action, which is a combat event of its own
+	void unitHasCast(const CBattleInfoCallback & battle, const spells::Spell & spell, const battle::Unit * casterUnit);
 	/// Queues UNIT_DEATH events from the given casualties
 	void noteDeaths(const CBattleInfoCallback & battle, const std::vector<BattleStackAttacked> & casualties);
 	/// Dispatches queued UNIT_DEATH events outside a battle action

@@ -39,7 +39,6 @@ public:
 	static BattleAction makeMeleeAttack(const battle::Unit * stack, const BattleHex & destination, const BattleHex & attackFrom);
 	static BattleAction makeMeleeAttack(const battle::Unit* stack, const battle::Unit* target, const BattleHex& attackFrom);
 	static BattleAction makeShotAttack(const battle::Unit * shooter, const battle::Unit * target);
-	static BattleAction makeWalkAndCast(const battle::Unit * stack, const BattleHex & castFrom, const battle::Unit * target, const SpellID & spellID);
 	static BattleAction makeCreatureSpellcast(const battle::Unit * stack, const battle::Target & target, const SpellID & spellID);
 	static BattleAction makeMove(const battle::Unit * stack, const BattleHex & dest);
 	static BattleAction makeScriptedAction(const battle::Unit * stack, const ScriptID & actionScript, const BattleHexArray & targets);

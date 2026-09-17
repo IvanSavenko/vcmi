@@ -2,7 +2,7 @@
 	"artifact.core.orbOfVulnerability.bonus.noResistance": "{Sårbarhetens Klot}\nUnder strid upphäver detta klot den naturliga magiresistensen hos alla varelser på slagfältet.",
 	"core.bonus.ADDITIONAL_ATTACK.description": "{Ytterligare Attacker}\nDenna enhet kan attackera ${val} extra gång(er).",
 	"core.bonus.ADDITIONAL_RETALIATION.description": "{Ytterligare Vedergällningar}\nDenna enhet kan vedergälla ${val} extra gång(er).",
-	"core.bonus.ADJACENT_SPELLCASTER.description": "{Magiker På Nära Håll}\nKan kasta ${subtype.spell} medan den står bredvid målet.",
+	"core.script.adjacentSpellcast.description": "{Magiker På Nära Håll}\nKan kasta ${subtype.spell} medan den står bredvid målet.",
 	"core.bonus.ALWAYS_MAXIMUM_DAMAGE.description": "{Maximal Skada}\nDen här enheten orsakar alltid maximal skada.",
 	"core.bonus.ATTACKS_ALL_ADJACENT.description": "{Angriper Runtomkring}\nDen här enheten angriper alla fiender som står intill huvudmålet.",
 	"core.bonus.BLOCKS_RANGED_RETALIATION.description": "{Blockera Distansvedergällning}\nFienden kan inte vedergälla på distans när den beskjuts av denna enhet.",

@@ -2,7 +2,7 @@
 	"artifact.core.orbOfVulnerability.bonus.noResistance": "{Zayıflık Küresi}\nSavaş alanındaki tüm yaratıkların doğal büyü direncini ortadan kaldırır.",
 	"core.bonus.ADDITIONAL_ATTACK.description": "{Ek Saldırılar}\nBu birim ${val} ek saldırı yapabilir.",
 	"core.bonus.ADDITIONAL_RETALIATION.description": "{Ek Misillemeler}\nBu birim ek ${val} kez misilleme yapabilir.",
-	"core.bonus.ADJACENT_SPELLCASTER.description": "{Bitişik Büyücü}\nBu birim, hedefinin yanında dururken ${subtype.spell} büyüsünü yapabilir.",
+	"core.script.adjacentSpellcast.description": "{Bitişik Büyücü}\nBu birim, hedefinin yanında dururken ${subtype.spell} büyüsünü yapabilir.",
 	"core.bonus.ALWAYS_MAXIMUM_DAMAGE.description": "{Maksimum Hasar}\nBu birim her zaman mümkün olan en yüksek hasarı verir.",
 	"core.bonus.ATTACKS_ALL_ADJACENT.description": "{Her Yönden Saldırı}\nBu birim, birincil hedefin yanındaki tüm düşmanlara saldırır.",
 	"core.bonus.BLOCKS_RANGED_RETALIATION.description": "{Menzilli Misilleme Yok}\nDüşmanlar bu birimin menzilli saldırılarına misilleme yapamaz.",

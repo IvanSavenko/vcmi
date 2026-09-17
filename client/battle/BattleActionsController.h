@@ -80,6 +80,9 @@ class BattleActionsController
 	/// script and parameters behind a SCRIPTED_ACTION, taken from the bonus of the acting stack
 	ScriptedActionInfo getScriptedAction(PossiblePlayerBattleAction action) const;
 
+	/// Side of the target the mouse names, when the script accepts being aimed that way
+	BattleHex scriptedApproachHex(const ScriptedActionInfo & info, const CStack * actor, const BattleHex & targetHex);
+
 public:
 	BattleActionsController(BattleInterface & owner);
 
@@ -98,7 +101,9 @@ public:
 	bool currentActionSpellcasting(const BattleHex & hoveredHex);
 
 	/// returns true if current hex action is "walk and spellcast" with active stack
-	bool currentActionWalkAndCast(const BattleHex& hoveredHex);
+	/// Hex the current action would leave the acting unit on, invalid unless it is a scripted action
+	/// that walks up to its target
+	BattleHex currentActionMovementTarget(const BattleHex & hoveredHex);
 
 	/// returns true if currently selected action allows long weapon reach for melee attacks
 	bool currentActionUsesLongWeapon(const BattleHex & hoveredHex);

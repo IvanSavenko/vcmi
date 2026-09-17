@@ -2,7 +2,7 @@
 	"artifact.core.orbOfVulnerability.bonus.noResistance": "{Kugel der Verwundbarkeit}\nNegiert die natürliche Magieresistenz aller Einheiten auf dem Schlachtfeld.",
 	"core.bonus.ADDITIONAL_ATTACK.description": "{Zusätzliche Angriffe}\nKann ${val} Mal zusätzlich angreifen.",
 	"core.bonus.ADDITIONAL_RETALIATION.description": "{Zusätzliche Gegenschläge}\nKann ${val} Mal zusätzlich vergelten.",
-	"core.bonus.ADJACENT_SPELLCASTER.description": "{Nahzauberer}\nBewegt sich zum Ziel, um dort '${subtype.spell}' zu zaubern.",
+	"core.script.adjacentSpellcast.description": "{Nahzauberer}\nBewegt sich zum Ziel, um dort '${subtype.spell}' zu zaubern.",
 	"core.bonus.ALWAYS_MAXIMUM_DAMAGE.description": "{Maximaler Schaden}\nVerursacht immer den maximal möglichen Schaden.",
 	"core.bonus.ATTACKS_ALL_ADJACENT.description": "{Rundum Angreifen}\nGreift alle benachbarten Feinde an.",
 	"core.bonus.BLOCKS_RANGED_RETALIATION.description": "{Keine Fernkampfvergeltung}\nFeind kann nicht auf Fernkampfangriffe dieser Einheit vergelten.",

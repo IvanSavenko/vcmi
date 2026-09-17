@@ -2,7 +2,7 @@
 	"artifact.core.orbOfVulnerability.bonus.noResistance": "{Kula Wrażliwości}\nNeguje naturalną odporność na magię wszystkich stworzeń na polu bitwy.",
 	"core.bonus.ADDITIONAL_ATTACK.description": "{Dodatkowe Uderzenia}\nJednostka ma zdolność dodatkowych uderzeń - ${val}.",
 	"core.bonus.ADDITIONAL_RETALIATION.description": "{Dodatkowy Odwet}\nJednostka ma zdolność dodatkowych kontrataków - ${val}.",
-	"core.bonus.ADJACENT_SPELLCASTER.description": "{Zaklęcie w zwarciu}\nJednostka może rzucić zaklęcie ${subtype.spell}, będąc na sąsiednim polu względem celu.",
+	"core.script.adjacentSpellcast.description": "{Zaklęcie w zwarciu}\nJednostka może rzucić zaklęcie ${subtype.spell}, będąc na sąsiednim polu względem celu.",
 	"core.bonus.ALWAYS_MAXIMUM_DAMAGE.description": "{Maksymalne obrażenia}\nJednostka zawsze zadaje maksymalne obrażenia.",
 	"core.bonus.ATTACKS_ALL_ADJACENT.description": "{Atak kierunkowy}\nJednostka atakuje wszystkich sąsiadujących wrogów.",
 	"core.bonus.BLOCKS_RANGED_RETALIATION.description": "{Brak kontry na dystans}\nWróg nie może kontrować ataków dystansowych tej jednostki.",

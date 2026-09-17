@@ -377,9 +377,6 @@ void BattleActionsController::reorderPossibleActionsPriority(const CStack * stac
 			case PossiblePlayerBattleAction::WALK_AND_ATTACK:
 				return 8;
 				break;
-			case PossiblePlayerBattleAction::WALK_AND_SPELLCAST:
-				return 9;
-				break;
 			case PossiblePlayerBattleAction::MOVE_STACK:
 				return 10;
 				break;
@@ -465,12 +462,6 @@ const CSpell * BattleActionsController::getStackSpellToCast(const BattleHex & ho
 	if(owner.stacksController->getActiveStack()->hasBonusOfType(BonusType::SPELL_LIKE_ATTACK))
 	{
 		auto bonus = owner.stacksController->getActiveStack()->getBonus(Selector::type()(BonusType::SPELL_LIKE_ATTACK));
-		return bonus->subtype.as<SpellID>().toSpell();
-	}
-
-	if(action.get() == PossiblePlayerBattleAction::WALK_AND_SPELLCAST)
-	{
-		auto bonus = owner.stacksController->getActiveStack()->getBonus(Selector::type()(BonusType::ADJACENT_SPELLCASTER));
 		return bonus->subtype.as<SpellID>().toSpell();
 	}
 
@@ -568,7 +559,6 @@ void BattleActionsController::actionSetCursor(PossiblePlayerBattleAction action,
 
 		case PossiblePlayerBattleAction::AIMED_SPELL_CREATURE:
 		case PossiblePlayerBattleAction::ANY_LOCATION:
-		case PossiblePlayerBattleAction::WALK_AND_SPELLCAST:
 		case PossiblePlayerBattleAction::FREE_LOCATION:
 		case PossiblePlayerBattleAction::OBSTACLE:
 			ENGINE->cursor().set(Cursor::Spellcast::SPELL);
@@ -740,18 +730,6 @@ std::string BattleActionsController::actionGetStatusMessage(PossiblePlayerBattle
 			return prepareSpellEffectText(26, *spellEffectValue, spell->getNameTranslated(), "");
 		}
 
-		case PossiblePlayerBattleAction::WALK_AND_SPELLCAST:
-		{
-			const CSpell * spell = getStackSpellToCast(targetHex);
-			assert(spell);
-
-			auto spellEffectValue =
-					owner.getBattle()->getSpellEffectValue(spell, getCurrentSpellcaster(), getCurrentCastMode(), targetHex);
-
-			// "Cast %s on %s" plus dmg and kills info
-			return prepareSpellEffectText(27, *spellEffectValue, spell->getNameTranslated(), targetStack->getName());
-		}
-
 		case PossiblePlayerBattleAction::TELEPORT:
 		{
 			if(!selectedStack) // Phase 1: hovering over unit to teleport
@@ -894,17 +872,6 @@ bool BattleActionsController::actionIsLegal(PossiblePlayerBattleAction action, c
 					owner.getBattle()->battleCanAttackHex(currentStack, targetHex) &&
 					findAttackFromHex(owner, currentStack, targetHex, allowLongWeapon).isValid();
 			}
-		case PossiblePlayerBattleAction::WALK_AND_SPELLCAST:
-			{
-				const CStack * currentStack = owner.stacksController->getActiveStack();
-				if (!currentStack || !targetStack)
-					return false;
-
-				if (targetStack == currentStack)
-					return false;
-
-				return owner.getBattle()->battleCanAttackHex(currentStack, targetHex) && isCastingPossibleHere(action.spell().toSpell(), nullptr, targetHex);
-			}
 		case PossiblePlayerBattleAction::SHOOT:
 			{
 				auto currentStack = owner.stacksController->getActiveStack();
@@ -1020,18 +987,14 @@ void BattleActionsController::actionRealize(PossiblePlayerBattleAction action, c
 			const auto * actor = owner.stacksController->getActiveStack();
 			ScriptedActionInfo info = getScriptedAction(action);
 
-			// an action that strikes in melee wants to know which side the owner is approaching
+			// an action that acts from up close wants to know which side the owner is approaching
 			// from, which only the mouse knows. It is offered rather than assumed: a script that
 			// does not want it refuses the second target and gets the aim alone
 			BattleHexArray targets({targetHex});
-			BattleHex approach = findAttackFromHex(owner, actor, targetHex, false);
+			BattleHex approach = info.script ? scriptedApproachHex(info, actor, targetHex) : BattleHex::INVALID;
 
-			if(info.script && approach.isValid() && approach != targetHex)
-			{
-				BattleHexArray withApproach({targetHex, approach});
-				if(info.script->validateTargets(*owner.getBattle(), actor, withApproach, info.parameters))
-					targets = withApproach;
-			}
+			if(approach.isValid())
+				targets = BattleHexArray({targetHex, approach});
 
 			owner.sendCommand(BattleAction::makeScriptedAction(actor, action.script(), targets), actor);
 			return;
@@ -1042,18 +1005,6 @@ void BattleActionsController::actionRealize(PossiblePlayerBattleAction action, c
 			owner.giveCommand(EActionType::STACK_HEAL, targetHex);
 			return;
 		};
-
-		case PossiblePlayerBattleAction::WALK_AND_SPELLCAST:
-		{
-			auto stack = owner.stacksController->getActiveStack();
-			BattleHex attackFromHex = owner.getBattle()->fromWhichHexAttack(stack, targetHex, owner.fieldController->selectAttackDirection(targetHex));
-			if (attackFromHex.isValid())
-			{
-				BattleAction command = BattleAction::makeWalkAndCast(stack, attackFromHex, targetStack, getStackSpellToCast(targetHex)->id);
-				owner.sendCommand(command, stack);
-			}
-			return;
-		}
 
 		case PossiblePlayerBattleAction::CATAPULT:
 		{
@@ -1390,15 +1341,34 @@ bool BattleActionsController::currentActionSpellcasting(const BattleHex & hovere
 	return action.spellcast();
 }
 
-bool BattleActionsController::currentActionWalkAndCast(const BattleHex & hoveredHex)
+BattleHex BattleActionsController::currentActionMovementTarget(const BattleHex & hoveredHex)
 {
-	if (heroSpellToCast)
-		return false;
+	if (heroSpellToCast || possibleActions.empty() || !hoveredHex.isValid())
+		return BattleHex::INVALID;
 
-	if (!owner.stacksController->getActiveStack())
-		return false;
+	const CStack * actor = owner.stacksController->getActiveStack();
+	PossiblePlayerBattleAction action = selectAction(hoveredHex);
+	ScriptedActionInfo info = getScriptedAction(action);
 
-	return selectAction(hoveredHex).get() == PossiblePlayerBattleAction::WALK_AND_SPELLCAST;
+	if (!actor || !info.script || !actionIsLegal(action, hoveredHex))
+		return BattleHex::INVALID;
+
+	return scriptedApproachHex(info, actor, hoveredHex);
+}
+
+BattleHex BattleActionsController::scriptedApproachHex(const ScriptedActionInfo & info, const CStack * actor, const BattleHex & targetHex)
+{
+	BattleHex approach = findAttackFromHex(owner, actor, targetHex, false);
+
+	if (!approach.isValid() || approach == actor->getPosition())
+		return BattleHex::INVALID;
+
+	BattleHexArray withApproach({targetHex, approach});
+
+	if (!info.script->validateTargets(*owner.getBattle(), actor, withApproach, info.parameters))
+		return BattleHex::INVALID;
+
+	return approach;
 }
 
 bool BattleActionsController::currentActionUsesLongWeapon(const BattleHex & hoveredHex)

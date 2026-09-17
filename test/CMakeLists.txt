@@ -107,6 +107,7 @@ set(test_SRCS
 		battleAI/ScriptedActionEvaluationTest.cpp
 		modding/ModConfigsTest.cpp
 		server/battles/AcidBreathTest.cpp
+		server/battles/AdjacentSpellcastTest.cpp
 		server/battles/AttackSequenceTest.cpp
 		server/battles/BallistaDamageTest.cpp
 		server/battles/BattleTestFixture.cpp

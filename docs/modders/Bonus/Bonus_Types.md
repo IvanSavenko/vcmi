@@ -1158,7 +1158,7 @@ Affected unit will not use spellcast as default attack option
 
 ### SPELLCASTER
 
-Affected units can cast a spell as targeted action (Archangel, Faerie Dragon). Use CASTS bonus to specify how many times per combat creature can use spellcasting (counter is shared with other bonuses like ADJACENT_SPELLCASTER). Use SPECIFIC_SPELL_POWER, CREATURE_SPELL_POWER or CREATURE_ENCHANT_POWER bonuses to set spell power. SPECIFIC_SPELL_RANGE bonus can be used to limit range of spell.
+Affected units can cast a spell as targeted action (Archangel, Faerie Dragon). Use CASTS bonus to specify how many times per combat creature can use spellcasting (counter is shared with other bonuses like the adjacentSpellcast action). Use SPECIFIC_SPELL_POWER, CREATURE_SPELL_POWER or CREATURE_ENCHANT_POWER bonuses to set spell power. SPECIFIC_SPELL_RANGE bonus can be used to limit range of spell.
 
 - subtype: spell identifier
 - val: spell mastery level
@@ -1188,10 +1188,20 @@ DEPRECATED. Configs and saves declaring it are converted to the [genieSpell](../
 
 ### ADJACENT_SPELLCASTER
 
-Affected units can walk and cast spell at target unit (like HotA engineers). Empty hexes are not currently supported. Use CASTS bonus to specify how many times per combat creature can cast spell (counter is shared with other bonuses like SPELLCASTER). Use SPECIFIC_SPELL_POWER, CREATURE_SPELL_POWER or CREATURE_ENCHANT_POWER bonuses to set spell power.
+DEPRECATED. Configs and saves declaring it are converted to the [adjacentSpellcast](../Lua/Combat_Action_Scripts.md#adjacentspellcast) combat action script on load, so existing content keeps working, but new content should declare the script directly:
 
-- subtype: spell identifier
-- val: spell mastery level
+```json
+{
+	"type" : "COMBAT_ACTION",
+	"subtype" : "adjacentSpellcast",
+	"val" : 2,
+	"addInfo" : { "spell" : "hotaRepair" }
+}
+```
+
+The spell moves from the subtype into the `spell` parameter; `val` keeps its meaning, the mastery level the spell is cast at.
+
+Use CASTS to say how many times per combat the creature may cast (the counter is shared with other bonuses like SPELLCASTER). Use SPECIFIC_SPELL_POWER, CREATURE_SPELL_POWER or CREATURE_ENCHANT_POWER to set spell power.
 
 ### CASTS
 

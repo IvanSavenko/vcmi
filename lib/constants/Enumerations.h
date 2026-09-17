@@ -144,7 +144,7 @@ enum class EActionType : int8_t
 	MONSTER_SPELL,
 	BAD_MORALE,
 	STACK_HEAL,
-	WALK_AND_CAST,
+	UNUSED_WALK_AND_CAST, // retired in favour of the adjacentSpellcast script; the value stays because recorded actions are saved by number
 	SCRIPTED_ACTION,
 };
 

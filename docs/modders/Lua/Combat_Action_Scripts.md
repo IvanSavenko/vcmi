@@ -209,6 +209,24 @@ A patch never changes the list of the script it extends: the first `addSpell` or
 it, so a mod extending `genieSpell` does not alter the genie of the base game.
 
 
+### adjacentSpellcast
+
+Walks up to a unit and casts a spell on it from there, the way a HotA engineer repairs a machine.
+Replaces the `ADJACENT_SPELLCASTER` bonus, which is converted to this script on load.
+
+Parameters:
+
+- `spell` - the spell to cast
+- `val` - mastery level it is cast at
+
+Only hexes where the spell would actually do something are offered, and only while the caster can
+still cast at all, so the action disappears once its `CASTS` are spent. The owner may pick which side
+to walk up from, which the action takes as a second target.
+
+It declares no icon, so it gets no button in the unit action panel - the spell is what differs between
+the abilities using this script, and one shared icon would name none of them. The status bar names the
+spell and the unit but not what the spell would do, which the engine's version estimated.
+
 ### attackAndReturn
 
 Walks up to an enemy, strikes it and flies back to where it started, the way a harpy does. Replaces

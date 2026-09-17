@@ -2,7 +2,7 @@
 	"artifact.core.orbOfVulnerability.bonus.noResistance": "{Orb of Vulnerability}\nAnula la resistencia mágica natural de todas las criaturas en el campo de batalla.",
 	"core.bonus.ADDITIONAL_ATTACK.description": "{Ataque adicional}\nEsta unidad puede atacar ${var} veces adicionales.",
 	"core.bonus.ADDITIONAL_RETALIATION.description": "{Contraataques adicionales}\nEsta unidad puede contraatacar ${val} veces adicionales.",
-	"core.bonus.ADJACENT_SPELLCASTER.description": "{Lanzador de hechizos}\nSe puede invocar ${subtype.spell} mientras apunta al su objetivo.",
+	"core.script.adjacentSpellcast.description": "{Lanzador de hechizos}\nSe puede invocar ${subtype.spell} mientras apunta al su objetivo.",
 	"core.bonus.ALWAYS_MAXIMUM_DAMAGE.description": "{Daño máximo}\nEsta unidad siempre inflige el máximo daño posible.",
 	"core.bonus.ATTACKS_ALL_ADJACENT.description": "{Ataque en todas las partes}\nEsta unidad ataca a todos los enemigos adyacentes al objetivo principal.",
 	"core.bonus.BLOCKS_RANGED_RETALIATION.description": "{Evita contraataque a distancia}\nLos enemigos no pueden contraatacar los ataques a distancia de esta unidad.",

@@ -40,6 +40,7 @@ public:
 	void performAttack(const IBattleInfoCallback & battle, const battle::Unit & attacker, const battle::Unit & defender, const BattleHex & targetHex, int distance) override;
 
 	void spellHasHit(const CBattleInfoCallback & battle, const spells::Spell & spell, const battle::Unit * casterUnit, const std::vector<std::shared_ptr<const battle::CUnitState>> & unitsBefore) override;
+	void unitHasCast(const CBattleInfoCallback & battle, const spells::Spell & spell, const battle::Unit * casterUnit) override;
 
 	const CMap * getMap() const override;
 	const IGameInfoCallback * getCb() const override;

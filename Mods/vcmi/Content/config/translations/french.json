@@ -2,7 +2,7 @@
 	"artifact.core.orbOfVulnerability.bonus.noResistance": "{Globe de Vulnérabilité}\nNeutralise la résistance naturelle à la magie de toutes les créatures du champ de bataille.",
 	"core.bonus.ADDITIONAL_ATTACK.description": "{Double frappe}\nCette unité peut attaquer ${val} fois de plus.",
 	"core.bonus.ADDITIONAL_RETALIATION.description": "{Représailles Supplémentaires}\nCette unité peut riposter ${val} fois de plus.",
-	"core.bonus.ADJACENT_SPELLCASTER.description": "{Sort de proximité}\nCette unité peut lancer ${subtype.spell} à proximité de sa cible.",
+	"core.script.adjacentSpellcast.description": "{Sort de proximité}\nCette unité peut lancer ${subtype.spell} à proximité de sa cible.",
 	"core.bonus.ALWAYS_MAXIMUM_DAMAGE.description": "{Dégâts Maximaux}\nCette unité infligera toujours le maximum de dégâts possibles.",
 	"core.bonus.ATTACKS_ALL_ADJACENT.description": "{Attaque tout autour}\nAttaque tous les ennemis adjacents.",
 	"core.bonus.BLOCKS_RANGED_RETALIATION.description": "{Pas de représailles à distance}\nL'ennemi ne peut pas riposter en utilisant une attaque à distance.",

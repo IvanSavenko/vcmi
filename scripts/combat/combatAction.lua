@@ -58,4 +58,37 @@ end
 function Script:execute(server, actions, battle, unit, targets)
 end
 
+--- Hex the unit has to stand on to touch the target, preferring the one it already stands on, or
+--- nil when it can reach none. What both an action that strikes and one that casts from up close
+--- need in order to say where they would walk.
+function Script:hexToReach(battle, unit, target)
+	if battle:isMeleeAttackPossible(unit, target) then
+		return unit:getPosition()
+	end
+
+	local around = target:getSurroundingHexes()
+	for i = 1, around:size() do
+		local hex = around:at(i)
+		if battle:isAccessibleForUnit(unit, hex) then
+			return hex
+		end
+	end
+
+	return nil
+end
+
+--- Whether the aim names a hex the unit could walk to in order to touch the target, which is what
+--- the owner picks by where the mouse sits inside the target hex.
+function Script:isHexToReachFrom(battle, unit, target, hex)
+	local around = target:getSurroundingHexes()
+
+	for i = 1, around:size() do
+		if around:at(i) == hex then
+			return hex == unit:getPosition() or battle:isAccessibleForUnit(unit, hex)
+		end
+	end
+
+	return false
+end
+
 return Script

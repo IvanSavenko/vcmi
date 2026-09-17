@@ -142,7 +142,6 @@ EntityTypeEnum bonusSubtypeEntityType(BonusType type)
 		case BonusType::SPELL_BEFORE_ATTACK:
 		case BonusType::SPECIFIC_SPELL_POWER:
 		case BonusType::MORE_DAMAGE_FROM_SPELL:
-		case BonusType::ADJACENT_SPELLCASTER:
 		case BonusType::NOT_ACTIVE:
 			return EntityTypeEnum::SPELL;
 

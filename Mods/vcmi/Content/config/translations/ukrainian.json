@@ -2,7 +2,7 @@
 	"artifact.core.orbOfVulnerability.bonus.noResistance": "{Сфера вразливості}\nЗнімає природний опір магії у всіх істот на полі бою.",
 	"core.bonus.ADDITIONAL_ATTACK.description": "{Додаткові удари}\nЦей загін може атакувати ${val} разів додатково.",
 	"core.bonus.ADDITIONAL_RETALIATION.description": "{Додаткові атаки у відповідь}\nЗагін може нанести ${val} додаткових ударів у відповідь.",
-	"core.bonus.ADJACENT_SPELLCASTER.description": "{Чаклування при дотику}\nЗагін може накладати закляття ${subtype.spell} стоячи поруч із ціллю.",
+	"core.script.adjacentSpellcast.description": "{Чаклування при дотику}\nЗагін може накладати закляття ${subtype.spell} стоячи поруч із ціллю.",
 	"core.bonus.ALWAYS_MAXIMUM_DAMAGE.description": "{Максимальна шкода}\nЦей загін завжди завдає максимально можливої шкоди.",
 	"core.bonus.ATTACKS_ALL_ADJACENT.description": "{Атакує всіх навколо}\nАтакує всіх прилеглих супротивників на додаток до основної цілі.",
 	"core.bonus.BLOCKS_RANGED_RETALIATION.description": "{Ворог не стріляє у відповідь}\nПротивник не може відповісти на постріл цього загону.",

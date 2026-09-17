@@ -340,12 +340,6 @@ std::vector<PossiblePlayerBattleAction> CBattleInfoCallback::getClientActionsFor
 			allowedActionList.push_back(PossiblePlayerBattleAction::CATAPULT);
 		if(stack->hasBonusOfType(BonusType::HEALER))
 			allowedActionList.push_back(PossiblePlayerBattleAction::HEAL);
-		if(stack->hasBonusOfType(BonusType::ADJACENT_SPELLCASTER))
-		{
-			SpellID spellID = stack->getBonus(Selector::type()(BonusType::ADJACENT_SPELLCASTER))->subtype.as<SpellID>();
-			if(stack->canCast()) //TODO: check for battlefield effects that prevent casting?
-				allowedActionList.push_back(PossiblePlayerBattleAction(PossiblePlayerBattleAction::WALK_AND_SPELLCAST, spellID));
-		}
 
 		// one action per bonus, so a unit offering several of them is simply carrying several
 		for(const auto & bonus : *stack->getBonusesOfType(BonusType::COMBAT_ACTION))

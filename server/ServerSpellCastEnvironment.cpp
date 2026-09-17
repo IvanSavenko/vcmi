@@ -122,6 +122,11 @@ void ServerSpellCastEnvironment::spellHasHit(const CBattleInfoCallback & battle,
 	gh->battles->spellHasHit(battle, spell, casterUnit, unitsBefore);
 }
 
+void ServerSpellCastEnvironment::unitHasCast(const CBattleInfoCallback & battle, const spells::Spell & spell, const battle::Unit * casterUnit)
+{
+	gh->battles->unitHasCast(battle, spell, casterUnit);
+}
+
 const CMap * ServerSpellCastEnvironment::getMap() const
 {
 	return &gh->gameState().getMap();

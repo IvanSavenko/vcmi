@@ -2,7 +2,7 @@
 	"artifact.core.orbOfVulnerability.bonus.noResistance": "{Orb of Vulnerability}\nVô hiệu hóa khả năng kháng phép sẵn có của tất cả các quân trên chiến trường.",
 	"core.bonus.ADDITIONAL_ATTACK.description": "{Tấn công thêm}\nĐơn vị này có thể tấn công thêm ${val} lần.",
 	"core.bonus.ADDITIONAL_RETALIATION.description": "{Phản đòn thêm}\nCó thể phản đòn thêm ${val} lần.",
-	"core.bonus.ADJACENT_SPELLCASTER.description": "{Dùng phép gần}\nĐơn vị này có thể dùng phép ${subtype.spell} khi đứng gần mục tiêu.",
+	"core.script.adjacentSpellcast.description": "{Dùng phép gần}\nĐơn vị này có thể dùng phép ${subtype.spell} khi đứng gần mục tiêu.",
 	"core.bonus.ALWAYS_MAXIMUM_DAMAGE.description": "{Sát thương tối đa}\nĐơn vị này luôn gây ra sát thương tối đa.",
 	"core.bonus.ATTACKS_ALL_ADJACENT.description": "{Đánh xung quanh}\nTấn công tất cả kẻ địch xung quanh.",
 	"core.bonus.BLOCKS_RANGED_RETALIATION.description": "{Bắn không phản}\nKẻ địch không thể bắn phản đòn khi đơn vị này bắn xa.",

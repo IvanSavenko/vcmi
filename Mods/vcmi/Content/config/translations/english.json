@@ -3,7 +3,7 @@
 	"artifact.core.spellScroll.spellName.default": "",
 	"core.bonus.ADDITIONAL_ATTACK.description": "{Additional Attacks}\nThis unit can attack ${val} additional time(s).",
 	"core.bonus.ADDITIONAL_RETALIATION.description": "{Additional Retaliations}\nThis unit can retaliate ${val} additional time(s).",
-	"core.bonus.ADJACENT_SPELLCASTER.description": "{Adjacent Spellcaster}\nThis unit can cast ${subtype.spell} while standing next to its target.",
+	"core.script.adjacentSpellcast.description": "{Adjacent Spellcaster}\nThis unit can cast ${subtype.spell} while standing next to its target.",
 	"core.bonus.ALWAYS_MAXIMUM_DAMAGE.description": "{Maximum Damage}\nThis unit always deals the maximum possible damage.",
 	"core.bonus.ATTACKS_ALL_ADJACENT.description": "{Attacks All Around}\nThis unit attacks all enemies adjacent to the primary target.",
 	"core.bonus.BLOCKS_RANGED_RETALIATION.description": "{No Ranged Retaliation}\nEnemies cannot retaliate against this unit's ranged attacks.",

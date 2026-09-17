@@ -2,7 +2,7 @@
 	"artifact.core.orbOfVulnerability.bonus.noResistance": "{A sebezhetőség gömbje}\nSemlegesíti minden lény természetes varázsellenállását a csatamezőn.",
 	"core.bonus.ADDITIONAL_ATTACK.description": "{További támadások}\nEz a lény még ${val} alkalommal támadhat.",
 	"core.bonus.ADDITIONAL_RETALIATION.description": "{További ellencsapások}\nEz a lény még ${val} alkalommal tehet ellencsapást.",
-	"core.bonus.ADJACENT_SPELLCASTER.description": "{Szomszédos varázshasználó}\nEz a lény képes elmondani a(z) ${subtype.spell} varázslatot a célpontja mellett állva.",
+	"core.script.adjacentSpellcast.description": "{Szomszédos varázshasználó}\nEz a lény képes elmondani a(z) ${subtype.spell} varázslatot a célpontja mellett állva.",
 	"core.bonus.ALWAYS_MAXIMUM_DAMAGE.description": "{Maximális sebzés}\nEz a lény mindig a lehető legnagyobb sebzést okozza.",
 	"core.bonus.ATTACKS_ALL_ADJACENT.description": "{Körbetámadás}\nEz a lény az elsődleges célponttal szomszédos összes ellenséget támadja.",
 	"core.bonus.BLOCKS_RANGED_RETALIATION.description": "{Nincs távolsági ellencsapás}\nAz ellenség nem tud távolsági támadással visszatámadni.",
