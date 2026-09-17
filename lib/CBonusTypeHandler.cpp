@@ -99,7 +99,7 @@ std::string CBonusTypeHandler::combatScriptToString(const std::shared_ptr<Bonus>
 
 	const ScriptTypeDescription & script = LIBRARY->scriptTypes()->getById(scriptID);
 
-	// only a combat event script is required to describe itself, and only one of those belongs here
+	// a script that describes itself is one meant to be seen; the rest stay out of the creature window
 	if(script.descriptionTextID.empty())
 		return "";
 
@@ -127,7 +127,7 @@ std::string CBonusTypeHandler::bonusToString(const std::shared_ptr<Bonus> & bonu
 {
 	// a scripted ability is described by its script - the bonus type is shared by all of them,
 	// so the type-level description and its hidden flag can not say anything useful here
-	if(bonus->type == BonusType::COMBAT_EVENT_TRIGGER)
+	if(bonus->type == BonusType::COMBAT_EVENT_TRIGGER || bonus->type == BonusType::COMBAT_ACTION)
 		return combatScriptToString(bonus, bonusValue);
 
 	const CBonusType & bt = *bonusTypes.at(vstd::to_underlying(bonus->type));

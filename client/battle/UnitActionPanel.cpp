@@ -127,11 +127,10 @@ void UnitActionPanel::testAndAddScriptedAction(const std::vector<PossiblePlayerB
 
 	const ScriptTypeDescription & description = LIBRARY->scriptTypes()->getById(scriptFilter);
 
+	// an action without artwork of its own offers no button, which is how an ability whose look
+	// depends on its parameters rather than on its script says so
 	if (description.icon.empty())
-	{
-		logGlobal->error("Combat action script '%s' declares no icon, so it can not be offered as a button!", description.scriptId);
 		return;
-	}
 
 	int index = buttons.size();
 
@@ -174,9 +173,12 @@ void UnitActionPanel::setPossibleActions(const std::vector<PossiblePlayerBattleA
 	testAndAddAction(newActions, actionsShoot, ImagePath::builtin("battle/actionShoot"), "vcmi.battle.action.shoot");
 	testAndAddAction(newActions, actionsAttackLongWeapon, ImagePath::builtin("battle/actionLongWeapon"), "vcmi.battle.action.attackLongWeapon");
 
-	// one button per script, so a unit offering two variants of an ability gets one button each
+	// one button per script, so a unit offering two variants of an ability gets one button each -
+	// and only one when it carries the same ability twice
+	std::set<ScriptID> scripted;
+
 	for (const auto & action : newActions)
-		if (action.get() == PossiblePlayerBattleAction::SCRIPTED_ACTION)
+		if (action.get() == PossiblePlayerBattleAction::SCRIPTED_ACTION && scripted.insert(action.script()).second)
 			testAndAddScriptedAction(newActions, action.script());
 
 	std::vector<SpellID> spells;

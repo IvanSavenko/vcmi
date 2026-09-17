@@ -12,6 +12,10 @@
 #include "BattleTestFixture.h"
 
 #include "../../../lib/bonuses/BonusParameters.h"
+#include "../../../lib/bonuses/BonusSelector.h"
+#include "../../../lib/CBonusTypeHandler.h"
+#include "../../../lib/GameLibrary.h"
+#include "../../../lib/texts/CGeneralTextHandler.h"
 
 class AttackSequenceTest : public BattleTestFixture
 {
@@ -150,4 +154,22 @@ TEST_F(AttackSequenceTest, approachHexIsHonouredAndChecked)
 	ASSERT_TRUE(useScriptedAction(attacker, script, BattleHexArray({BattleHex(targetHex), approach})));
 	EXPECT_LT(defender->getAvailableHealth(), defenderCount * defender->getMaxHealth());
 	EXPECT_EQ(attacker->getPosition(), BattleHex(originHex)) << "the attacker did not fly back";
+}
+
+/// The creature window lists an ability by what its script says, which is the only thing that can
+/// tell two scripted abilities apart - they share one bonus type.
+TEST_F(AttackSequenceTest, describesItselfByItsScript)
+{
+	startGame();
+	startBattle();
+
+	CStack * harpy = addStack(BattleSide::ATTACKER, creatureByName("core:harpy"), BattleHex(originHex), attackerCount);
+	ASSERT_NE(harpy, nullptr);
+
+	auto found = harpy->getBonus(Selector::type()(BonusType::COMBAT_ACTION));
+	ASSERT_NE(found, nullptr) << "the harpy no longer carries the ability at all";
+
+	auto bonus = std::make_shared<Bonus>(*found);
+
+	EXPECT_EQ(LIBRARY->getBth()->bonusToString(bonus, harpy), LIBRARY->generaltexth->translate("core.script.attackAndReturn.description"));
 }
