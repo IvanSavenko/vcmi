@@ -16,18 +16,42 @@
 
 #include "MinizipExtensions.h"
 
+/// Archive handle shared between loader and all streams opened from it.
+/// Opening archive requires locating its central directory, which is expensive, so archive is opened only once
+struct CZipArchiveHandle : boost::noncopyable
+{
+	std::shared_ptr<CIOApi> ioApi;
+	zlib_filefunc64_def zlibApi;
+	unzFile file = nullptr;
+
+	/// guards all access to file, including current file position within archive
+	std::mutex mutex;
+	/// stream that currently has its file opened within archive, if any
+	const void * activeStream = nullptr;
+
+	CZipArchiveHandle(const boost::filesystem::path & archive, std::shared_ptr<CIOApi> api);
+	~CZipArchiveHandle();
+};
+
 class CZipStream : public CBufferedStream
 {
-	unzFile file;
+	std::shared_ptr<CZipArchiveHandle> archive;
+	unz64_file_pos filepos;
+	si64 fileSize;
+	ui32 fileCRC;
+	/// number of bytes already read from file by this stream
+	si64 bytesRead = 0;
+
+	/// Makes this stream's file current in shared archive handle. Must be called with archive mutex locked
+	void activate();
 
 public:
 	/**
-	 * @brief constructs zip stream from already opened file
-	 * @param api virtual filesystem interface
-	 * @param archive path to archive to open
+	 * @brief constructs zip stream from already opened archive
+	 * @param archive shared handle of opened archive
 	 * @param filepos position of file to open
 	 */
-	CZipStream(const std::shared_ptr<CIOApi> & api, const boost::filesystem::path & archive, unz64_file_pos filepos);
+	CZipStream(std::shared_ptr<CZipArchiveHandle> archive, unz64_file_pos filepos);
 	~CZipStream();
 
 	si64 getSize() override;
@@ -39,14 +63,13 @@ protected:
 
 class CZipLoader : public ISimpleResourceLoader
 {
-	std::shared_ptr<CIOApi> ioApi;
-	zlib_filefunc64_def zlibApi;
 	boost::filesystem::path archiveName;
 	std::string mountPoint;
+	std::shared_ptr<CZipArchiveHandle> archive;
 
 	std::unordered_map<ResourcePath, unz64_file_pos> files;
 
-	std::unordered_map<ResourcePath, unz64_file_pos> listFiles(const std::string & mountPoint, const boost::filesystem::path &archive);
+	std::unordered_map<ResourcePath, unz64_file_pos> listFiles(const std::string & mountPoint);
 public:
 	CZipLoader(const std::string & mountPoint, const boost::filesystem::path & archive, std::shared_ptr<CIOApi> api = std::make_shared<CDefaultIOApi>());
 

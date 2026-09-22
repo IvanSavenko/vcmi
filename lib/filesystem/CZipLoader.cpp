@@ -13,63 +13,108 @@
 #include "../ScopeGuard.h"
 #include "../texts/TextOperations.h"
 
-CZipStream::CZipStream(const std::shared_ptr<CIOApi> & api, const boost::filesystem::path & archive, unz64_file_pos filepos)
+CZipArchiveHandle::CZipArchiveHandle(const boost::filesystem::path & archive, std::shared_ptr<CIOApi> api)
+	: ioApi(std::move(api))
+	, zlibApi(ioApi->getApiStructure())
 {
-	zlib_filefunc64_def zlibApi;
-
-	zlibApi = api->getApiStructure();
-
 	file = unzOpen2_64(archive.c_str(), &zlibApi);
-	unzGoToFilePos64(file, &filepos);
-	unzOpenCurrentFile(file);
+
+	if(file == nullptr)
+		logGlobal->error("%s failed to open", TextOperations::filesystemPathToUtf8(archive));
+}
+
+CZipArchiveHandle::~CZipArchiveHandle()
+{
+	if (file)
+		unzClose(file);
+}
+
+CZipStream::CZipStream(std::shared_ptr<CZipArchiveHandle> archive, unz64_file_pos filepos)
+	: archive(std::move(archive))
+	, filepos(filepos)
+{
+	std::scoped_lock lock(this->archive->mutex);
+
+	unz_file_info64 info;
+	unzGoToFilePos64(this->archive->file, &this->filepos);
+	unzGetCurrentFileInfo64(this->archive->file, &info, nullptr, 0, nullptr, 0, nullptr, 0);
+	fileSize = info.uncompressed_size;
+	fileCRC = info.crc;
 }
 
 CZipStream::~CZipStream()
 {
-	unzCloseCurrentFile(file);
-	unzClose(file);
+	std::scoped_lock lock(archive->mutex);
+	if (archive->activeStream == this)
+	{
+		unzCloseCurrentFile(archive->file);
+		archive->activeStream = nullptr;
+	}
+}
+
+void CZipStream::activate()
+{
+	if (archive->activeStream == this)
+		return;
+
+	if (archive->activeStream != nullptr)
+		unzCloseCurrentFile(archive->file);
+
+	unzGoToFilePos64(archive->file, &filepos);
+	unzOpenCurrentFile(archive->file);
+	archive->activeStream = this;
+
+	// another stream was using archive since our last read - restore our position within file
+	std::array<ui8, 8 * 1024> skipBuffer{};
+	si64 toSkip = bytesRead;
+	while (toSkip > 0)
+	{
+		int skipped = unzReadCurrentFile(archive->file, skipBuffer.data(), static_cast<unsigned int>(std::min<si64>(toSkip, skipBuffer.size())));
+		if (skipped <= 0)
+			break;
+		toSkip -= skipped;
+	}
 }
 
 si64 CZipStream::readMore(ui8 * data, si64 size)
 {
-	return unzReadCurrentFile(file, data, static_cast<unsigned int>(size));
+	std::scoped_lock lock(archive->mutex);
+	activate();
+
+	int result = unzReadCurrentFile(archive->file, data, static_cast<unsigned int>(size));
+	if (result > 0)
+		bytesRead += result;
+	return result;
 }
 
 si64 CZipStream::getSize()
 {
-	unz_file_info64 info;
-	unzGetCurrentFileInfo64 (file, &info, nullptr, 0, nullptr, 0, nullptr, 0);
-	return info.uncompressed_size;
+	return fileSize;
 }
 
 ui32 CZipStream::calculateCRC32()
 {
-	unz_file_info64 info;
-	unzGetCurrentFileInfo64 (file, &info, nullptr, 0, nullptr, 0, nullptr, 0);
-	return info.crc;
+	return fileCRC;
 }
 
 ///CZipLoader
-CZipLoader::CZipLoader(const std::string & mountPoint, const boost::filesystem::path & archive, std::shared_ptr<CIOApi> api):
-	ioApi(std::move(api)),
-	zlibApi(ioApi->getApiStructure()),
-	archiveName(archive),
+CZipLoader::CZipLoader(const std::string & mountPoint, const boost::filesystem::path & archivePath, std::shared_ptr<CIOApi> api):
+	archiveName(archivePath),
 	mountPoint(mountPoint),
-	files(listFiles(mountPoint, archive))
+	archive(std::make_shared<CZipArchiveHandle>(archivePath, std::move(api))),
+	files(listFiles(mountPoint))
 {
 	logGlobal->trace("Zip archive loaded, %d files found", files.size());
 }
 
-std::unordered_map<ResourcePath, unz64_file_pos> CZipLoader::listFiles(const std::string & mountPoint, const boost::filesystem::path & archive)
+std::unordered_map<ResourcePath, unz64_file_pos> CZipLoader::listFiles(const std::string & mountPoint)
 {
 	std::unordered_map<ResourcePath, unz64_file_pos> ret;
 
-	unzFile file = unzOpen2_64(archive.c_str(), &zlibApi);
+	std::scoped_lock lock(archive->mutex);
+	unzFile file = archive->file;
 
-	if(file == nullptr)
-		logGlobal->error("%s failed to open", TextOperations::filesystemPathToUtf8(archive));
-
-	if (unzGoToFirstFile(file) == UNZ_OK)
+	if (file != nullptr && unzGoToFirstFile(file) == UNZ_OK)
 	{
 		do
 		{
@@ -87,14 +132,13 @@ std::unordered_map<ResourcePath, unz64_file_pos> CZipLoader::listFiles(const std
 		}
 		while (unzGoToNextFile(file) == UNZ_OK);
 	}
-	unzClose(file);
 
 	return ret;
 }
 
 std::unique_ptr<CInputStream> CZipLoader::load(const ResourcePath & resourceName) const
 {
-	return std::unique_ptr<CInputStream>(new CZipStream(ioApi, archiveName, files.at(resourceName)));
+	return std::make_unique<CZipStream>(archive, files.at(resourceName));
 }
 
 bool CZipLoader::existsResource(const ResourcePath & resourceName) const
