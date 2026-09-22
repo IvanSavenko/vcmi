@@ -63,8 +63,11 @@ void CFilesystemLoader::updateFilteredFiles(std::function<bool(const std::string
 {
 	if (filter(mountPoint))
 	{
-		std::lock_guard lock(fileListGuard);
-		fileList = listFiles(mountPoint, recursiveDepth, false);
+		{
+			std::lock_guard lock(fileListGuard);
+			fileList = listFiles(mountPoint, recursiveDepth, false);
+		}
+		notifyContentsChanged();
 	}
 }
 
@@ -112,6 +115,7 @@ bool CFilesystemLoader::createResource(const std::string & requestedFilename, bo
 			return false;
 	}
 	fileList[resID] = filePath;
+	notifyContentsChanged();
 	return true;
 }
 
@@ -131,6 +135,7 @@ bool CFilesystemLoader::removeResource(const ResourcePath & resourceName)
 	}
 
 	fileList.erase(resource);
+	notifyContentsChanged();
 	return true;
 }
 

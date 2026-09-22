@@ -74,7 +74,41 @@ CFilesystemList::~CFilesystemList()
 {
 }
 
-const ISimpleResourceLoader * CFilesystemList::getLoader(const ResourcePath & resourceName) const
+void ISimpleResourceLoader::notifyContentsChanged()
+{
+	if (parentList)
+		parentList->onContentsChanged();
+}
+
+void CFilesystemList::onContentsChanged()
+{
+	++contentsVersion;
+	notifyContentsChanged();
+}
+
+void CFilesystemList::enableLookupIndex()
+{
+	lookupIndexEnabled = true;
+}
+
+void CFilesystemList::rebuildLookupIndex() const
+{
+	std::unique_lock lock(lookupIndexMutex);
+
+	// any changes done while index is being built will cause another rebuild on next lookup
+	uint64_t version = contentsVersion;
+	if (lookupIndexVersion == version)
+		return; // already rebuilt by another thread
+
+	lookupIndex.clear();
+	for (size_t i = 0; i < loaders.size(); ++i)
+		for (const auto & resource : loaders[i]->getFilteredFiles([](const ResourcePath &){ return true; }))
+			lookupIndex[std::hash<ResourcePath>()(resource)] = i; // later loaders overwrite earlier ones
+
+	lookupIndexVersion = version;
+}
+
+const ISimpleResourceLoader * CFilesystemList::getLoaderLinear(const ResourcePath & resourceName) const
 {
 	// last loader that has the resource wins - it holds the last overridden version
 	for(const auto & loader : std::views::reverse(loaders))
@@ -82,6 +116,38 @@ const ISimpleResourceLoader * CFilesystemList::getLoader(const ResourcePath & re
 			return loader.get();
 
 	return nullptr;
+}
+
+const ISimpleResourceLoader * CFilesystemList::getLoader(const ResourcePath & resourceName) const
+{
+	if (!lookupIndexEnabled)
+		return getLoaderLinear(resourceName);
+
+	size_t resourceHash = std::hash<ResourcePath>()(resourceName);
+
+	for (int attempt = 0; attempt < 2; ++attempt)
+	{
+		{
+			std::shared_lock lock(lookupIndexMutex);
+			if (lookupIndexVersion == contentsVersion)
+			{
+				auto it = lookupIndex.find(resourceHash);
+				if (it == lookupIndex.end())
+					return nullptr;
+
+				// Loader has resource with such hash. Since it is the last one with such hash, it is also the last one with this resource.
+				// If loader does not have this resource, then this is hash collision with another resource
+				const auto & loader = loaders[it->second];
+				if (loader->existsResource(resourceName))
+					return loader.get();
+				break;
+			}
+		}
+		rebuildLookupIndex();
+	}
+
+	// hash collision or contents keep changing during lookup
+	return getLoaderLinear(resourceName);
 }
 
 std::unique_ptr<CInputStream> CFilesystemList::load(const ResourcePath & resourceName) const
@@ -192,7 +258,9 @@ void CFilesystemList::addLoader(std::unique_ptr<ISimpleResourceLoader> loader, b
 	if (writeable)
 		writeableLoaders.insert(loader.get());
 
+	loader->parentList = this;
 	loaders.push_back(std::move(loader));
+	onContentsChanged();
 }
 
 bool CFilesystemList::removeLoader(ISimpleResourceLoader * loader)
@@ -203,6 +271,7 @@ bool CFilesystemList::removeLoader(ISimpleResourceLoader * loader)
 		{
 			loaders.erase(loaderIterator);
 			writeableLoaders.erase(loader);
+			onContentsChanged();
 			return true;
 		}
 	}

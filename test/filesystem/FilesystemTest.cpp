@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 
+#include "../../lib/filesystem/AdapterLoaders.h"
 #include "../../lib/filesystem/CFilesystemLoader.h"
 #include "../../lib/filesystem/ResourcePath.h"
 
@@ -51,6 +52,41 @@ TEST_F(FilesystemTest, RemovesResourceAndUpdatesIndex)
 	EXPECT_TRUE(loader.removeResource(resource));
 	EXPECT_FALSE(loader.existsResource(resource));
 	EXPECT_FALSE(boost::filesystem::exists(getDirectory() / "example.txt"));
+}
+
+TEST_F(FilesystemTest, LookupIndexFollowsChangesInNestedLoaders)
+{
+	ASSERT_TRUE(boost::filesystem::create_directory(getDirectory() / "first"));
+	ASSERT_TRUE(boost::filesystem::create_directory(getDirectory() / "second"));
+
+	auto firstLoader = std::make_unique<CFilesystemLoader>("Test/", getDirectory() / "first");
+	auto secondLoader = std::make_unique<CFilesystemLoader>("Test/", getDirectory() / "second");
+	auto * first = firstLoader.get();
+	auto * second = secondLoader.get();
+
+	auto nested = std::make_unique<CFilesystemList>();
+	nested->addLoader(std::move(firstLoader), true);
+
+	CFilesystemList indexed;
+	indexed.enableLookupIndex();
+	indexed.addLoader(std::move(nested), false);
+	indexed.addLoader(std::move(secondLoader), false);
+
+	const ResourcePath resource("Test/example.txt");
+	EXPECT_FALSE(indexed.existsResource(resource));
+
+	ASSERT_TRUE(first->createResource("Test/example.txt"));
+	EXPECT_EQ(indexed.getResourceName(resource), getDirectory() / "first" / "example.txt");
+
+	// later loader overrides earlier one
+	ASSERT_TRUE(second->createResource("Test/example.txt"));
+	EXPECT_EQ(indexed.getResourceName(resource), getDirectory() / "second" / "example.txt");
+
+	ASSERT_TRUE(second->removeResource(resource));
+	EXPECT_EQ(indexed.getResourceName(resource), getDirectory() / "first" / "example.txt");
+
+	ASSERT_TRUE(first->removeResource(resource));
+	EXPECT_FALSE(indexed.existsResource(resource));
 }
 
 }

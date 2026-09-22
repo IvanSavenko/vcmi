@@ -59,9 +59,23 @@ class CFilesystemList : public ISimpleResourceLoader
 
 	std::set<ISimpleResourceLoader *> writeableLoaders;
 
+	/// Resource lookup index, maps hash of resource path to position of last loader that contains resource with such hash
+	/// Makes lookups independent of number of loaders, but must be rebuilt whenever set of resources in any loader changes
+	bool lookupIndexEnabled = false;
+	/// incremented on any change in set of resources provided by this list
+	std::atomic<uint64_t> contentsVersion = 0;
+	mutable std::shared_mutex lookupIndexMutex;
+	mutable std::unordered_map<size_t, size_t> lookupIndex;
+	mutable uint64_t lookupIndexVersion = std::numeric_limits<uint64_t>::max();
+
 	/// Loader that provides the resource, or nullptr. Every lookup goes through here,
 	/// so that a resource is located exactly once per query
 	const ISimpleResourceLoader * getLoader(const ResourcePath & resourceName) const;
+	const ISimpleResourceLoader * getLoaderLinear(const ResourcePath & resourceName) const;
+	void rebuildLookupIndex() const;
+
+	friend class ISimpleResourceLoader;
+	void onContentsChanged();
 
 	//FIXME: this is only compile fix, should be removed in the end
 	CFilesystemList(CFilesystemList &) = delete;
@@ -84,6 +98,9 @@ public:
 	std::vector<const ISimpleResourceLoader *> getResourcesWithName(const ResourcePath & resourceName) const override;
 	std::string getFullFileURI(const ResourcePath& resourceName) const override;
 	std::time_t getLastWriteTime(const ResourcePath& resourceName) const override;
+
+	/// Enables lookup index for this list. Intended for lists with large number of loaders that rarely change
+	void enableLookupIndex();
 
 	/**
 	 * Adds a resource loader to the loaders list

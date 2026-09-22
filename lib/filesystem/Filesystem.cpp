@@ -201,7 +201,10 @@ void CResourceHandler::initialize()
 	localFS->addLoader(std::move(configLoader), true);
 
 	addFilesystem("root", "initial", createInitial());
-	addFilesystem("root", "data", std::make_unique<CFilesystemList>());
+	// data filesystem contains loaders of all mods, and changes only on explicit refresh of file lists
+	auto dataFS = std::make_unique<CFilesystemList>();
+	dataFS->enableLookupIndex();
+	addFilesystem("root", "data", std::move(dataFS));
 	addFilesystem("root", "local", std::move(localFS));
 }
 

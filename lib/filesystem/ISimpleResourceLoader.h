@@ -10,6 +10,7 @@
 #pragma once
 
 class CInputStream;
+class CFilesystemList;
 class ResourcePath;
 
 /**
@@ -118,4 +119,13 @@ public:
 	virtual std::string getFullFileURI(const ResourcePath& resourceName) const = 0;
 		
 	virtual std::time_t getLastWriteTime(const ResourcePath& resourceName) const = 0;
+
+protected:
+	/// Must be called whenever set of resources provided by this loader changes, to notify list that contains this loader
+	void notifyContentsChanged();
+
+private:
+	friend class CFilesystemList;
+	/// list that owns this loader, if any
+	CFilesystemList * parentList = nullptr;
 };
