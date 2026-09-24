@@ -31,7 +31,7 @@ class CGameHandler;
 class BattleProcessor;
 class ICombatEventScript;
 
-/// Processes incoming battle action queries and applies requested action(s)
+/// Processes incoming battle action activities and applies requested action(s)
 class BattleActionProcessor : boost::noncopyable
 {
 	struct MovementResult

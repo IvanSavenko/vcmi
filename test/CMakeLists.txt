@@ -115,7 +115,7 @@ set(test_SRCS
 		server/battles/SoulStealTest.cpp
 		server/battles/SummonGuardiansTest.cpp
 		server/battles/TransmutationTest.cpp
-		server/queries/QueriesProcessorTest.cpp
+		server/activities/ActivityProcessorTest.cpp
 
 		texts/TextOperationsTest.cpp
 
