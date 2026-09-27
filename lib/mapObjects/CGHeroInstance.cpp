@@ -217,7 +217,18 @@ static int getMovementSpeed(const CStackInstance & stack)
 		.And(Selector::sourceTypeSel(BonusSource::ARTIFACT).Not())
 		.And(Selector::sourceTypeSel(BonusSource::ARTIFACT_INSTANCE).Not());
 
-	return stack.valOfBonuses(selector, "type_STACKS_SPEED_noArtifacts");
+	int speed = 0;
+	for(const auto & bonus : *stack.getAllBonuses(selector, "type_STACKS_SPEED_noArtifacts"))
+	{
+		// Blanket hero specialties that boost speed of all troops (e.g. Sir Mullich)
+		// must not affect adventure map movement, while creature-targeted specialty
+		// speed bonuses (those limited to specific creature type) must.
+		if(bonus->source == BonusSource::HERO_SPECIAL && bonus->limiter == nullptr)
+			continue;
+
+		speed += bonus->val;
+	}
+	return speed;
 }
 
 int CGHeroInstance::getLowestCreatureSpeed() const
