@@ -13,9 +13,25 @@
 
 #include "../../../lib/bonuses/BonusParameters.h"
 #include "../../../lib/json/JsonNode.h"
+#include "../../../lib/CCreatureHandler.h"
+#include "../../../lib/texts/MetaString.h"
+#include "../../../lib/GameLibrary.h"
 
 namespace
 {
+
+/// Builds the localized combat log line the engine produces for death stare kills
+/// (see scripts/spells/damage.lua, describeEffect), so the test does not depend on
+/// the language of the local Heroes III install.
+std::string stareKillLogLine(const CreatureID & victim, const CreatureID & caster, int kills)
+{
+	MetaString text;
+	text.appendTextID(kills == 1 ? "core.genrltxt.118" : "core.genrltxt.119");
+	text.replaceTextID(kills == 1 ? victim.toCreature()->getNameSingularTextID() : victim.toCreature()->getNamePluralTextID());
+	text.replaceTextID(caster.toCreature()->getNamePluralTextID());
+	text.replaceNumber(kills);
+	return text.toString(LIBRARY->staticTexts());
+}
 
 /// One scenario: who the gorgons stare at, and how many of them die per triggered stare.
 struct DeathStareCase
@@ -23,7 +39,6 @@ struct DeathStareCase
 	const char * name;
 	int defendingCreature;
 	uint32_t expectedKills;   ///< most one stare can kill; 0 when the target is immune to it
-	std::vector<std::string> expectedLog;
 };
 
 }
@@ -97,7 +112,16 @@ TEST_P(DeathStareTest, killsExpectedCreatures)
 		[](const RecordedCast & left, const RecordedCast & right) { return left.killed < right.killed; });
 
 	EXPECT_EQ(heaviest.killed, scenario.expectedKills) << scenario.name;
-	EXPECT_EQ(heaviest.logLines, scenario.expectedLog) << scenario.name;
+
+	if(scenario.expectedKills > 0)
+	{
+		// the kill line is composed from the localized engine templates, so compare
+		// against the same composition instead of a hard-coded language string
+		const std::vector<std::string> expectedLog = {
+			stareKillLogLine(CreatureID(scenario.defendingCreature), creatureByName("core:mightyGorgon"), heaviest.killed)
+		};
+		EXPECT_EQ(heaviest.logLines, expectedLog) << scenario.name;
+	}
 
 	if(scenario.expectedKills == 0)
 		EXPECT_TRUE(heaviest.announcement.affectedCres.empty()) << scenario.name;
@@ -118,9 +142,9 @@ constexpr int ironGolem = 33;  // non-living, likewise immune
 // the immunity lives in the spell's targetCondition, which a script dealing raw damage would skip -
 // note that they still get the cast and its animation, they just survive it.
 INSTANTIATE_TEST_SUITE_P(Scenarios, DeathStareTest, ::testing::Values(
-	DeathStareCase{"livingTarget", pikeman,  10, {"10 Pikemen die under the terrible gaze of the Mighty Gorgons."}},
-	DeathStareCase{"undeadTarget", skeleton,  0, {}},
-	DeathStareCase{"golemTarget",  ironGolem, 0, {}}
+	DeathStareCase{"livingTarget", pikeman,  10},
+	DeathStareCase{"undeadTarget", skeleton,  0},
+	DeathStareCase{"golemTarget",  ironGolem, 0}
 ),
 	[](const ::testing::TestParamInfo<DeathStareCase> & info) { return info.param.name; });
 

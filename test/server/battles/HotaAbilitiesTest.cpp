@@ -412,7 +412,7 @@ TEST_F(HeatStrokeTest, LuckIsTakenCappedRatherThanAsTheSumOfItsBonuses)
 	startBattle();
 
 	juggernaut = addStack(BattleSide::ATTACKER, creatureByName("vcmi-test:testJuggernaut"), origin, bigStack);
-	// Prevent either result from killing the target.
+	// Prevent any result from killing the target.
 	CStack * victim = addStack(BattleSide::DEFENDER, creatureByName("core:pikeman"), aim, 100 * bigStack);
 
 	// Equal attack and defence isolate creature damage.
@@ -423,15 +423,29 @@ TEST_F(HeatStrokeTest, LuckIsTakenCappedRatherThanAsTheSumOfItsBonuses)
 	juggernaut->addNewBonus(std::make_shared<Bonus>(BonusDuration::PERMANENT, BonusType::LUCK, BonusSource::OTHER, 24, BonusSourceID()));
 	ASSERT_LT(juggernaut->luckVal(), 24) << "effective luck must be lower than the raw bonus sum";
 
-	beginCombat();
-
-	const int64_t healthBefore = victim->getAvailableHealth();
-
-	ASSERT_TRUE(castAsUnit(juggernaut, spellByName("vcmi-test:heatStroke"), aim));
-
-	const int64_t plainStrike = bigStack * juggernaut->getMinDamage(false);
 	ASSERT_EQ(juggernaut->getMinDamage(false), juggernaut->getMaxDamage(false)) << "a flat range leaves nothing to roll";
 
-	EXPECT_EQ(healthBefore - victim->getAvailableHealth(), plainStrike)
-		<< "the raw sum would roll 24 dice out of 24 and double every strike";
+	// Effective luck is capped, so a lucky strike (double damage) is possible but
+	// never guaranteed - a single strike cannot distinguish capped luck from a raw
+	// roll, so strike repeatedly and require that plain strikes do happen.
+	const int64_t plainStrike = bigStack * juggernaut->getMinDamage(false);
+	const int strikes = 20;
+	bool sawPlainStrike = false;
+
+	for(int i = 0; i < strikes; ++i)
+	{
+		ASSERT_TRUE(victim->alive()) << "target died on strike " << i;
+		const int64_t healthBefore = victim->getAvailableHealth();
+
+		ASSERT_TRUE(castAsUnit(juggernaut, spellByName("vcmi-test:heatStroke"), aim));
+
+		const int64_t damage = healthBefore - victim->getAvailableHealth();
+		ASSERT_TRUE(damage == plainStrike || damage == 2 * plainStrike)
+			<< "strike " << i << " dealt " << damage << ", must be plain or luck-doubled";
+		if(damage == plainStrike)
+			sawPlainStrike = true;
+	}
+
+	EXPECT_TRUE(sawPlainStrike)
+		<< "with capped luck, plain strikes must occur - raw sum would roll 24 dice out of 24 and double every strike";
 }

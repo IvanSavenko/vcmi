@@ -12,6 +12,8 @@
 #include "CVcmiTestConfig.h"
 
 #include "../lib/GameLibrary.h"
+#include "../lib/CConfigHandler.h"
+#include "../lib/texts/Languages.h"
 
 void CVcmiTestConfig::SetUp()
 {
@@ -21,6 +23,16 @@ void CVcmiTestConfig::SetUp()
 	// modSettings.json. The vcmi-test mod supplies all fixtures and flips on the HOTA map
 	// format needed by TinyH3MBuilder.
 	LIBRARY->initializeFilesystem(false, /*useTestPreset*/ true);
+
+	// Tests expect English texts: string comparisons in test assertions use
+	// English strings from the base game data. Force English session language
+	// so tests pass regardless of the language of the local HoMM3 install.
+	Settings language = settings.write["session"]["language"];
+	language->String() = "english";
+
+	Settings encoding = settings.write["session"]["encoding"];
+	encoding->String() = Languages::getLanguageOptions("english").encoding;
+
 	LIBRARY->initializeLibrary();
 }
 

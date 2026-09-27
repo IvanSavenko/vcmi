@@ -11,8 +11,24 @@
 
 #include "BattleTestFixture.h"
 
+#include "../../../lib/GameLibrary.h"
+#include "../../../lib/spells/CSpellHandler.h"
+#include "../../../lib/texts/MetaString.h"
+
 namespace
 {
+
+/// Builds the localized combat log line the engine produces for spell damage
+/// (see scripts/battleLog.lua, BattleLog.spellDamage), so the test does not
+/// depend on the language of the local Heroes III install.
+std::string spellDamageLogLine(int64_t damage)
+{
+	MetaString text;
+	text.appendTextID("core.genrltxt.376");
+	text.replaceTextID(LIBRARY->spellh->getById(SpellID::ACID_BREATH_DAMAGE)->getNameTextID());
+	text.replaceNumber(damage);
+	return text.toString(LIBRARY->staticTexts());
+}
 
 /// One scenario: who the rust dragon hits, and how much acid damage that target takes.
 struct AcidBreathCase
@@ -20,7 +36,6 @@ struct AcidBreathCase
 	const char * name;
 	int defendingCreature;
 	int64_t expectedDamage;
-	const char * expectedLogLine;
 };
 
 }
@@ -82,14 +97,16 @@ TEST_P(AcidBreathTest, dealsExpectedDamage)
 
 		// how much of the target the damage takes down depends on what earlier attacks left of it,
 		// so only the damage line is the same every time. The line about the dead is there exactly
-		// when the damage killed somebody, and starts with the newline that H3 puts in front of it
+		// when the damage killed somebody, and starts with the whitespace separator that H3 puts
+		// in front of it (a newline in the English data, a space in some translations)
 		ASSERT_FALSE(cast.logLines.empty()) << scenario.name;
-		EXPECT_EQ(cast.logLines.front(), scenario.expectedLogLine) << scenario.name;
+		EXPECT_EQ(cast.logLines.front(), spellDamageLogLine(scenario.expectedDamage)) << scenario.name;
 		EXPECT_EQ(cast.logLines.size(), cast.killed > 0 ? 2u : 1u) << scenario.name;
 
 		if(cast.killed > 0)
         {
-			EXPECT_EQ(cast.logLines.back().front(), '\n') << scenario.name;
+			const char separator = cast.logLines.back().front();
+			EXPECT_TRUE(separator == '\n' || separator == ' ') << scenario.name;
         }
 
 		// what the client turns into the acid animation and sound
@@ -119,9 +136,9 @@ constexpr int diamondGolem = 117;
 // target with no magic damage reduction. Golems reduce it by their own percentage, which is why
 // they are here: the ability is cast as a spell, and a script dealing raw damage would skip that.
 INSTANTIATE_TEST_SUITE_P(Scenarios, AcidBreathTest, ::testing::Values(
-	AcidBreathCase{"plainTarget",  pikeman,      250, "The Acid breath does 250 damage."},
-	AcidBreathCase{"ironGolem",    ironGolem,     62, "The Acid breath does 62 damage."},
-	AcidBreathCase{"goldGolem",    goldGolem,     37, "The Acid breath does 37 damage."},
-	AcidBreathCase{"diamondGolem", diamondGolem,  12, "The Acid breath does 12 damage."}
+	AcidBreathCase{"plainTarget",  pikeman,      250},
+	AcidBreathCase{"ironGolem",    ironGolem,     62},
+	AcidBreathCase{"goldGolem",    goldGolem,     37},
+	AcidBreathCase{"diamondGolem", diamondGolem,  12}
 ),
 	[](const ::testing::TestParamInfo<AcidBreathCase> & info) { return info.param.name; });
