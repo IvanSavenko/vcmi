@@ -70,6 +70,8 @@ set(test_SRCS
 
 		netpacks/NetPackFixture.cpp
 
+		rmg/RmgFuzzTest.cpp
+
 		spells/AbilityCasterTest.cpp
 		spells/AdventureSpellEffectTest.cpp
 		spells/CSpellTest.cpp
