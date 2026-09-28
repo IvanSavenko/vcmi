@@ -990,8 +990,14 @@ BattleActionProcessor::MovementResult BattleActionProcessor::moveStack(const CBa
 
 		while(movementSuccess)
 		{
-			if (movementsLeft<tilesToMove)
-				throw std::runtime_error("Movement terminated abnormally");
+			if (movementsLeft < tilesToMove)
+			{
+				// Crash report #7499: this aborts the whole process if unhandled.
+				// Report the failure through the return value instead - callers
+				// already bail out gracefully on invalidRequest.
+				logGlobal->error("Movement of stack %d terminated abnormally", currentUnit->unitId());
+				return { 0, false, true };
+			}
 
 			bool gateStateChanging = false;
 			//special handling for opening gate on from starting hex
