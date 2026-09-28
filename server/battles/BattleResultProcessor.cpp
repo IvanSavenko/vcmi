@@ -444,7 +444,18 @@ void BattleResultProcessor::battleFinalize(const BattleID & battleID, const Batt
 		{
 			return desiredBattle->battleID == battleID;
 		});
-	assert(battle != gameHandler->gameState().currentBattles.end());
+
+	if(battle == gameHandler->gameState().currentBattles.end())
+	{
+		// Should not happen: all battle queries are closed only after battle consequences
+		// are applied and the battle is removed from the current battles list.
+		// Crash reports (e.g. #7503) indicate this can still occur in edge cases;
+		// dereferencing the end iterator here crashes the server, so bail out instead.
+		logGlobal->error("Battle %d is not in the list of current battles, cannot finalize battle result!", battleID.getNum());
+		finishingBattles.erase(battleID);
+		battleResults.erase(battleID);
+		return;
+	}
 
 	const CGHeroInstance * winnerHero = nullptr;
 	const CGHeroInstance * loserHero = nullptr;
