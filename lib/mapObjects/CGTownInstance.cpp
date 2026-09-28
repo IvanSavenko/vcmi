@@ -231,8 +231,18 @@ TResources CGTownInstance::dailyIncome() const
 	if (!getOwner().isValidPlayer())
 		return ret;
 
-	const auto & playerSettings = cb->getPlayerSettings(getOwner());
-	ret.applyHandicap(playerSettings->handicap.percentIncome);
+	try
+	{
+		const auto & playerSettings = cb->getPlayerSettings(getOwner());
+		ret.applyHandicap(playerSettings->handicap.percentIncome);
+	}
+	catch(const std::exception &)
+	{
+		// Crash reports (#7332): a town can be queried on behalf of an owner
+		// that has no entry in StartInfo (e.g. Thieves Guild income statistics).
+		// Missing settings only means that no income handicap applies.
+		logGlobal->warn("No player settings for player %s, income handicap not applied", getOwner().toString());
+	}
 	return ret;
 }
 
