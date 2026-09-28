@@ -52,7 +52,19 @@
 
 void ClientCommandManager::handleQuitCommand()
 {
-		throw GameShutdownException();
+	if(ENGINE)
+	{
+		// GameShutdownException is only handled by the main loop, which runs on
+		// the main (GUI) thread. Commands are processed on the console thread,
+		// so throwing here would terminate the whole process - dispatch the
+		// shutdown request to the main thread instead.
+		ENGINE->dispatchMainThread([]()
+		{
+			throw GameShutdownException();
+		});
+	}
+	else
+		GAME->onShutdownRequested(false);
 }
 
 void ClientCommandManager::handleSaveCommand(std::istringstream & singleWordBuffer)
