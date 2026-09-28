@@ -444,8 +444,15 @@ void CPlayerInterface::heroCreated(const CGHeroInstance * hero)
 void CPlayerInterface::openTownWindow(const CGTownInstance * town)
 {
 	if(castleInt)
-		castleInt->close();
-	castleInt = nullptr;
+	{
+		// Crash report #7215: the town window can be buried under other windows
+		// (e.g. opened via hotkey while a hero window is on top). WindowBase::close
+		// throws if the window is not on top of the stack, which terminated the
+		// process - only close it when it is actually on top.
+		if(ENGINE->windows().isTopWindow(static_cast<IShowActivatable *>(castleInt)))
+			castleInt->close();
+		castleInt = nullptr;
+	}
 
 	auto newCastleInt = std::make_shared<CCastleInterface>(town);
 
