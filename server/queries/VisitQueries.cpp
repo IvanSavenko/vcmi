@@ -39,10 +39,10 @@ void MapObjectVisitQuery::onExposure(QueryPtr topQuery)
 	auto object = gh->gameState().getObjInstance(visitedObject);
 	auto hero = gh->gameState().getHero(visitingHero);
 
-	// Object may have been removed and deleted.
-	// Deferred battle XP level-ups are not part of the object reward pipeline,
-	// so they must not trigger heroLevelUpDone on the visited object.
-	if (object && !processingDeferredBattleLevelUps)
+	// Object may have been removed and deleted. The visiting hero may also be
+	// gone by the time the query resolves (crash report #7263: SIGSEGV inside
+	// giveReward dereferencing a null hero after the battle was finished).
+	if (object && hero && !processingDeferredBattleLevelUps)
 		topQuery->notifyObjectAboutRemoval(object, hero);
 
 	if(auto battleQuery = std::dynamic_pointer_cast<CBattleQuery>(topQuery))
@@ -101,7 +101,8 @@ void TownBuildingVisitQuery::onExposure(QueryPtr topQuery)
 	auto object = gh->gameState().getObjInstance(visitedObject);
 	auto hero = gh->gameState().getHero(visitingHero);
 
-	topQuery->notifyObjectAboutRemoval(object, hero);
+	if (object && hero)
+		topQuery->notifyObjectAboutRemoval(object, hero);
 
 	onAdded(players.front());
 }
