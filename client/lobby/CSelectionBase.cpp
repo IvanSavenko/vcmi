@@ -81,7 +81,18 @@ PlayerInfo ISelectionScreenInfo::getPlayerInfo(PlayerColor color)
 	if (!mapInfo->mapHeader)
 		throw std::runtime_error("Attempt to get player info for invalid map header!");
 
-	return mapInfo->mapHeader->players.at(color.getNum());
+	const auto index = color.getNum();
+	if(index < 0 || index >= static_cast<int>(mapInfo->mapHeader->players.size()))
+	{
+		// Crash report #7070: UI can query player info for a color that has no
+		// entry in the loaded map header (e.g. right after map change in lobby).
+		// This is a display-only query - return a default entry instead of
+		// terminating the process via std::out_of_range.
+		logGlobal->warn("No player info for player %s in current map header", color.toString());
+		return PlayerInfo();
+	}
+
+	return mapInfo->mapHeader->players[index];
 }
 
 CSelectionBase::CSelectionBase(ESelectionScreen type)
