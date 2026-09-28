@@ -122,7 +122,14 @@ TEST_F(Nullkiller2_Behaviors_GatherArmyBehavior, upgradesPikemenCarriedByGarriso
 
 	GameHandlerClient client(gameState(), PLAYER);
 	const auto gateway = makeGateway(PLAYER, &client);
-	gateway->nullkiller->makeTurn();
+	{
+		// Nullkiller::makeTurn expects the caller to hold the game state shared
+		// lock for the whole turn: AI internals (e.g. AIGateway::waitTillFree)
+		// temporarily release and re-acquire it. In production this lock is
+		// taken by AIGateway::makeTurn; mirror that contract here.
+		std::shared_lock gsLock(CGameState::mutex);
+		gateway->nullkiller->makeTurn();
+	}
 
 	ASSERT_NE(hero->getStackPtr(SlotID(0)), nullptr);
 	EXPECT_EQ(hero->getStackPtr(SlotID(0))->getCreatureID(), halberdier);
