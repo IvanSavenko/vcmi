@@ -361,8 +361,13 @@ void WindowBase::close()
 {
 	if(!ENGINE->windows().isTopWindow(this))
 	{
-		auto topWindow = ENGINE->windows().topWindow<IShowActivatable>().get();
-		throw std::runtime_error(std::string("Only top interface can be closed! Top window is ") + typeid(*topWindow).name() + " but attempted to close " + typeid(*this).name());
+		// Crash report #6952: this throw escapes from UI callbacks on the main
+		// thread with no handler, terminating the process. A stale window
+		// close request is a recoverable situation - log and return.
+		auto topWindow = ENGINE->windows().topWindow<IShowActivatable>();
+		logGlobal->warn("Attempted to close non-top window '%s', top window is '%s'",
+			typeid(*this).name(), topWindow ? typeid(*topWindow.get()).name() : "<null>");
+		return;
 	}
 	ENGINE->windows().popWindows(1);
 }

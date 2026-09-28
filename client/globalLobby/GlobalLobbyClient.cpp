@@ -465,6 +465,14 @@ void GlobalLobbyClient::onDisconnected(const std::shared_ptr<INetworkConnection>
 void GlobalLobbyClient::sendMessage(const JsonNode & data)
 {
 	assert(JsonUtils::validate(data, "vcmi:lobbyProtocol/" + data["type"].String(), data["type"].String() + " pack"));
+	// Crash report #7071: connection can be reset by onDisconnected between
+	// the caller checking isConnected() and this call. Silently drop instead
+	// of dereferencing a null pointer.
+	if (!networkConnection)
+	{
+		logGlobal->warn("Attempt to send message on closed lobby connection");
+		return;
+	}
 	networkConnection->sendPacket(data.toBytes());
 }
 

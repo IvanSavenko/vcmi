@@ -382,7 +382,12 @@ void CLogConsoleTarget::write(const LogRecord & record)
 	}
 
 	os_log_t currentLog;
+	// Crash report #7171: this static map is accessed from multiple threads
+	// (network thread, console thread, main thread) without synchronization.
+	// Protect it with a mutex to prevent use-after-free during shutdown.
+	static std::mutex osLogMutex;
 	static std::unordered_map<std::string, decltype(currentLog)> logs;
+	std::scoped_lock osLogLock(osLogMutex);
 	const auto& domainName = record.domain.getName();
 	auto logIt = logs.find(domainName);
 	if (logIt != logs.end())

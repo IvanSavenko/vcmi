@@ -72,7 +72,12 @@ void GameConnection::sendPack(const CPack & pack)
 	auto connectionPtr = networkConnection.lock();
 
 	if (!connectionPtr)
-		throw std::runtime_error("Attempt to send packet on a closed connection!");
+	{
+		// Crash report #7010: this throws on the network thread during lobby
+		// disconnection, terminating the process. Log and drop instead.
+		logNetwork->error("Attempt to send pack on a closed connection, dropping");
+		return;
+	}
 
 	packWriter->buffer.clear();
 	*serializer & &pack;
