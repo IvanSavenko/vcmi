@@ -1407,6 +1407,12 @@ void AIGateway::executeActionAsync(const std::string & description, const std::f
 		{
 			logAi->debug("%s thread has been terminated. We'll end it immediately", description);
 		}
+		catch (const std::exception & e)
+		{
+			// this lambda is noexcept: an escaping exception here would terminate
+			// the whole process instead of just failing this one async action
+			logAi->error("%s thread caught an exception: %s", description, e.what());
+		}
 	});
 }
 
