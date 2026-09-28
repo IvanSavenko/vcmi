@@ -849,6 +849,12 @@ void GameStatePackVisitor::visitRebalanceStacks(RebalanceStacks & pack)
 	const CCreature * dstType = dstObj->getCreature(dst.slot);
 	TQuantity srcCount = srcObj->getStackCount(src.slot);
 
+	// Crash report #7170: a rebalance request for a slot that is empty or holds
+	// fewer creatures than requested used to escape from splitStack as uncaught
+	// std::out_of_range / negative count corruption. Validate before applying.
+	if(srcCount < pack.count)
+		throw std::runtime_error("RebalanceStacks: request to move " + std::to_string(pack.count) + " creatures from slot with only " + std::to_string(srcCount) + ", possible game state corruption.");
+
 	if(srcCount == pack.count) //moving whole stack
 	{
 		if(dstType) //stack at dest -> merge

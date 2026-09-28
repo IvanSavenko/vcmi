@@ -544,6 +544,15 @@ void CGameHandler::handleReceivedPack(GameConnectionID connection, CPackForServe
 		{
 			result = false;
 		}
+		catch(const std::exception & e)
+		{
+			// Crash reports (#7170, #7332): invalid packs from misbehaving
+			// clients used to escape as unhandled exceptions and terminate
+			// the whole server. A rejected request is not fatal - complain
+			// and continue.
+			logGlobal->error("Exception while applying %s: %s", typeid(pack).name(), e.what());
+			result = false;
+		}
 
 		if(result)
 			logGlobal->trace("Message %s successfully applied!", typeid(pack).name());
