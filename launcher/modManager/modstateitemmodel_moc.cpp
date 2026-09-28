@@ -222,8 +222,20 @@ void ModStateItemModel::reloadViewModel()
 void ModStateItemModel::modChanged(QString modID)
 {
 	int index = modNameToID.indexOf(modID);
+	// Crash report #7265: the mod list can be rebuilt between the change
+	// notification and this call, leaving the mod missing from the view model.
+	// indexOf then returns -1 and parent() would dereference an invalid index.
+	if(index < 0)
+		return;
+
 	QModelIndex parent = this->parent(createIndex(0, 0, index));
+	if(!parent.isValid())
+		return; // top-level mod without a parent category
+
 	int row = modIndex[modIndexToName(parent)].indexOf(modID);
+	if(row < 0)
+		return;
+
 	dataChanged(createIndex(row, 0, index), createIndex(row, 4, index));
 }
 
