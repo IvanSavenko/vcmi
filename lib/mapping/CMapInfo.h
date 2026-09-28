@@ -47,6 +47,7 @@ public:
 	CMapInfo &operator=(const CMapInfo &other) = delete;
 
 	void mapInit(const std::string & fname);
+	void mapInit(const ResourcePath & resource);
 	void saveInit(const ResourcePath & file);
 	void campaignInit();
 	void countPlayers();

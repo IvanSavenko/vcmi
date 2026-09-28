@@ -1194,7 +1194,10 @@ void SelectionTab::parseMaps(const std::unordered_set<ResourcePath> & files)
 			try
 			{
 				auto mapInfo = std::make_shared<ElementInfo>();
-				mapInfo->mapInit(file.getOriginalName());
+				// pass the enumerated ResourcePath directly: rebuilding it from
+				// the original name would strip the extension a second time for
+				// files like "map.h3m.h3m" and break the resource lookup (#4833)
+				mapInfo->mapInit(file);
 
 				if (isMapSupported(*mapInfo))
 					allItems[offset + i] = mapInfo;

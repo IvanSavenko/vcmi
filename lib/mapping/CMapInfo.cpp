@@ -39,9 +39,13 @@ CMapInfo::~CMapInfo() = default;
 
 void CMapInfo::mapInit(const std::string & fname)
 {
-	fileURI = fname;
+	mapInit(ResourcePath(fname, EResType::MAP));
+}
+
+void CMapInfo::mapInit(const ResourcePath & resource)
+{
 	CMapService mapService;
-	ResourcePath resource = ResourcePath(fname, EResType::MAP);
+	fileURI = resource.getOriginalName();
 	originalFileURI = resource.getOriginalName();
 	mapHeader = mapService.loadMapHeader(resource);
 	mapHeader->registerMapStrings();
