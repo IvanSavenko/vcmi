@@ -2369,6 +2369,11 @@ bool CGameHandler::buildStructure(ObjectInstanceID tid, BuildingID requestedID, 
 		case CBuilding::BUILD_GRAIL  :
 			if(requestedBuilding->mode == CBuilding::BUILD_GRAIL) //needs grail
 			{
+				// Crash report #6020: autoskip mode could attempt to build the Grail
+				// in a city where it was already built, consuming the artifact needlessly
+				if(t->hasBuilt(requestedID))
+					COMPLAIN_RET("This grail building is already built!");
+
 				if(!t->getVisitingHero() || !t->getVisitingHero()->hasArt(ArtifactID::GRAIL))
 					COMPLAIN_RET("Cannot build this without grail!")
 				else
