@@ -29,6 +29,10 @@ ResourceSet::ResourceSet(const ResourceSet& rhs)
 
 void ResourceSet::resizeContainer()
 {
+	// Crash report #7069: LIBRARY can be null or partially destroyed during
+	// shutdown when ResourceSets are still alive. Guard against this.
+	if(!LIBRARY || !LIBRARY->resourceTypeHandler)
+		return;
 	container.resize(std::max({
 		static_cast<int>(container.size()),
 		static_cast<int>(LIBRARY->resourceTypeHandler->getAllObjects().size()),

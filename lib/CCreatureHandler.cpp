@@ -685,10 +685,12 @@ void CCreatureHandler::loadCrExpMod()
 {
 	if (LIBRARY->engineSettings()->getBoolean(EGameSettings::MODULE_STACK_EXPERIENCE)) 	//reading default stack experience values
 	{
-		//Calculate rank exp values, formula appears complicated bu no parsing needed
-		expRanks.resize(8);
-		int dif = 0;
-		int it = 8000; //ignore name of this variable
+		try
+		{
+			//Calculate rank exp values, formula appears complicated bu no parsing needed
+			expRanks.resize(8);
+			int dif = 0;
+			int it = 8000; //ignore name of this variable
 		expRanks[0].push_back(it);
 		for (int j = 1; j < 10; ++j) //used for tiers 8-10, and all other probably
 		{
@@ -728,6 +730,13 @@ void CCreatureHandler::loadCrExpMod()
 		expRanks[0].push_back(147000);
 		expAfterUpgrade = 75; //percent
 		maxExpPerBattle[0] = maxExpPerBattle[7];
+		}
+		catch(const std::exception & e)
+		{
+			// Issue #6132: enabling stackExperience module should not prevent
+			// the game from starting if the data files are missing or corrupted.
+			logGlobal->error("Failed to load stack experience module data: %s", e.what());
+		}
 	}
 }
 

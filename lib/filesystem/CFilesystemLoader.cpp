@@ -34,10 +34,28 @@ std::unique_ptr<CInputStream> CFilesystemLoader::load(const ResourcePath & resou
 {
 	std::shared_lock lock(fileListGuard);
 
-	assert(fileList.contains(resourceName));
+	if (!fileList.contains(resourceName))
+	{
+		// Crash report #6951: file can be deleted between listing and opening
+		// (e.g. by mod installation or external process). Return empty stream
+		// instead of crashing with "No such file or directory".
+		logGlobal->error("Resource '%s' not found in file list, cannot load",
+			TextOperations::filesystemPathToUtf8(resourceName.getOriginalName()));
+		return nullptr;
+	}
+
 	boost::filesystem::path file = baseDirectory / fileList.at(resourceName);
 	logGlobal->trace("loading %s", TextOperations::filesystemPathToUtf8(file));
-	return std::make_unique<CFileInputStream>(file);
+	try
+	{
+		return std::make_unique<CFileInputStream>(file);
+	}
+	catch(const std::exception & e)
+	{
+		logGlobal->error("Failed to open file '%s': %s",
+			TextOperations::filesystemPathToUtf8(file), e.what());
+		return nullptr;
+	}
 }
 
 bool CFilesystemLoader::existsResource(const ResourcePath & resourceName) const
