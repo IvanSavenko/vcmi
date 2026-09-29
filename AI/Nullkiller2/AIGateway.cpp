@@ -805,8 +805,24 @@ void AIGateway::makeTurn()
 {
 	try
 	{
+		// Automated testing: VCMI_MAX_TURNS env var limits the number of turns
+		// before the AI cleanly exits. Used by headless test scripts.
+		static const int maxTurnsLimit = []() {
+			const char * env = std::getenv("VCMI_MAX_TURNS");
+			return env ? std::atoi(env) : INT_MAX;
+		}();
+
 		auto day = cc->getCalendar().getCurrentDay();
 		logAi->info("Player %d (%s) starting turn, day %d", playerID, playerID.toString(), day);
+
+		if(day > maxTurnsLimit)
+		{
+			logAi->info("Turn limit %d reached (day %d), exiting for automated testing", maxTurnsLimit, day);
+			// Give the logging system time to flush before exiting
+			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+			// Exit code 0 = clean test completion (no crash)
+			exit(0);
+		}
 
 		std::shared_lock gsLock(CGameState::mutex);
 		cheatMapReveal(nullkiller);
