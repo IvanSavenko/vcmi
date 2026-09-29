@@ -827,6 +827,15 @@ void AIGateway::makeTurn()
 				logAi->warn("Hero %s has %d MP left", h->getNameTextID(), h->movementPointsRemaining());
 		}
 
+		// Crash reports #6714, #7372: if the AI's last hero died during the turn
+		// (e.g. lost a battle), the player is eliminated but endTurn() would still
+		// be sent for an eliminated player, causing server-side "Got false" errors.
+		if(cc->getPlayerStatus(playerID) != EPlayerStatus::INGAME)
+		{
+			logAi->info("Player %d was eliminated during the turn, skipping endTurn", playerID.toString());
+			return;
+		}
+
 		endTurn();
 	}
 	catch (const InterruptionRequestedException &)
