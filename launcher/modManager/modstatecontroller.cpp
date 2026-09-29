@@ -84,7 +84,21 @@ bool extractContentArchives(ModStateController * controller, const QString & mod
 			qApp->processEvents();
 		}
 
-		if(!futureExtract.get())
+		bool extractResult = false;
+		try
+		{
+			extractResult = futureExtract.get();
+		}
+		catch(const std::exception & e)
+		{
+			// Crash report #6953: ZipArchive can throw during extraction
+			// (e.g. corrupted archive), which would escape as an uncaught
+			// exception and terminate the launcher.
+			logGlobal->error("Mod extraction failed: %s", e.what());
+			return false;
+		}
+
+		if(!extractResult)
 			return false;
 
 		if(!QFile::remove(archivePath))
