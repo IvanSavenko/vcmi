@@ -190,7 +190,8 @@ int main(int argc, char * argv[])
 		("nointro,i", "skips intro movies")
 		("donotstartserver,d","do not attempt to start server and just connect to it instead server")
 		("serverport", po::value<si64>(), "override port specified in config file")
-		("savefrequency", po::value<si64>(), "limit auto save creation to each N days");
+		("savefrequency", po::value<si64>(), "limit auto save creation to each N days")
+		("connectServer", po::value<std::string>(), "connect to an already running server (for automated MP testing)");
 
 	if(argc > 1)
 	{
@@ -398,6 +399,27 @@ int main(int argc, char * argv[])
 			session["testsave"].String() = vm["testsave"].as<std::string>();
 			session["onlyai"].Bool() = true;
 			GAME->server().debugStartTest(session["testsave"].String(), true);
+		}
+		else if(vm.count("connectServer"))
+		{
+			// Automated MP testing: connect to an already running server
+			// that was started with --loadSave. Skip main menu and lobby.
+			std::string serverAddr = vm["connectServer"].as<std::string>();
+			logGlobal->info("Auto-connecting to server at %s for automated MP testing", serverAddr);
+
+			session["onlyai"].Bool() = true;
+			GAME->server().resetStateForLobby(EStartMode::LOAD_GAME, ESelectionScreen::loadGame, EServerMode::LOCAL, {});
+
+			uint16_t port = 3030;
+			if(vm.count("serverport"))
+				port = static_cast<uint16_t>(vm["serverport"].as<si64>());
+
+			// Extract hostname (strip port if present)
+			auto colonPos = serverAddr.find(':');
+			std::string hostname = (colonPos != std::string::npos) ? serverAddr.substr(0, colonPos) : serverAddr;
+
+			GAME->server().connectToServer(hostname, port);
+			GAME->server().sendClientConnecting();
 		}
 		else if (!settings["session"]["headless"].Bool())
 		{

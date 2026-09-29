@@ -239,7 +239,9 @@ static void handleCommandOptions(int argc, const char * argv[], boost::program_o
 	("translate-mod", boost::program_options::value<std::string>(), "Export translations for specified mod")
 	("export-lua-docs", boost::program_options::value<std::string>(), "Export Lua scripting API documentation to specified directory")
 	("port", boost::program_options::value<ui16>(), "port at which server will listen to connections from client")
-	("lobby", "start server in lobby mode in which server connects to a global lobby");
+	("lobby", "start server in lobby mode in which server connects to a global lobby")
+	("loadSave", boost::program_options::value<std::string>(), "Auto-start MP: load save file, assign AI to all human slots, wait for clients")
+	("expectedClients", boost::program_options::value<int>(), "Number of headless clients that will connect (default: 1)");
 
 	if(argc > 1)
 	{
@@ -320,6 +322,16 @@ int main(int argc, const char * argv[])
 			port = opts["port"].as<uint16_t>();
 
 		CVCMIServer server(port, runByClient);
+
+		// Automated MP testing: load save, assign AI to all human slots,
+		// wait for headless clients to connect, then auto-start the game
+		if(opts.count("loadSave"))
+		{
+			std::string savePath = opts["loadSave"].as<std::string>();
+			int expectedClients = opts.count("expectedClients") ? opts["expectedClients"].as<int>() : 1;
+			server.prepareAutoStart(savePath, expectedClients);
+		}
+
 		server.prepare(connectToLobby, true);
 		server.run();
 		// CVCMIServer destructor must be called here - before LIBRARY cleanup

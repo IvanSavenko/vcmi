@@ -95,6 +95,12 @@ public:
 	void startGameImmediately();
 	uint16_t startAcceptingIncomingConnections(bool listenForConnections);
 
+	// Automated MP testing
+	bool autoStartMode = false;
+	int autoStartConnectedClients = 0;
+	int autoStartExpectedClients = 1;
+	void prepareAutoStart(const std::string & savePath, int expectedClients);
+
 	void threadHandleClient(std::shared_ptr<GameConnection> c);
 
 	void announcePack(CPackForLobby & pack);

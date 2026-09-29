@@ -104,6 +104,35 @@ uint16_t CVCMIServer::prepare(bool connectToLobby, bool listenForConnections) {
 	}
 }
 
+void CVCMIServer::prepareAutoStart(const std::string & savePath, int expectedClients)
+{
+	autoStartMode = true;
+	autoStartExpectedClients = expectedClients;
+
+	// Load save header to get player info and StartInfo
+	auto mapInfo = std::make_shared<CMapInfo>();
+	mapInfo->saveInit(ResourcePath(savePath, EResType::SAVEGAME));
+
+	// Use the StartInfo loaded from the save
+	si = mapInfo->scenarioOptionsOfSave;
+	mi = mapInfo;
+	si->mapname = savePath;
+	si->mode = EStartMode::LOAD_GAME;
+
+	// Assign all human-controlled players to AI for automated testing
+	for(auto & player : si->playerInfos)
+	{
+		if(!player.second.isControlledByAI())
+		{
+			player.second.isControlledByAI() = true;
+			logGlobal->info("Auto-start: player %s assigned to AI", player.first.toString());
+		}
+	}
+
+	logGlobal->info("Auto-start mode initialized: save='%s', expectedClients=%d, humanPlayersConverted=%d",
+		savePath, expectedClients, static_cast<int>(si->playerInfos.size()));
+}
+
 uint16_t CVCMIServer::startAcceptingIncomingConnections(bool listenForConnections)
 {
 	networkServer = networkHandler->createServerTCP(*this);
@@ -130,6 +159,18 @@ void CVCMIServer::onNewConnection(const std::shared_ptr<INetworkConnection> & co
 	{
 		activeConnections.push_back(std::make_shared<GameConnection>(connection));
 		activeConnections.back()->enterLobbyConnectionMode();
+
+		// Automated MP testing: auto-start when enough clients connect
+		if(autoStartMode)
+		{
+			autoStartConnectedClients++;
+			logGlobal->info("Auto-start: client %d of %d connected", autoStartConnectedClients, autoStartExpectedClients);
+			if(autoStartConnectedClients >= autoStartExpectedClients)
+			{
+				logGlobal->info("Auto-start: all clients connected, starting game");
+				prepareToStartGame();
+			}
+		}
 	}
 	else
 	{
