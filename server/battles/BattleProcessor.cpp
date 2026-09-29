@@ -291,6 +291,18 @@ bool BattleProcessor::checkBattleStateChanges(const CBattleInfoCallback & battle
 		return true;
 	}
 
+	// HotA fair play rules (#3540): after 100 rounds the attacker must retreat.
+	// Without this check, battles between armies that cannot damage each other
+	// (e.g. melee-only vs. flying) continue forever.
+	constexpr int MAX_BATTLE_ROUNDS = 100;
+	if (battle.getRound() > MAX_BATTLE_ROUNDS)
+	{
+		logGlobal->info("Battle %d reached round %d limit, attacker retreats",
+			battle.getBattle()->getBattleID().getNum(), battle.getRound());
+		setBattleResult(battle, EBattleResult::ESCAPE, BattleSide::DEFENDER);
+		return true;
+	}
+
 	return false;
 }
 
