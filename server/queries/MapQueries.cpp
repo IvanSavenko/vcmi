@@ -258,8 +258,12 @@ void CHeroLevelUpDialogQuery::onAdded(PlayerColor color)
 	if(owner->topQuery(color).get() != this)
 		return;
 
-	if(!gh->uiReadyForDialogs.contains(color))
-		return;
+	// Soft-lock report #7849: in multiplayer, uiReadyForDialogs may not contain
+	// the player if the client hasn't finished initializing when a battle ends
+	// and the hero levels up. Without this check the query would never be
+	// prompted, causing a soft-lock. Send the dialog anyway - netpacks are
+	// queued on the client side and will be processed when UI is ready.
+	logGlobal->trace("Prompting hero level-up dialog for player %s", color.toString());
 
 	prompted = true;
 	hlu.queryID = queryID;

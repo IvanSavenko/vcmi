@@ -113,20 +113,18 @@ void CVCMIServer::prepareAutoStart(const std::string & savePath, int expectedCli
 	auto mapInfo = std::make_shared<CMapInfo>();
 	mapInfo->saveInit(ResourcePath(savePath, EResType::SAVEGAME));
 
-	// Use the StartInfo loaded from the save
-	si = mapInfo->scenarioOptionsOfSave;
+	// Use the StartInfo loaded from the save (transfer unique_ptr → shared_ptr)
+	si = std::shared_ptr<StartInfo>(mapInfo->scenarioOptionsOfSave.release());
 	mi = mapInfo;
 	si->mapname = savePath;
 	si->mode = EStartMode::LOAD_GAME;
 
 	// Assign all human-controlled players to AI for automated testing
+	// (clear connectedPlayerIDs — empty set means AI-controlled)
 	for(auto & player : si->playerInfos)
 	{
-		if(!player.second.isControlledByAI())
-		{
-			player.second.isControlledByAI() = true;
-			logGlobal->info("Auto-start: player %s assigned to AI", player.first.toString());
-		}
+		player.second.connectedPlayerIDs.clear();
+		logGlobal->info("Auto-start: player %s assigned to AI", player.first.toString());
 	}
 
 	logGlobal->info("Auto-start mode initialized: save='%s', expectedClients=%d, humanPlayersConverted=%d",
