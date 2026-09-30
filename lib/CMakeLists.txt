@@ -71,6 +71,7 @@ set(lib_MAIN_SRCS
 	battle/SiegeInfo.cpp
 	battle/Unit.cpp
 	battle/actions/BattleActionType.cpp
+	battle/actions/CatapultAction.cpp
 	battle/actions/HealAction.cpp
 	battle/actions/NoTargetActions.cpp
 	battle/actions/ShootAction.cpp
@@ -489,6 +490,7 @@ set(lib_MAIN_HEADERS
 	battle/Unit.h
 	battle/actions/ActionOption.h
 	battle/actions/BattleActionType.h
+	battle/actions/CatapultAction.h
 	battle/actions/HealAction.h
 	battle/actions/IBattleActionEnvironment.h
 	battle/actions/NoTargetActions.h
