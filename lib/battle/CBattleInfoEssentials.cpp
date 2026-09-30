@@ -263,13 +263,16 @@ const CGHeroInstance * CBattleInfoEssentials::battleGetFightingHero(BattleSide s
 	RETURN_IF_NOT_BATTLE(nullptr);
 	if(side != BattleSide::DEFENDER && side != BattleSide::ATTACKER)
 	{
-		logGlobal->error("FIXME: %s wrong argument!", __FUNCTION__);
+		logGlobal->debug("%s wrong argument!", __FUNCTION__);
 		return nullptr;
 	}
 
+	// Not knowing about a side is normal for e.g. neutral stacks fighting with
+	// no hero on that side - not an error (#4559: this fired on every AI
+	// evaluation of such battles and flooded the log).
 	if(!battleDoWeKnowAbout(side))
 	{
-		logGlobal->error("FIXME: %s access check ", __FUNCTION__);
+		logGlobal->debug("%s: no info about side %d", __FUNCTION__, static_cast<int>(side));
 		return nullptr;
 	}
 
@@ -281,12 +284,12 @@ const CArmedInstance * CBattleInfoEssentials::battleGetArmyObject(BattleSide sid
 	RETURN_IF_NOT_BATTLE(nullptr);
 	if(side != BattleSide::DEFENDER && side != BattleSide::ATTACKER)
 	{
-		logGlobal->error("FIXME: %s wrong argument!", __FUNCTION__);
+		logGlobal->debug("%s wrong argument!", __FUNCTION__);
 		return nullptr;
 	}
 	if(!battleDoWeKnowAbout(side))
 	{
-		logGlobal->error("FIXME: %s access check!", __FUNCTION__);
+		logGlobal->debug("%s: no info about side %d", __FUNCTION__, static_cast<int>(side));
 		return nullptr;
 	}
 	return getBattle()->getSideArmy(side);

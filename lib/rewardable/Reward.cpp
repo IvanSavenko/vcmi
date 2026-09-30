@@ -31,7 +31,10 @@ Rewardable::Reward::Reward()
 	, heroLevel(0)
 	, manaDiff(0)
 	, manaPercentage(-1)
-	, manaOverflowFactor(0)
+	// Issue #7922: H3 applies mana rewards in full, letting mana exceed the
+	// current limit (up to 2x). Default of 0 discarded all overflow, so a
+	// hero at full mana received 0 spell points from Seer Hut rewards.
+	, manaOverflowFactor(100)
 	, movePoints(0)
 	, movePercentage(-1)
 	, moveOverflowFactor(100)
