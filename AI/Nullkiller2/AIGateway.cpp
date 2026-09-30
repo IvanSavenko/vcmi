@@ -753,7 +753,21 @@ void AIGateway::showGarrisonDialog(const CArmedInstance * up, const CGHeroInstan
 void AIGateway::showMapObjectSelectDialog(QueryID askID, const Component & icon, const MetaString & title, const MetaString & description, const std::vector<ObjectInstanceID> & objects)
 {
 	status.addQuery(askID, "Map object select query");
-	executeActionAsync("showMapObjectSelectDialog", [this, askID](){ answerQuery(askID, selectedObject.getNum()); });
+	executeActionAsync("showMapObjectSelectDialog", [this, askID, objects]()
+	{
+		// Issue #7823: cached selectedObject may reference an object that is not
+		// in the offered list (e.g. the town was captured or lost between goal
+		// evaluation and the cast). Answering with a non-offered object triggers
+		// "Invalid town selected in dialog" on the server. Validate before
+		// answering and decline if the cached selection is no longer valid.
+		ObjectInstanceID selected = selectedObject;
+		if(!vstd::contains(objects, selected))
+		{
+			logAi->warn("Cached selectedObject %d is not offered in select dialog, declining", selected.getNum());
+			selected = ObjectInstanceID(-1);
+		}
+		answerQuery(askID, selected.getNum());
+	});
 }
 
 bool AIGateway::makePossibleUpgrades(const CArmedInstance * obj)
