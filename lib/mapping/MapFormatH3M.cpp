@@ -1311,13 +1311,34 @@ std::shared_ptr<CGObjectInstance> CMapLoaderH3M::readWitchHut(const int3 & posit
 
 		if (rewardable)
 		{
+			// Issue #3229: skills restricted for this Witch Hut may conflict with
+			// skills banned in map settings. Filter out map-banned skills so the
+			// hut cannot grant a skill that is forbidden on this map.
+			for(auto it = allowedAbilities.begin(); it != allowedAbilities.end();)
+			{
+				if(!map->allowedAbilities.count(*it))
+					it = allowedAbilities.erase(it);
+				else
+					++it;
+			}
+
 			if(allowedAbilities.size() != 1)
 			{
 				auto defaultAllowed = LIBRARY->skillh->getDefaultAllowed();
 
 				for(int skillID = features.skillsCount; skillID < defaultAllowed.size(); ++skillID)
-					if(defaultAllowed.count(skillID))
+					if(defaultAllowed.count(skillID) && map->allowedAbilities.count(SecondarySkill(skillID)))
 						allowedAbilities.insert(SecondarySkill(skillID));
+			}
+
+			if(allowedAbilities.empty())
+			{
+				// All potential skills are banned - Witch Hut has nothing to grant.
+				// Keep object without preset variable; visit will use default reward
+				// path instead of crashing on an empty anyOf list.
+				logGlobal->warn("Witch Hut at %s has all skills banned, it will grant nothing",
+					position.toString());
+				return object;
 			}
 
 			JsonNode variable;
