@@ -315,6 +315,15 @@ std::vector<JsonNode> ObstacleSetHandler::loadLegacyData()
 
 void ObstacleSetHandler::loadObject(const std::string & scope, const std::string & name, const JsonNode & data)
 {
+	// Issue #6859: a mod can disable a biome defined in another mod by
+	// overriding it with null in its patch. Skip such disabled entries
+	// instead of crashing in typeFromString on the empty object data.
+	if(data.isNull())
+	{
+		logMod->info("Obstacle set '%s' is disabled by patch, skipping", name);
+		return;
+	}
+
 	auto os = loadFromJson(scope, data, name, biomes.size());
 	if(os)
 	{
