@@ -45,6 +45,18 @@ void RecruitHero::accept(AIGateway * aiGw)
 	}
 
 	auto heroToHire = heroToBuy;
+
+	// Issue #6122: heroToBuy was cached during goal evaluation. The tavern pool
+	// refreshes on each new week, so the cached hero may no longer be offered.
+	// Validate against the fresh tavern list and fall back to the best
+	// available hero instead of sending a stale HireHero request.
+	if(heroToHire && !vstd::contains(heroes, heroToHire))
+	{
+		logAi->warn("Cached hero %s is no longer available in tavern, picking another",
+			heroToHire->getNameTextID());
+		heroToHire = nullptr;
+	}
+
 	if(!heroToHire)
 	{
 		for(auto hero : heroes)
