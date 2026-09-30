@@ -17,6 +17,7 @@
 #include "BattleStacksController.h"
 #include "BattleWindow.h"
 #include "ClientCommandEntries.h"
+#include "LibActionEntry.h"
 
 #include "../CPlayerInterface.h"
 #include "../GameEngine.h"
@@ -33,6 +34,7 @@
 #include "../../lib/battle/CUnitState.h"
 #include "../../lib/GameLibrary.h"
 #include "../../lib/battle/BattleAction.h"
+#include "../../lib/battle/actions/BattleActionType.h"
 #include "../../lib/battle/CPlayerBattleCallback.h"
 #include "../../lib/callback/CCallback.h"
 #include "../../lib/spells/ISpellMechanics.h"
@@ -240,6 +242,11 @@ public:
 		return {"combatBlocked", controller.actionGetStatusMessageBlocked(action, hex)};
 	}
 
+	BattleHexArray getShadedHexes(const BattleHex & hex) const override
+	{
+		return {};
+	}
+
 	void realize(const BattleHex & hex) const override
 	{
 		controller.actionRealize(action, hex);
@@ -257,8 +264,6 @@ public:
 
 		switch(action.get())
 		{
-			case PossiblePlayerBattleAction::MOVE_STACK:
-				return UnitActionButton{0, SpellID::NONE, ImagePath::builtin("battle/actionMove"), "vcmi.battle.action.move"};
 			case PossiblePlayerBattleAction::ATTACK_AND_RETURN:
 				return UnitActionButton{1, SpellID::NONE, ImagePath::builtin("battle/actionReturn"), "vcmi.battle.action.return"};
 			case PossiblePlayerBattleAction::ATTACK:
@@ -402,6 +407,11 @@ BattleActionEntries BattleActionsController::getPossibleActionsForStack(const CS
 	for(const auto & action : owner.getBattle()->getClientActionsForStack(stack, data))
 		entries.push_back(std::make_shared<LegacyEntry>(*this, action));
 
+	std::vector<ActionOption> options;
+	BattleActionType::collectAllOptions(*owner.getBattle(), *stack, options);
+	for(const auto & option : options)
+		entries.push_back(std::make_shared<LibActionEntry>(owner, *stack, option));
+
 	if(data.tacticsMode)
 		entries.push_back(std::make_shared<TacticsUnitSelectionEntry>(owner));
 
@@ -456,10 +466,6 @@ int BattleActionsController::actionGetPriority(PossiblePlayerBattleAction item, 
 			break;
 		case PossiblePlayerBattleAction::WALK_AND_SPELLCAST:
 			return 9;
-			break;
-		case PossiblePlayerBattleAction::MOVE_TACTICS:
-		case PossiblePlayerBattleAction::MOVE_STACK:
-			return 10;
 			break;
 		case PossiblePlayerBattleAction::CATAPULT:
 			return 11;
@@ -557,13 +563,6 @@ std::string BattleActionsController::actionGetCursor(PossiblePlayerBattleAction 
 {
 	switch (action.get())
 	{
-		case PossiblePlayerBattleAction::MOVE_TACTICS:
-		case PossiblePlayerBattleAction::MOVE_STACK:
-			if (owner.stacksController->getActiveStack()->hasBonusOfType(BonusType::FLYING))
-				return "combatFly";
-			else
-				return "combatMove";
-
 		case PossiblePlayerBattleAction::ATTACK:
 		case PossiblePlayerBattleAction::LONG_WEAPON_ATTACK:
 		case PossiblePlayerBattleAction::WALK_AND_ATTACK:
@@ -632,16 +631,6 @@ std::string BattleActionsController::actionGetStatusMessage(PossiblePlayerBattle
 
 	switch (action.get()) //display console message, realize selected action
 	{
-		case PossiblePlayerBattleAction::MOVE_TACTICS:
-		case PossiblePlayerBattleAction::MOVE_STACK:
-		{
-			const CStack * activeStack = owner.stacksController->getActiveStack();
-			if (activeStack->hasBonusOfType(BonusType::FLYING))
-				return formatWithStackName("core.genrltxt.295", activeStack); //Fly %s here
-			else
-				return formatWithStackName("core.genrltxt.294", activeStack); //Move %s here
-		}
-
 		case PossiblePlayerBattleAction::ATTACK:
 		case PossiblePlayerBattleAction::LONG_WEAPON_ATTACK:
 		case PossiblePlayerBattleAction::WALK_AND_ATTACK:
@@ -829,15 +818,6 @@ bool BattleActionsController::actionIsLegal(PossiblePlayerBattleAction action, c
 
 	switch (action.get())
 	{
-		case PossiblePlayerBattleAction::MOVE_TACTICS:
-		case PossiblePlayerBattleAction::MOVE_STACK:
-			if (!(targetStack && targetStack->alive())) //we can walk on dead stacks
-			{
-				const CStack * currentStack = owner.stacksController->getActiveStack();
-				return currentStack && owner.getBattle()->toWhichHexMove(currentStack, targetHex).isValid();
-			}
-			return false;
-
 		case PossiblePlayerBattleAction::ATTACK:
 		case PossiblePlayerBattleAction::LONG_WEAPON_ATTACK:
 		case PossiblePlayerBattleAction::WALK_AND_ATTACK:
@@ -933,16 +913,6 @@ void BattleActionsController::actionRealize(PossiblePlayerBattleAction action, c
 
 	switch (action.get()) //display console message, realize selected action
 	{
-		case PossiblePlayerBattleAction::MOVE_TACTICS:
-		case PossiblePlayerBattleAction::MOVE_STACK:
-		{
-			const auto * activeStack = owner.stacksController->getActiveStack();
-			auto toHex = owner.getBattle()->toWhichHexMove(activeStack, targetHex);
-			assert(toHex.isValid());
-			owner.giveCommand(EActionType::WALK, toHex);
-			return;
-		}
-
 		case PossiblePlayerBattleAction::ATTACK:
 		case PossiblePlayerBattleAction::LONG_WEAPON_ATTACK:
 		case PossiblePlayerBattleAction::WALK_AND_ATTACK:
@@ -1317,6 +1287,13 @@ bool BattleActionsController::currentActionUsesLongWeapon(const BattleHex & hove
 	const auto entry = selectEntry(hoveredHex);
 
 	return entry && isLegacyAction(*entry, PossiblePlayerBattleAction::LONG_WEAPON_ATTACK);
+}
+
+BattleHexArray BattleActionsController::getShadedHexes(const BattleHex & hoveredHex)
+{
+	const auto entry = selectEntry(hoveredHex);
+
+	return entry ? entry->getShadedHexes(hoveredHex) : BattleHexArray();
 }
 
 void BattleActionsController::setPriorityActions(const BattleActionEntries & actions)

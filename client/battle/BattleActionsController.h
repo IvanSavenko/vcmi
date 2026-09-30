@@ -109,6 +109,9 @@ public:
 	/// returns true if currently selected action allows long weapon reach for melee attacks
 	bool currentActionUsesLongWeapon(const BattleHex & hoveredHex);
 
+	/// Hexes highlighted as the result of clicking the hovered hex
+	BattleHexArray getShadedHexes(const BattleHex & hoveredHex);
+
 	/// enter targeted spellcasting mode for creature, e.g. via "F" hotkey
 	void enterCreatureCastingMode();
 
