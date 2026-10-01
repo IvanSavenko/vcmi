@@ -1,4 +1,4 @@
-/*
+﻿/*
  * CVCMIServer.h, part of VCMI engine
  *
  * Authors: listed in file AUTHORS in main folder
@@ -97,6 +97,7 @@ public:
 
 	// Automated MP testing
 	bool autoStartMode = false;
+	bool autoStartMapMode = false;
 	int autoStartConnectedClients = 0;
 	int autoStartExpectedClients = 1;
 	void prepareAutoStart(const std::string & savePath, int expectedClients);

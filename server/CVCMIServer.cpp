@@ -104,31 +104,79 @@ uint16_t CVCMIServer::prepare(bool connectToLobby, bool listenForConnections) {
 	}
 }
 
-void CVCMIServer::prepareAutoStart(const std::string & savePath, int expectedClients)
+void CVCMIServer::prepareAutoStart(const std::string & path, int expectedClients)
 {
 	autoStartMode = true;
 	autoStartExpectedClients = expectedClients;
 
+	// Resource paths resolve against filesystem mounts - strip any leading
+	// directories and use the bare filename (maps are looked up in MAPS).
+	std::string fileName = path;
+	auto slashPos = fileName.find_last_of("/\\");
+	if(slashPos != std::string::npos)
+		fileName = fileName.substr(slashPos + 1);
+
 	// Load save header to get player info and StartInfo
 	auto mapInfo = std::make_shared<CMapInfo>();
-	mapInfo->saveInit(ResourcePath(savePath, EResType::SAVEGAME));
 
-	// Use the StartInfo loaded from the save (transfer unique_ptr → shared_ptr)
-	si = std::shared_ptr<StartInfo>(mapInfo->scenarioOptionsOfSave.release());
-	mi = mapInfo;
-	si->mapname = savePath;
-	si->mode = EStartMode::LOAD_GAME;
-
-	// Assign all human-controlled players to AI for automated testing
-	// (clear connectedPlayerIDs — empty set means AI-controlled)
-	for(auto & player : si->playerInfos)
+	if(fileName.ends_with(".vsgm1") || fileName.ends_with(".vsgm2"))
 	{
-		player.second.connectedPlayerIDs.clear();
-		logGlobal->info("Auto-start: player %s assigned to AI", player.first.toString());
+		mapInfo->saveInit(ResourcePath(fileName, EResType::SAVEGAME));
+
+		// Use the StartInfo loaded from the save (transfer unique_ptr → shared_ptr)
+		si = std::shared_ptr<StartInfo>(mapInfo->scenarioOptionsOfSave.release());
+		mi = mapInfo;
+		si->mapname = path;
+		si->mode = EStartMode::LOAD_GAME;
+
+		// Assign all human-controlled players to AI for automated testing
+		// (clear connectedPlayerIDs — empty set means AI-controlled)
+		for(auto & player : si->playerInfos)
+		{
+			player.second.connectedPlayerIDs.clear();
+			logGlobal->info("Auto-start: player %s assigned to AI", player.first.toString());
+		}
+	}
+	else
+	{
+		// MP testing from a plain map file - no save compatibility issues.
+		// All human slots are played by AI once clients connect.
+		autoStartMapMode = true;
+		mapInfo->mapInit(ResourcePath("MAPS/" + fileName, EResType::MAP));
+		mi = mapInfo;
+
+		si->mode = EStartMode::NEW_GAME;
+		si->mapname = "MAPS/" + fileName;
+		si->difficulty = static_cast<ui8>(mi->mapHeader->difficulty);
+		si->playerInfos.clear();
+
+		for(int i = 0; i < mi->mapHeader->players.size(); i++)
+		{
+			const PlayerInfo & pinfo = mi->mapHeader->players[i];
+
+			if(!(pinfo.canHumanPlay || pinfo.canComputerPlay))
+				continue;
+
+			PlayerSettings & pset = si->playerInfos[PlayerColor(i)];
+			pset.color = PlayerColor(i);
+			setPlayerConnectedId(pset, PlayerConnectionID::PLAYER_AI);
+			if(!pinfo.canHumanPlay)
+				pset.compOnly = true;
+
+			pset.castle = pinfo.defaultCastle();
+			pset.hero = pinfo.defaultHero();
+
+			if(pset.hero != HeroTypeID::RANDOM && pinfo.hasCustomMainHero())
+			{
+				pset.hero = pinfo.mainCustomHeroId;
+				pset.heroNameTextId = pinfo.mainCustomHeroNameTextId;
+				pset.heroPortrait = pinfo.mainCustomHeroPortrait;
+			}
+		}
 	}
 
-	logGlobal->info("Auto-start mode initialized: save='%s', expectedClients=%d, humanPlayersConverted=%d",
-		savePath, expectedClients, static_cast<int>(si->playerInfos.size()));
+	logGlobal->info("Auto-start mode initialized: path='%s', expectedClients=%d, players=%d",
+		path, expectedClients, static_cast<int>(si->playerInfos.size()));
 }
 
 uint16_t CVCMIServer::startAcceptingIncomingConnections(bool listenForConnections)
@@ -165,6 +213,11 @@ void CVCMIServer::onNewConnection(const std::shared_ptr<INetworkConnection> & co
 			logGlobal->info("Auto-start: client %d of %d connected", autoStartConnectedClients, autoStartExpectedClients);
 			if(autoStartConnectedClients >= autoStartExpectedClients)
 			{
+				// Client LobbyClientConnected packs carry the client's own
+				// StartInfo mode (LOAD_GAME), which overwrote the map-based
+				// NEW_GAME mode set by prepareAutoStart and crashed game start.
+				// Re-assert the mode chosen by prepareAutoStart.
+				si->mode = autoStartMapMode ? EStartMode::NEW_GAME : EStartMode::LOAD_GAME;
 				logGlobal->info("Auto-start: all clients connected, starting game");
 				prepareToStartGame();
 			}

@@ -240,7 +240,7 @@ static void handleCommandOptions(int argc, const char * argv[], boost::program_o
 	("export-lua-docs", boost::program_options::value<std::string>(), "Export Lua scripting API documentation to specified directory")
 	("port", boost::program_options::value<ui16>(), "port at which server will listen to connections from client")
 	("lobby", "start server in lobby mode in which server connects to a global lobby")
-	("loadSave", boost::program_options::value<std::string>(), "Auto-start MP: load save file, assign AI to all human slots, wait for clients")
+	("loadSave", boost::program_options::value<std::string>(), "Auto-start MP: load save (.vsgm1) or map (.h3m) file, assign AI to all human slots, wait for clients")
 	("expectedClients", boost::program_options::value<int>(), "Number of headless clients that will connect (default: 1)");
 
 	if(argc > 1)
@@ -329,7 +329,15 @@ int main(int argc, const char * argv[])
 		{
 			std::string savePath = opts["loadSave"].as<std::string>();
 			int expectedClients = opts.count("expectedClients") ? opts["expectedClients"].as<int>() : 1;
-			server.prepareAutoStart(savePath, expectedClients);
+			try
+			{
+				server.prepareAutoStart(savePath, expectedClients);
+			}
+			catch(const std::exception & e)
+			{
+				logGlobal->error("Auto-start setup failed for '%s': %s", savePath, e.what());
+				return 1;
+			}
 		}
 
 		server.prepare(connectToLobby, true);
