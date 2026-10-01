@@ -12,6 +12,8 @@
 #include "ExecuteHeroChain.h"
 #include "../AIGateway.h"
 #include "../Engine/Nullkiller.h"
+#include "../../../lib/IGameSettings.h"
+#include "../../../lib/GameLibrary.h"
 
 namespace NK2AI
 {
@@ -61,10 +63,20 @@ void ExchangeSwapTownHeroes::accept(AIGateway * aiGw)
 	if(!getGarrisonHero())
 	{
 		auto currentGarrisonHero = targetTown->getGarrisonHero();
-		
+
 		if(!currentGarrisonHero)
 			throw cannotFulfillGoalException("Invalid configuration. There is no hero in town garrison.");
-		
+
+		// Issue #7847: extracting a hero from garrison increases the number of
+		// wandering heroes. If the player already has the maximum allowed, the
+		// server rejects the swap with 'Cannot move hero out of the garrison,
+		// there are already N wandering heroes!'. Fail the goal gracefully so
+		// the AI can re-plan instead of looping on a rejected request.
+		int wanderingHeroes = aiGw->cc->getHeroCount(aiGw->playerID, false);
+		int mapCap = LIBRARY->engineSettings()->getInteger(EGameSettings::HEROES_PER_PLAYER_ON_MAP_CAP);
+		if(wanderingHeroes >= mapCap)
+			throw cannotFulfillGoalException("Cannot move hero out of the garrison: wandering hero cap reached");
+
 		aiGw->cc->swapGarrisonHero(targetTown);
 
 		if(currentGarrisonHero != targetTown->getVisitingHero())

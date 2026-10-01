@@ -14,6 +14,8 @@
 #include "../../../lib/spells/Problem.h"
 #include "../../../lib/spells/adventure/TownPortalEffect.h"
 #include "../../../lib/spells/CSpell.h"
+#include "../../../lib/IGameSettings.h"
+#include "../../../lib/GameLibrary.h"
 
 namespace NK2AI
 {
@@ -62,7 +64,17 @@ void AdventureSpellCast::accept(AIGateway * aiGw)
 	}
 
 	if (hero->isGarrisoned())
+	{
+		// Issue #7847 family: extracting the casting hero from garrison adds a
+		// wandering hero. Fail the goal gracefully if the cap is reached
+		// instead of triggering a rejected GarrisonHeroSwap on the server.
+		int wanderingHeroes = aiGw->cc->getHeroCount(aiGw->playerID, false);
+		int mapCap = LIBRARY->engineSettings()->getInteger(EGameSettings::HEROES_PER_PLAYER_ON_MAP_CAP);
+		if(wanderingHeroes >= mapCap)
+			throw cannotFulfillGoalException("Cannot cast from garrison: wandering hero cap reached");
+
 		aiGw->cc->swapGarrisonHero(hero->getVisitedTown());
+	}
 
 	if(aiGw->cc->isInTheMap(tile))
 	{
