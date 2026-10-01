@@ -309,7 +309,13 @@ BattleAction BattleEvaluator::selectStackAction(const CStack * stack)
 
 						float defenseValue = scoreEvaluator.evaluateExchange(apDefend, 0, *targets, damageCache, hb);
 
-						if((defenseValue > score && score <= 0) || (defenseValue > 2 * score && score > 0))
+						// Issues #5778 / #7092: the defense value includes working tower
+						// fire, which made garrison units defend indefinitely even with
+						// overwhelming forces. When we outclass the enemy and the attack
+						// is profitable, ignore the tower bonus and take the attack.
+						bool overwhelmingAdvantage = strengthRatio >= 2.0f && score > 0;
+
+						if(!overwhelmingAdvantage && ((defenseValue > score && score <= 0) || (defenseValue > 2 * score && score > 0)))
 						{
 							return BattleAction::makeDefend(stack);
 						}
