@@ -741,7 +741,17 @@ void AIGateway::showGarrisonDialog(const CArmedInstance * up, const CGHeroInstan
 	//you can't request action from action-response thread
 	executeActionAsync("showGarrisonDialog", [this, up, down, removableUnits, queryID]()
 	{
-		if(removableUnits && up->tempOwner == down->tempOwner && nullkiller->settings->isGarrisonTroopsUsageAllowed() && !cc->getStartInfo()->restrictedGarrisonsForAI())
+		// Issue #6118: the hero/town pointers were cached when the dialog was
+		// triggered. By the time this async action runs, either object may have
+		// been removed (hero dismissed, town captured), and pickBestCreatures
+		// would send ArrangeStacks for non-existing objects, rejected by the
+		// server with 'Cannot exchange stacks between non-existing objects!'.
+		// Verify both objects still exist before rearranging armies.
+		bool objectsValid = removableUnits
+			&& cc->getObj(up->id, false) != nullptr
+			&& cc->getObj(down->id, false) != nullptr;
+
+		if(objectsValid && up->tempOwner == down->tempOwner && nullkiller->settings->isGarrisonTroopsUsageAllowed() && !cc->getStartInfo()->restrictedGarrisonsForAI())
 		{
 			pickBestCreatures(down, up);
 		}
