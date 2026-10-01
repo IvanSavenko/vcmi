@@ -134,6 +134,8 @@ void CBattleAI::activeStack(const BattleID & battleID, const CStack * stack )
 
 	auto start = std::chrono::high_resolution_clock::now();
 
+	float strengthRatio = getStrengthRatio(cb->getBattle(battleID), side);
+
 	if(stack->isCatapult())
 	{
 		cb->battleMakeUnitAction(battleID, useCatapult(battleID, stack));
@@ -151,7 +153,7 @@ void CBattleAI::activeStack(const BattleID & battleID, const CStack * stack )
 
 	BattleEvaluator evaluator(
 		env, cb, stack, playerID, battleID, side,
-		getStrengthRatio(cb->getBattle(battleID), side),
+		strengthRatio,
 		getSimulationTurnsCount(env->game()->getStartInfo()));
 
 	result = evaluator.selectStackAction(stack);
@@ -166,7 +168,7 @@ void CBattleAI::activeStack(const BattleID & battleID, const CStack * stack )
 
 	logAi->trace("Spellcast attempt completed in %lld", timeElapsed(start));
 
-	if(auto action = considerFleeingOrSurrendering(battleID))
+	if(auto action = considerFleeingOrSurrendering(battleID, strengthRatio))
 	{
 		cb->battleMakeUnitAction(battleID, *action);
 		return;
@@ -215,7 +217,7 @@ void CBattleAI::print(const std::string &text) const
 	logAi->trace("%s Battle AI[%p]: %s", playerID.toString(), this, text);
 }
 
-std::optional<BattleAction> CBattleAI::considerFleeingOrSurrendering(const BattleID & battleID)
+std::optional<BattleAction> CBattleAI::considerFleeingOrSurrendering(const BattleID & battleID, float strengthRatio)
 {
 	BattleStateInfoForRetreat bs;
 
@@ -248,7 +250,12 @@ std::optional<BattleAction> CBattleAI::considerFleeingOrSurrendering(const Battl
 
 	auto result = cb->makeSurrenderRetreatDecision(battleID, bs);
 
-	if(!result && bs.canFlee && bs.turnsSkippedByDefense > 30)
+	// Issue #5271: the fallback retreat after many skipped turns fired
+	// unconditionally. An attacker whose catapult broke and whose melee units
+	// cannot reach the enemy yet simply defends while waiting - and after 30
+	// skipped turns the whole army fled a battle it was not losing. Only use
+	// this fallback when we are actually losing badly.
+	if(!result && bs.canFlee && bs.turnsSkippedByDefense > 30 && strengthRatio < 0.5f)
 	{
 		return BattleAction::makeRetreat(bs.ourSide);
 	}
