@@ -82,13 +82,14 @@ enum class ESerializationVersion : int32_t
 	MAP_ALLOWED_DIFFICULTIES, // map header may restrict difficulties available to player
 	LOBBY_CAMPAIGN_ON_SERVER, // server loads campaigns by name and prepares their next scenario itself
 	CAMPAIGN_STATIC_DATA, // campaign state refers to its campaign by pointer, shared between start infos
+	SCENARIO_LIST_STATUS, // scenario list includes entries incompatible with active mods, with the reason
 
 	RELEASE_170 = HOTA_MAP_STACK_COUNT,
 	RELEASE_174 = CUSTOM_GARRISON_TITLE,
 
 	MINIMAL = RELEASE_170,
-	MINIMAL_LOBBY = CAMPAIGN_STATIC_DATA, // client and server of lobby reject each other below this version
-	CURRENT = CAMPAIGN_STATIC_DATA,
+	MINIMAL_LOBBY = SCENARIO_LIST_STATUS, // client and server of lobby reject each other below this version
+	CURRENT = SCENARIO_LIST_STATUS,
 };
 
 static_assert(ESerializationVersion::MINIMAL <= ESerializationVersion::CURRENT, "Invalid serialization version definition!");
