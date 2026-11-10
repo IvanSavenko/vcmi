@@ -368,7 +368,7 @@ void CBonusSystemNode::propagateBonus(const std::shared_ptr<Bonus> & b, const CB
 			: b;
 		bonuses.push_back(propagated);
 		logBonus->trace("Bonus (type=%d, val=%d) propagated to %s", static_cast<int>(propagated->type), propagated->val, nodeName());
-		invalidateChildrenNodes(globalCounter);
+		nodeHasChanged();
 	}
 
 	TNodes lchildren;
@@ -396,7 +396,7 @@ void CBonusSystemNode::unpropagateBonus(const std::shared_ptr<Bonus> & b)
 				logBonus->warn("Attempt to remove bonus (type=%d, val=%d), which is not propagated to %s", static_cast<int>(b->type), b->val, nodeName());
 		}
 
-		invalidateChildrenNodes(globalCounter);
+		nodeHasChanged();
 	}
 
 	TNodes lchildren;
