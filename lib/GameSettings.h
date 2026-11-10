@@ -38,6 +38,9 @@ public:
 	GameSettings();
 	~GameSettings();
 
+	/// Returns value of a setting in config with layout of "settings" section of mod.json, null if not present
+	static const JsonNode & findValue(const JsonNode & config, EGameSettings option);
+
 	/// Loads settings as 'base settings' that can be overriden
 	/// For settings defined in vcmi or in mods
 	void loadBase(const JsonNode & input);

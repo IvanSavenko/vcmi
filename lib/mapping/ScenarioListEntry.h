@@ -75,6 +75,8 @@ public:
 	EMapFormat getMapFormat() const;
 	/// Returns settings of the map format from the engine settings, null node for unknown formats
 	const JsonNode & getMapFormatSettings() const;
+	/// Returns installed mods that enable support of the map format in their settings
+	std::vector<TModID> findMapFormatMods() const;
 	int getMapWidth() const;
 	int getVictoryIcon() const;
 	int getDefeatIcon() const;

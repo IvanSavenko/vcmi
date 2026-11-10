@@ -151,6 +151,14 @@ const std::vector<GameSettings::SettingOption> GameSettings::settingProperties =
 		{EGameSettings::INTERFACE_PLAYER_COLORED_BACKGROUND,              "interface", "playerColoredBackground"              },
 	};
 
+const JsonNode & GameSettings::findValue(const JsonNode & config, EGameSettings option)
+{
+	for(const auto & property : settingProperties)
+		if(property.setting == option)
+			return config[property.group][property.key];
+	throw std::runtime_error("Unknown game setting " + std::to_string(static_cast<int>(option)));
+}
+
 void GameSettings::loadBase(const JsonNode & input)
 {
 	for(const auto & option : settingProperties)

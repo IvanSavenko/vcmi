@@ -16,11 +16,14 @@
 #include "ScenarioMetadata.h"
 
 #include "../GameLibrary.h"
+#include "../GameSettings.h"
 #include "../IGameSettings.h"
 #include "../StartInfo.h"
 #include "../campaign/CampaignHandler.h"
 #include "../filesystem/Filesystem.h"
 #include "../gameState/SaveMetadata.h"
+#include "../modding/CModHandler.h"
+#include "../modding/ModDescription.h"
 #include "../serializer/CLegacyLoadFile.h"
 #include "../serializer/CLoadFile.h"
 
@@ -130,27 +133,52 @@ EMapFormat ScenarioListEntry::getMapFormat() const
 	return static_cast<EMapFormat>(metadata["map"]["format"].Integer());
 }
 
-const JsonNode & ScenarioListEntry::getMapFormatSettings() const
+static std::optional<EGameSettings> getMapFormatOption(EMapFormat format)
 {
-	switch(getMapFormat())
+	switch(format)
 	{
 		case EMapFormat::ROE:
-			return LIBRARY->engineSettings()->getValue(EGameSettings::MAP_FORMAT_RESTORATION_OF_ERATHIA);
+			return EGameSettings::MAP_FORMAT_RESTORATION_OF_ERATHIA;
 		case EMapFormat::AB:
-			return LIBRARY->engineSettings()->getValue(EGameSettings::MAP_FORMAT_ARMAGEDDONS_BLADE);
+			return EGameSettings::MAP_FORMAT_ARMAGEDDONS_BLADE;
 		case EMapFormat::SOD:
-			return LIBRARY->engineSettings()->getValue(EGameSettings::MAP_FORMAT_SHADOW_OF_DEATH);
+			return EGameSettings::MAP_FORMAT_SHADOW_OF_DEATH;
 		case EMapFormat::CHR:
-			return LIBRARY->engineSettings()->getValue(EGameSettings::MAP_FORMAT_CHRONICLES);
+			return EGameSettings::MAP_FORMAT_CHRONICLES;
 		case EMapFormat::WOG:
-			return LIBRARY->engineSettings()->getValue(EGameSettings::MAP_FORMAT_IN_THE_WAKE_OF_GODS);
+			return EGameSettings::MAP_FORMAT_IN_THE_WAKE_OF_GODS;
 		case EMapFormat::HOTA:
-			return LIBRARY->engineSettings()->getValue(EGameSettings::MAP_FORMAT_HORN_OF_THE_ABYSS);
+			return EGameSettings::MAP_FORMAT_HORN_OF_THE_ABYSS;
 		case EMapFormat::VCMI:
-			return LIBRARY->engineSettings()->getValue(EGameSettings::MAP_FORMAT_JSON_VCMI);
+			return EGameSettings::MAP_FORMAT_JSON_VCMI;
 	}
+	return std::nullopt;
+}
+
+const JsonNode & ScenarioListEntry::getMapFormatSettings() const
+{
+	const auto option = getMapFormatOption(getMapFormat());
+	if(option)
+		return LIBRARY->engineSettings()->getValue(*option);
+
 	static const JsonNode unknownFormat;
 	return unknownFormat;
+}
+
+std::vector<TModID> ScenarioListEntry::findMapFormatMods() const
+{
+	std::vector<TModID> result;
+	const auto option = getMapFormatOption(getMapFormat());
+	if(!option)
+		return result;
+
+	for(const auto & modID : LIBRARY->modh->getAllMods())
+	{
+		const JsonNode & modSettings = LIBRARY->modh->getModInfo(modID).getLocalValue("settings");
+		if(GameSettings::findValue(modSettings, *option)["supported"].Bool())
+			result.push_back(modID);
+	}
+	return result;
 }
 
 int ScenarioListEntry::getMapWidth() const
