@@ -130,7 +130,7 @@ std::time_t ScenarioListEntry::getCreationTime() const
 
 EMapFormat ScenarioListEntry::getMapFormat() const
 {
-	return static_cast<EMapFormat>(metadata["map"]["format"].Integer());
+	return static_cast<EMapFormat>(getDescription()["format"].Integer());
 }
 
 static std::optional<EGameSettings> getMapFormatOption(EMapFormat format)
