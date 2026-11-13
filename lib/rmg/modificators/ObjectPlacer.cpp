@@ -54,12 +54,11 @@ bool ObjectPlacer::placeRequiredObjects(ObjectManager & manager)
 				}
 				secondaryID = *RandomGeneratorUtil::nextItem(subObjects, zone.getRand());
 			}
-			TObjectTypeHandler handler = LIBRARY->objtypeh->getHandlerFor(objid.primaryID, secondaryID);
+			auto & handler = LIBRARY->objtypeh->getHandlerFor(objid.primaryID, secondaryID);
 
-			assert(handler);
-			ui32 guardStrength = info.second.has_value() ? info.second.value() : handler->getRMGInfo().value;
+			ui32 guardStrength = info.second.has_value() ? info.second.value() : handler.getRMGInfo().value;
 			
-			auto object = handler->create(map.mapInstance->cb, nullptr);
+			auto object = handler.create(map.mapInstance->cb, nullptr);
 			if (object->asOwnable() && object->tempOwner == PlayerColor::UNFLAGGABLE)
 				object->setOwner(PlayerColor::NEUTRAL);		
 
