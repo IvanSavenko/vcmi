@@ -117,6 +117,8 @@ set(test_SRCS
  		spells/targetConditions/SpellEffectConditionTest.cpp
  		spells/targetConditions/TargetConditionItemFixture.cpp
 
+		scripting/LuaModScopeTest.cpp
+
 		server/lobby/ScenarioListBuilderTest.cpp
 		server/battles/AcidBreathTest.cpp
 		server/battles/ActionOptionsTest.cpp

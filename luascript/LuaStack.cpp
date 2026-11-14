@@ -206,6 +206,14 @@ void LuaStack::get(int position, std::string & value)
 	value = std::string(raw, len);
 }
 
+void LuaStack::get(int position, ScriptModScope & value)
+{
+	if(lua_isnoneornil(L, position))
+		value.value = callerModScope();
+	else
+		get(position, value.value);
+}
+
 void LuaStack::get(int position, int3 & value)
 {
 	get(position,   value.x);

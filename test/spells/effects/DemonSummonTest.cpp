@@ -32,7 +32,7 @@ public:
 
 	void setCreatureExpectations()
 	{
-		EXPECT_CALL(creatureServiceMock, getByName(demonId)).WillRepeatedly(Return(&demonType));
+		EXPECT_CALL(creatureServiceMock, getByName(_, demonId)).WillRepeatedly(Return(&demonType));
 		EXPECT_CALL(demonType, getMaxHealth()).WillRepeatedly(Return(demonMaxHealth));
 	}
 
@@ -165,7 +165,7 @@ TEST_P(DemonSummonApplyTest, SpawnsNewUnitAndRemovesCorpse)
 	EXPECT_CALL(corpse, getTotalHealth()).WillRepeatedly(Return(corpseTotalHealth));
 	EXPECT_CALL(corpse, unitId()).WillRepeatedly(Return(corpseId));
 
-	EXPECT_CALL(creatureServiceMock, getByName(demonId)).WillRepeatedly(Return(&demonType));
+	EXPECT_CALL(creatureServiceMock, getByName(_, demonId)).WillRepeatedly(Return(&demonType));
 	EXPECT_CALL(demonType, getId()).WillRepeatedly(Return(CreatureID::AIR_ELEMENTAL));
 	EXPECT_CALL(demonType, getMaxHealth()).WillRepeatedly(Return(demonMaxHealth));
 	EXPECT_CALL(demonType, getJsonKey()).WillRepeatedly(Return(demonId));

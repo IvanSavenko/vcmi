@@ -28,7 +28,7 @@ function Script:targets(battle, unit)
 end
 
 function Script:applyEnchantment(server, battle, unit)
-	local spell = LIBRARY:getSpellByName(self.spell)
+	local spell = LIBRARY:getSpellByName(self.spell, scopeOf(self, "spell"))
 
 	if spell == nil then
 		error("Unable to apply enchantment - unknown spell " .. tostring(self.spell))

@@ -20,6 +20,7 @@
 #include <vcmi/SkillService.h>
 #include <vcmi/spells/Service.h>
 
+#include "../../LuaStack.h"
 #include "../../LuaWrapper.h"
 #include "../MethodRegistrar.h"
 
@@ -30,15 +31,15 @@ namespace scripting::api
 
 class ServicesProxy : public RawPointerWrapper<const Services, ServicesProxy>
 {
-	static const Artifact * getArtifactByName(const Services * services, const std::string & name);
-	static const Creature * getCreatureByName(const Services * services, const std::string & name);
-	static const Faction * getFactionByName(const Services * services, const std::string & name);
-	static const HeroClass * getHeroClassByName(const Services * services, const std::string & name);
-	static const HeroType * getHeroTypeByName(const Services * services, const std::string & name);
-	static const ResourceType * getResourceByName(const Services * services, const std::string & name);
-	static const spells::Spell * getSpellByName(const Services * services, const std::string & name);
-	static const Skill * getSecondarySkillByName(const Services * services, const std::string & name);
-	static const spells::SpellSchoolType * getSpellSchoolByName(const Services * services, const std::string & name);
+	static const Artifact * getArtifactByName(const Services * services, const std::string & name, const ScriptModScope & scope);
+	static const Creature * getCreatureByName(const Services * services, const std::string & name, const ScriptModScope & scope);
+	static const Faction * getFactionByName(const Services * services, const std::string & name, const ScriptModScope & scope);
+	static const HeroClass * getHeroClassByName(const Services * services, const std::string & name, const ScriptModScope & scope);
+	static const HeroType * getHeroTypeByName(const Services * services, const std::string & name, const ScriptModScope & scope);
+	static const ResourceType * getResourceByName(const Services * services, const std::string & name, const ScriptModScope & scope);
+	static const spells::Spell * getSpellByName(const Services * services, const std::string & name, const ScriptModScope & scope);
+	static const Skill * getSecondarySkillByName(const Services * services, const std::string & name, const ScriptModScope & scope);
+	static const spells::SpellSchoolType * getSpellSchoolByName(const Services * services, const std::string & name, const ScriptModScope & scope);
 
 	// TODO: battlefields, obstacles, engineSettings
 

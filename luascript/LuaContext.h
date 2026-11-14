@@ -84,6 +84,8 @@ private:
 	static int require(lua_State * L);
 	static int luaError(lua_State * L);
 	static int luaAssert(lua_State * L);
+	/// scopeOf(table, key) global function: mod scope of a value from json configuration, nil if unknown
+	static int luaScopeOf(lua_State * L);
 
 	/// Custom text printing function for use in scripting
 	/// based on luaB_print (part of Lua source code)

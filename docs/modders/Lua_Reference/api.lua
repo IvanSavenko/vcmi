@@ -1382,48 +1382,57 @@ local Services = {}
 
 ---Looks up an artifact by its JSON key. Returns nil if not found.
 ---@param name string # JSON key of the artifact (e.g. `core:goldenBow`).
+---@param scope string? # Mod from which configuration the name was taken, see `scopeOf`. Defaults to the mod of the calling script.
 ---@return Artifact
-function Services:getArtifactByName(name) end
+function Services:getArtifactByName(name, scope) end
 
 ---Looks up a creature by its JSON key. Returns nil if not found.
 ---@param name string # JSON key of the creature (e.g. `core:pikeman`).
+---@param scope string? # Mod from which configuration the name was taken, see `scopeOf`. Defaults to the mod of the calling script.
 ---@return Creature
-function Services:getCreatureByName(name) end
+function Services:getCreatureByName(name, scope) end
 
 ---Looks up a faction by its JSON key. Returns nil if not found.
 ---@param name string # JSON key of the faction (e.g. `core:castle`).
+---@param scope string? # Mod from which configuration the name was taken, see `scopeOf`. Defaults to the mod of the calling script.
 ---@return Faction
-function Services:getFactionByName(name) end
+function Services:getFactionByName(name, scope) end
 
 ---Looks up a hero class by its JSON key. Returns nil if not found.
 ---@param name string # JSON key of the hero class (e.g. `core:knight`).
+---@param scope string? # Mod from which configuration the name was taken, see `scopeOf`. Defaults to the mod of the calling script.
 ---@return HeroClass
-function Services:getHeroClassByName(name) end
+function Services:getHeroClassByName(name, scope) end
 
 ---Looks up a hero type by its JSON key. Returns nil if not found.
 ---@param name string # JSON key of the hero type (e.g. `core:orrin`).
+---@param scope string? # Mod from which configuration the name was taken, see `scopeOf`. Defaults to the mod of the calling script.
 ---@return HeroType
-function Services:getHeroTypeByName(name) end
+function Services:getHeroTypeByName(name, scope) end
 
 ---Looks up a resource by its JSON key. Returns nil if not found.
 ---@param name string # JSON key of the resource (e.g. `core:gold`).
+---@param scope string? # Mod from which configuration the name was taken, see `scopeOf`. Defaults to the mod of the calling script.
 ---@return ResourceType
-function Services:getResourceByName(name) end
+function Services:getResourceByName(name, scope) end
 
 ---Looks up a spell by its JSON key. Returns nil if not found.
 ---@param name string # JSON key of the spell (e.g. `core:magicArrow`).
+---@param scope string? # Mod from which configuration the name was taken, see `scopeOf`. Defaults to the mod of the calling script.
 ---@return Spell
-function Services:getSpellByName(name) end
+function Services:getSpellByName(name, scope) end
 
 ---Looks up a secondary skill by its JSON key. Returns nil if not found.
 ---@param name string # JSON key of the secondary skill (e.g. `core:wisdom`).
+---@param scope string? # Mod from which configuration the name was taken, see `scopeOf`. Defaults to the mod of the calling script.
 ---@return Skill
-function Services:getSecondarySkillByName(name) end
+function Services:getSecondarySkillByName(name, scope) end
 
 ---Looks up a spell school by its JSON key. Returns nil if not found.
 ---@param name string # JSON key of the spell school (e.g. `core:fire`).
+---@param scope string? # Mod from which configuration the name was taken, see `scopeOf`. Defaults to the mod of the calling script.
 ---@return SpellSchool
-function Services:getSpellSchoolByName(name) end
+function Services:getSpellSchoolByName(name, scope) end
 
 ---A secondary-skill definition (Wisdom, Tactics, Logistics, …). Database metadata; per-hero skill levels are read off HeroInstance.
 ---@class Skill

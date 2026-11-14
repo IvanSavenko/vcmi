@@ -94,6 +94,23 @@ int LuaContext::luaPrint(lua_State *L) {
 	return 0;
 }
 
+int LuaContext::luaScopeOf(lua_State * L)
+{
+	lua_settop(L, 2); // key is optional
+	LuaStack S(L);
+	std::string scope;
+
+	if(lua_istable(L, 1))
+		scope = S.fieldModScope(1, 2, S.tableModScope(1, ""));
+
+	S.clear();
+	if(scope.empty())
+		S.pushNil();
+	else
+		S.push(scope);
+	return 1;
+}
+
 std::shared_ptr<LuaContext> LuaContext::of(const Pool & pool, const Script * script)
 {
 	auto context = std::dynamic_pointer_cast<LuaContext>(pool.getContext(script));
@@ -192,6 +209,9 @@ void LuaContext::cleanupGlobals()
 
 	lua_pushcfunction(L, luaAssert);
 	lua_setglobal(L, "assert");
+
+	lua_pushcfunction(L, luaScopeOf);
+	lua_setglobal(L, "scopeOf");
 
 	S.clear();
 

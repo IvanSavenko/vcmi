@@ -197,11 +197,11 @@ void ScholarDelegate::updateModelData(QAbstractItemModel * model, const QModelIn
 	}
 	else if(!presetSs.isNull())
 	{
-		addEntityName(textList, static_cast<const Entity *>(LIBRARY->skillh->getByName(presetSs.String())));
+		addEntityName(textList, static_cast<const Entity *>(LIBRARY->skillh->getByName(ModScope::scopeMap(), presetSs.String())));
 	}
 	else if(!presetSp.isNull())
 	{
-		addEntityName(textList, static_cast<const Entity *>(LIBRARY->spellh->getByName(presetSp.String())));
+		addEntityName(textList, static_cast<const Entity *>(LIBRARY->spellh->getByName(ModScope::scopeMap(), presetSp.String())));
 	}
 	else
 		textList += QObject::tr("Default");

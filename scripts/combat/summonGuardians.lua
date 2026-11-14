@@ -85,7 +85,7 @@ function Script:guardianHexes(battle, position, side, targetIsTwoHex)
 end
 
 function Script:onBattleStart(server, battle, unit, other)
-	local guardian = LIBRARY:getCreatureByName(self.creature)
+	local guardian = LIBRARY:getCreatureByName(self.creature, scopeOf(self, "creature"))
 
 	if guardian == nil then
 		error("Unable to summon guardians - unknown creature " .. tostring(self.creature))

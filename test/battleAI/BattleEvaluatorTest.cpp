@@ -18,6 +18,7 @@
 #include "lib/battle/CObstacleInstance.h"
 #include "lib/battle/CPlayerBattleCallback.h"
 #include "lib/callback/CBattleCallback.h"
+#include "lib/modding/ModScope.h"
 #include "server/CGameHandler.h"
 
 namespace test
@@ -69,7 +70,7 @@ public:
 
 	void addObstacle()
 	{
-		const auto * obstacleInfo = LIBRARY->obstacles()->getByName("core:12");
+		const auto * obstacleInfo = LIBRARY->obstacles()->getByName(ModScope::scopeGame(), "core:12");
 		ASSERT_NE(obstacleInfo, nullptr);
 
 		auto obstacle = std::make_shared<CObstacleInstance>();

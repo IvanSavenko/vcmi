@@ -4,7 +4,7 @@ Script.__index = Script
 
 --- Returns the number of demons that can be raised from a dead unit.
 function Script:raisedCreatureAmount(mechanics, unit)
-	local creatureType = LIBRARY:getCreatureByName(self.id)
+	local creatureType = LIBRARY:getCreatureByName(self.id, scopeOf(self, "id"))
 
 	local deadCount         = unit:getBaseAmount()
 	local deadTotalHealth   = unit:getTotalHealth()
@@ -44,7 +44,7 @@ end
 
 --- Raise demons from each target corpse and remove the corpse.
 function Script:apply(mechanics, server, target)
-	local creatureType = LIBRARY:getCreatureByName(self.id)
+	local creatureType = LIBRARY:getCreatureByName(self.id, scopeOf(self, "id"))
 	local battle       = mechanics:getBattle()
 
 	for _, dest in ipairs(target) do
@@ -90,7 +90,7 @@ end
 
 --- Returns the number of demons that would be raised for the hover preview.
 function Script:getHealthChange(mechanics, spellTarget)
-	local creatureType = LIBRARY:getCreatureByName(self.id)
+	local creatureType = LIBRARY:getCreatureByName(self.id, scopeOf(self, "id"))
 
 	for _, dest in ipairs(spellTarget) do
 		if dest.unit ~= nil then

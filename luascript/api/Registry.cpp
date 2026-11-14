@@ -112,6 +112,7 @@ Registry::Registry()
 	// JsonNode fields accept any Lua value (string / number / table / …) and are funneled
 	// through JsonUtils::parseBonus — surface that openness rather than `userdata`.
 	registerLuaName<JsonNode>("any");
+	registerLuaName<ScriptModScope>("string?");
 
 	// Named enum aliases — the proxy registrations above don't cover these because they have no proxy of their own
 	registerLuaName<EHealLevel>("HealLevel");

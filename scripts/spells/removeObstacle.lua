@@ -9,8 +9,8 @@ function Script:canRemove(obstacle)
 	if self.removeAllSpells and kind == ENUM.ObstacleType.spellCreated then return true end
 	if kind == ENUM.ObstacleType.spellCreated and self.removeSpells then
 		local obstacleSpell = obstacle:getSpell()
-		for _, s in ipairs(self.removeSpells) do
-			if LIBRARY:getSpellByName(s) == obstacleSpell then return true end
+		for i, s in ipairs(self.removeSpells) do
+			if LIBRARY:getSpellByName(s, scopeOf(self.removeSpells, i)) == obstacleSpell then return true end
 		end
 	end
 	return false

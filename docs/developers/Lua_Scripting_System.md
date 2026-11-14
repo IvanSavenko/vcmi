@@ -72,6 +72,7 @@ The following global names are injected by `LuaContext` before the script runs:
 | `ENUM` | table | Integer constants for all engine enumerations |
 | `require` | function | Load a Lua module from the VFS by path (e.g. `require("mod:path/to/module")`) |
 | `print` | function | Redirected to the VCMI logger at INFO level |
+| `scopeOf` | function | `scopeOf(table, key)` returns the mod that defined a value taken from json config, or nil for values created by scripts |
 | `error`, `assert` | function | Standard behavior; the message is also logged as a warning |
 
 The following standard Lua globals are **removed** for safety: `collectgarbage`, `dofile`, `load`, `loadfile`, `loadstring`, `string.dump`, `math.random`, `math.randomseed`.

@@ -79,11 +79,11 @@ std::string CBonusTypeHandler::bonusToString(const std::shared_ptr<Bonus> & bonu
 std::string CBonusTypeHandler::describeParameter(const JsonNode & value, const std::string & entityType) const
 {
 	if(entityType == "creature")
-		if(const auto * creature = LIBRARY->creatures()->getByName(value.String()))
+		if(const auto * creature = LIBRARY->creatures()->getByName(value.getModScope(), value.String()))
 			return creature->getNamePluralTranslated();
 
 	if(entityType == "spell")
-		if(const auto * spell = LIBRARY->spells()->getByName(value.String()))
+		if(const auto * spell = LIBRARY->spells()->getByName(value.getModScope(), value.String()))
 			return spell->getNameTranslated();
 
 	return value.toCompactString();

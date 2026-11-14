@@ -57,7 +57,7 @@ function Script:onAfterAttack(server, battle, unit, other, payload)
 	if not killed or killed <= 0 then return end
 
 	-- Spell mechanics apply immunity and client animation.
-	local spell = LIBRARY:getSpellByName(self.spell or SPELL)
+	local spell = LIBRARY:getSpellByName(self.spell or SPELL, scopeOf(self, "spell"))
 
 	server:castSpell(battle, unit, spell, { other }, killed)
 end

@@ -45,31 +45,31 @@ public:
 	// so the Lua filter's LIBRARY:getSpellByName() calls are satisfied.
 	void setDefaultExpectations()
 	{
-		EXPECT_CALL(spellServiceMock, getByName(Eq(SpellID::encode(positiveID.getSpellID().getNum())))).WillRepeatedly(Return(&positiveSpell));
+		EXPECT_CALL(spellServiceMock, getByName(_, Eq(SpellID::encode(positiveID.getSpellID().getNum())))).WillRepeatedly(Return(&positiveSpell));
 		EXPECT_CALL(positiveSpell, isPersistent()).WillRepeatedly(Return(false));
 		EXPECT_CALL(positiveSpell, isAdventure()).WillRepeatedly(Return(false));
 		EXPECT_CALL(positiveSpell, isPositive()).WillRepeatedly(Return(true));
 		EXPECT_CALL(positiveSpell, isNegative()).WillRepeatedly(Return(false));
 		EXPECT_CALL(positiveSpell, isNeutral()).WillRepeatedly(Return(false));
 
-		EXPECT_CALL(spellServiceMock, getByName(Eq(SpellID::encode(negativeID.getSpellID().getNum())))).WillRepeatedly(Return(&negativeSpell));
+		EXPECT_CALL(spellServiceMock, getByName(_, Eq(SpellID::encode(negativeID.getSpellID().getNum())))).WillRepeatedly(Return(&negativeSpell));
 		EXPECT_CALL(negativeSpell, isPersistent()).WillRepeatedly(Return(false));
 		EXPECT_CALL(negativeSpell, isAdventure()).WillRepeatedly(Return(false));
 		EXPECT_CALL(negativeSpell, isPositive()).WillRepeatedly(Return(false));
 		EXPECT_CALL(negativeSpell, isNegative()).WillRepeatedly(Return(true));
 		EXPECT_CALL(negativeSpell, isNeutral()).WillRepeatedly(Return(false));
 
-		EXPECT_CALL(spellServiceMock, getByName(Eq(SpellID::encode(neutralID.getSpellID().getNum())))).WillRepeatedly(Return(&neutralSpell));
+		EXPECT_CALL(spellServiceMock, getByName(_, Eq(SpellID::encode(neutralID.getSpellID().getNum())))).WillRepeatedly(Return(&neutralSpell));
 		EXPECT_CALL(neutralSpell, isPersistent()).WillRepeatedly(Return(false));
 		EXPECT_CALL(neutralSpell, isAdventure()).WillRepeatedly(Return(false));
 		EXPECT_CALL(neutralSpell, isPositive()).WillRepeatedly(Return(false));
 		EXPECT_CALL(neutralSpell, isNegative()).WillRepeatedly(Return(false));
 		EXPECT_CALL(neutralSpell, isNeutral()).WillRepeatedly(Return(true));
 
-		EXPECT_CALL(spellServiceMock, getByName(Eq(SpellID::encode(persistentID.getSpellID().getNum())))).WillRepeatedly(Return(&persistentSpell));
+		EXPECT_CALL(spellServiceMock, getByName(_, Eq(SpellID::encode(persistentID.getSpellID().getNum())))).WillRepeatedly(Return(&persistentSpell));
 		EXPECT_CALL(persistentSpell, isPersistent()).WillRepeatedly(Return(true));
 
-		EXPECT_CALL(spellServiceMock, getByName(Eq(SpellID::encode(adventureID.getSpellID().getNum())))).WillRepeatedly(Return(&adventureSpell));
+		EXPECT_CALL(spellServiceMock, getByName(_, Eq(SpellID::encode(adventureID.getSpellID().getNum())))).WillRepeatedly(Return(&adventureSpell));
 		EXPECT_CALL(adventureSpell, isPersistent()).WillRepeatedly(Return(false));
 		EXPECT_CALL(adventureSpell, isAdventure()).WillRepeatedly(Return(true));
 	}

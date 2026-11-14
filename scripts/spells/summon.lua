@@ -12,7 +12,7 @@ end
 
 function Script:summonedCreatureHealth(mechanics)
 	local valueWithBonus = self:summonedEffectValue(mechanics)
-	local creature = LIBRARY:getCreatureByName(self.id)
+	local creature = LIBRARY:getCreatureByName(self.id, scopeOf(self, "id"))
 	if self.summonByHealth then
 		return valueWithBonus
 	else
@@ -22,7 +22,7 @@ end
 
 function Script:summonedCreatureAmount(mechanics)
 	local valueWithBonus = self:summonedEffectValue(mechanics)
-	local creature = LIBRARY:getCreatureByName(self.id)
+	local creature = LIBRARY:getCreatureByName(self.id, scopeOf(self, "id"))
 	if self.summonByHealth then
 		return math.floor(valueWithBonus / creature:getMaxHealth())
 	else
@@ -34,7 +34,7 @@ end
 --- if no valid targets exist, script needs to call `problem:add`
 --- to explain the reason to the player
 function Script:applicableGeneral(mechanics, problem)
-	local creature = LIBRARY:getCreatureByName(self.id)
+	local creature = LIBRARY:getCreatureByName(self.id, scopeOf(self, "id"))
 
 	if self:summonedCreatureAmount(mechanics) == 0 then
 		problem:addGeneric(mechanics)
@@ -81,7 +81,7 @@ end
 --- Actually casts the spells and applies all changes caused by spell
 --- use `server` parameter to apply changes on specified target(s)
 function Script:apply(mechanics, server, target)
-	local creature = LIBRARY:getCreatureByName(self.id)
+	local creature = LIBRARY:getCreatureByName(self.id, scopeOf(self, "id"))
 	local battle   = mechanics:getBattle()
 
 	for _, dest in ipairs(target) do
@@ -113,7 +113,7 @@ end
 --- for example, area damage spells should locate all units on affected hexes
 --- and return list of affected units
 function Script:transformTarget(mechanics, aimPoint, spellTarget)
-	local creature = LIBRARY:getCreatureByName(self.id)
+	local creature = LIBRARY:getCreatureByName(self.id, scopeOf(self, "id"))
 	local battle = mechanics:getBattle()
 	-- own summoned unit that is hypnotized fights for the enemy, so it is not reinforced
 	local sameSummoned = battle:getUnitsIf(function(unit)

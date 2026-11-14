@@ -17,7 +17,7 @@ function Script:isReceptive(mechanics, unit)
 		local matching = reductions:filter(function(b)
 			local sub = b:getSubtype()
 			if sub == "any" then return false end
-			return LIBRARY:getSpellSchoolByName(sub) == school
+			return LIBRARY:getSpellSchoolByName(sub, "game") == school
 		end)
 
 		if matching:totalValue() >= 100 then

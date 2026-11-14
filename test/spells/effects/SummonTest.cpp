@@ -105,11 +105,11 @@ TEST_P(SummonTest, Applicable)
 	{
 		EXPECT_CALL(creatureServiceMock, getById(otherSummoned)).WillRepeatedly(Return(&otherSummonedType));
 		EXPECT_CALL(creatureServiceMock, getByIndex(otherSummoned.getNum())).WillRepeatedly(Return(&otherSummonedType));
-		EXPECT_CALL(creatureServiceMock, getByName("core:fireElemental")).WillRepeatedly(Return(&otherSummonedType));
+		EXPECT_CALL(creatureServiceMock, getByName(_, "core:fireElemental")).WillRepeatedly(Return(&otherSummonedType));
 		EXPECT_CALL(otherSummonedType, getJsonKey()).WillRepeatedly(Return("core:fireElemental"));
 	}
 
-	EXPECT_CALL(creatureServiceMock, getByName("core:airElemental")).WillRepeatedly(Return(&creatureStub));
+	EXPECT_CALL(creatureServiceMock, getByName(_, "core:airElemental")).WillRepeatedly(Return(&creatureStub));
 	EXPECT_CALL(creatureStub, getId()).WillRepeatedly(Return(toSummon));
 	EXPECT_CALL(creatureStub, getJsonKey()).WillRepeatedly(Return("core:airElemental"));
 	EXPECT_CALL(creatureStub, isDoubleWide()).WillRepeatedly(Return(false));
@@ -129,7 +129,7 @@ TEST_P(SummonTest, Transform)
 	battleFake->setupEmptyBattlefield();
 	EXPECT_CALL(*battleFake, getUnitsIf(_)).Times(AtLeast(1));
 
-	EXPECT_CALL(creatureServiceMock, getByName(_)).WillRepeatedly(Return(&creatureStub));
+	EXPECT_CALL(creatureServiceMock, getByName(_, _)).WillRepeatedly(Return(&creatureStub));
 	EXPECT_CALL(creatureStub, getId()).WillRepeatedly(Return(toSummon));
 	EXPECT_CALL(creatureStub, getJsonKey()).WillRepeatedly(Return("core:airElemental"));
 	EXPECT_CALL(creatureStub, isDoubleWide()).WillRepeatedly(Return(false));
@@ -195,7 +195,7 @@ public:
 		EXPECT_CALL(mechanicsMock, creatures()).Times(AnyNumber());
 		EXPECT_CALL(creatureServiceMock, getById(Eq(toSummon))).WillRepeatedly(Return(&toSummonType));
 		EXPECT_CALL(creatureServiceMock, getByIndex(Eq(toSummon.getNum()))).WillRepeatedly(Return(&toSummonType));
-		EXPECT_CALL(creatureServiceMock, getByName(_)).WillRepeatedly(Return(&toSummonType));
+		EXPECT_CALL(creatureServiceMock, getByName(_, _)).WillRepeatedly(Return(&toSummonType));
 		EXPECT_CALL(toSummonType, getId()).WillRepeatedly(Return(toSummon));
 		EXPECT_CALL(toSummonType, getMaxHealth()).WillRepeatedly(Return(unitHealth));
 		EXPECT_CALL(toSummonType, getJsonKey()).WillRepeatedly(Return("core:airElemental"));

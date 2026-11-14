@@ -26,8 +26,10 @@ namespace test
 class CombatScriptDescriptionTest : public ::testing::Test
 {
 public:
-	static std::shared_ptr<Bonus> triggerBonus(const std::string & script, int value, const JsonNode & eventParameters = JsonNode())
+	static std::shared_ptr<Bonus> triggerBonus(const std::string & script, int value, JsonNode eventParameters = JsonNode())
 	{
+		// identifiers in parameters are resolved from the mod that defined them, as in loaded config
+		eventParameters.setModScope(ModScope::scopeBuiltin(), true);
 		auto scriptID = ScriptID(*LIBRARY->identifiers()->getIdentifier(ModScope::scopeGame(), "script", script, false));
 
 		auto bonus = std::make_shared<Bonus>(BonusDuration::PERMANENT, BonusType::COMBAT_EVENT_TRIGGER, BonusSource::CREATURE_ABILITY, value, BonusSourceID(), BonusSubtypeID(scriptID));
@@ -63,7 +65,7 @@ TEST_F(CombatScriptDescriptionTest, ParametersAreSubstitutedByName)
 /// which of the two it meant.
 TEST_F(CombatScriptDescriptionTest, ParameterIsResolvedAsItsDeclaredType)
 {
-	const auto * creature = LIBRARY->creatures()->getByName("core:woodElf");
+	const auto * creature = LIBRARY->creatures()->getByName(ModScope::scopeGame(), "core:woodElf");
 	ASSERT_NE(creature, nullptr);
 
 	// the spell parameter of this script is handed a creature, which no spell is named after

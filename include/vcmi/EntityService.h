@@ -27,7 +27,8 @@ class DLL_LINKAGE EntityServiceT : public EntityService
 public:
 	virtual const EntityType * getById(const IdType & id) const = 0;
 	virtual const EntityType * getByIndex(const int32_t index) const = 0;
-	virtual const EntityType * getByName(const std::string & name) const = 0;
+	/// Resolves identifier as if it was referenced from configuration of mod 'scope'
+	virtual const EntityType * getByName(const std::string & scope, const std::string & name) const = 0;
 
 	virtual void forEach(const std::function<void(const EntityType * entity, bool & stop)> & cb) const = 0;
 };

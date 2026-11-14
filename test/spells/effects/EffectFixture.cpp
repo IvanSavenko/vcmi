@@ -98,8 +98,8 @@ void EffectFixture::setUp()
 	ON_CALL(mechanicsMock, spells()).WillByDefault(Return(&spellServiceMock));
 	EXPECT_CALL(servicesMock, spells()).WillRepeatedly(Return(&spellServiceMock));
 	ON_CALL(spellServiceMock, getById(_)).WillByDefault(Return(&spellStub));
-	EXPECT_CALL(spellServiceMock, getByName(_)).Times(AnyNumber()).WillRepeatedly(Invoke([](const std::string & name){
-		return LIBRARY->spells()->getByName(name);
+	EXPECT_CALL(spellServiceMock, getByName(_, _)).Times(AnyNumber()).WillRepeatedly(Invoke([](const std::string & scope, const std::string & name){
+		return LIBRARY->spells()->getByName(scope, name);
 	}));
 	EXPECT_CALL(servicesMock, spellSchools()).Times(AnyNumber()).WillRepeatedly(Return(LIBRARY->spellSchools()));
 

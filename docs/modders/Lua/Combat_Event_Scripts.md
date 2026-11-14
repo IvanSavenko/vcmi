@@ -79,7 +79,7 @@ All handlers share the same signature and return nothing:
 
 Signature: `function Script:on<Event>(server, battle, unit, other, payload)`
 
-Bonus parameters initialize fields of `self`. For example, `{ "poison" : true }` in `addInfo` becomes `self.poison`. The bonus value becomes `self.val`.
+Bonus parameters initialize fields of `self`. For example, `{ "poison" : true }` in `addInfo` becomes `self.poison`. The bonus value becomes `self.val`. Identifiers in parameters are relative to the mod that defined them, so pass `scopeOf(self, "field")` as the second argument of `LIBRARY:get...ByName` lookups.
 
 Each bonus granting the same script creates a separate handler invocation with its own `val`. Values are not combined before execution. Use the same [`stacking`](../Bonus_Format.md) group for all sources when only the strongest bonus should apply, as in the core fire shield configuration.
 

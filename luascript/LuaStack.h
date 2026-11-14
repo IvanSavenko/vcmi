@@ -35,6 +35,13 @@ class LuaApiException : public std::runtime_error
 
 class LuaStack;
 
+/// Mod scope for resolving a string identifier passed by a script. Taken from the script argument
+/// when one is given, otherwise it is the mod of the Lua function that made the call.
+struct ScriptModScope
+{
+	std::string value;
+};
+
 /// Typed helper for Lua stack operations: push/get for all VCMI types and API objects.
 /// Records the initial stack top on construction; call restoreInitialTop() to reset to it.
 /// All get() overloads throw LuaApiException on type mismatch.
@@ -271,6 +278,7 @@ public:
 
 	void get(int position, double & value);
 	void get(int position, std::string & value);
+	void get(int position, ScriptModScope & value);
 
 	template<typename T>
 	void get(int position, std::optional<T> & value)

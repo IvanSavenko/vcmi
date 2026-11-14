@@ -26,6 +26,8 @@ VCMI does NOT guarantees:
 
 All spell parameters provided in the spell effect json config initialize the script, so every property defined there is available as a field of `self` - for example a config of `{ "cumulative" : true }` is read as `self.cumulative`.
 
+Identifiers in these fields are written relative to the mod that defined them, so another mod may define the same name. Pass their mod to lookups with `scopeOf`, for example `LIBRARY:getCreatureByName(self.id, scopeOf(self, "id"))`. Without the second argument the name is resolved from the mod of the calling script. Tables that keep config data, such as bonuses passed to `server:addUnitBonus`, carry their mod in their metatable: when copying such a table, copy its metatable as well (`setmetatable(copy, getmetatable(original))`).
+
 ### applicableGeneral
 
 Signature: `function Script:applicableGeneral(mechanics, problem)`
