@@ -141,6 +141,7 @@ ReturnType LuaContext::callImpl(const std::shared_ptr<LuaReference> & ref, const
 		// Build self: push params as Lua table, set __index = ref via metatable
 		S.push(*self);                 // stack: (function), (self)
 		lua_newtable(L);               // stack: (function), (self), (mt)
+		S.copyModScope(-2, -1);        // keeps mod scope of params
 		ref->push();                   // stack: (function), (self), (mt), (table)
 		lua_setfield(L, -2, "__index");// mt.__index = ref; stack: (function), (self), (mt)
 		lua_setmetatable(L, -2);       // setmetatable(self, mt); stack: (function), (self)

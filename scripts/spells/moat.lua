@@ -7,7 +7,8 @@ local function deepCopyBonus(b)
 	for k, v in pairs(b) do
 		copy[k] = v
 	end
-	return copy
+	-- keeps mod scope of json, used to resolve identifiers in this bonus
+	return setmetatable(copy, getmetatable(b))
 end
 
 function Script:apply(mechanics, server, target)

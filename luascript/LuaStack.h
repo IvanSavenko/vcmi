@@ -322,7 +322,15 @@ public:
 			}
 
 			try {
-				get(absindex(-1), data);
+				if constexpr (std::is_same_v<Data, JsonNode>)
+				{
+					lua_pushstring(L, keyName.c_str());
+					std::string scope = fieldModScope(position, absindex(-1), tableModScope(position, callerModScope()));
+					lua_pop(L, 1);
+					getJson(absindex(-1), data, scope);
+				}
+				else
+					get(absindex(-1), data);
 			} catch (...) {
 				lua_pop(L, 1);
 				throw;
@@ -408,6 +416,15 @@ public:
 
 	void get(int position, JsonNode & value);
 
+	/// Mod scope of a table value created from json, or the given fallback for tables made by scripts
+	std::string tableModScope(int tablePosition, const std::string & fallback);
+	/// Mod scope of the string stored in the table under the key at keyPosition, or the given tableScope
+	std::string fieldModScope(int tablePosition, int keyPosition, const std::string & tableScope);
+	/// Mod scope of the innermost Lua function on the call stack, taken from its chunk name "mod:path"
+	std::string callerModScope();
+	/// Copies mod scope of a table created from json into the metatable that is about to replace its own
+	void copyModScope(int tablePosition, int metatablePosition);
+
 	int retVoid();
 
 	/// Returns the current stack size.
@@ -428,6 +445,9 @@ public:
 
 private:
 	void getInteger(int position, lua_Integer & value);
+	void getJson(int position, JsonNode & value, const std::string & inheritedScope);
+	/// Attaches mod scope of json to the table on top of the stack that was created from it
+	void setModScopeMetatable(const JsonNode & json);
 
 	template<typename T>
 	void pushArray(T & value)

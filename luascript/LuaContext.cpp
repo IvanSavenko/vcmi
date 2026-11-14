@@ -392,7 +392,10 @@ int LuaContext::loadModule()
 
 	auto rawData = loader->load(id)->readAll();
 	auto sourceText = std::string(reinterpret_cast<char *>(rawData.first.get()), rawData.second);
-	int ret = luaL_loadbuffer(L, sourceText.c_str(), sourceText.size(), modulePath.c_str());
+	// chunk is named "mod:path" since mod scope of calling script is taken from it.
+	// Modules without explicit scope are engine modules
+	std::string chunkName = (scope.empty() ? ModScope::scopeBuiltin() : scope) + ':' + modulePath;
+	int ret = luaL_loadbuffer(L, sourceText.c_str(), sourceText.size(), chunkName.c_str());
 
 	if(ret)
 		return -1; // error string already on stack from luaL_loadbuffer

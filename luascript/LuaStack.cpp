@@ -138,6 +138,7 @@ void LuaStack::push(const JsonNode & value)
 				push(keyValue.second);
 				lua_rawset(L, -3);
 			}
+			setModScopeMetatable(value);
 		}
 		break;
 	case JsonNode::JsonType::DATA_STRING:
@@ -152,6 +153,7 @@ void LuaStack::push(const JsonNode & value)
 				push(value.Vector()[idx]);
 				lua_rawset(L, -3);
 			}
+			setModScopeMetatable(value);
 		}
 		break;
 
@@ -239,10 +241,12 @@ void LuaStack::get(int position, CreatureID & value)
 
 void LuaStack::get(int position, JsonNode & value)
 {
+	getJson(absindex(position), value, callerModScope());
+}
+
+void LuaStack::getJson(int position, JsonNode & value, const std::string & inheritedScope)
+{
 	auto type = lua_type(L, position);
-	// Intentionally "game" instead of the scope of the script's mod: a script of mod A may convert JSON of mod B,
-	// and the result keeps identifiers of mod B. Known drawback: an identifier defined by several mods is ambiguous here
-	value.setModScope("game");
 
 	switch(type)
 	{
@@ -251,15 +255,16 @@ void LuaStack::get(int position, JsonNode & value)
 		return;
 	case LUA_TNUMBER:
 		get(position, value.Float());
-		return;
+		break;
 	case LUA_TBOOLEAN:
 		value.Bool() = (lua_toboolean(L, position) != 0);
-		return;
+		break;
 	case LUA_TSTRING:
 		get(position, value.String());
-		return;
+		break;
 	case LUA_TTABLE:
 		{
+			const std::string scope = tableModScope(position, inheritedScope);
 			JsonNode asVector;
 			JsonNode asStruct;
 
@@ -272,7 +277,7 @@ void LuaStack::get(int position, JsonNode & value)
 				JsonNode fieldValue;
 				try
 				{
-					get(lua_gettop(L), fieldValue);
+					getJson(lua_gettop(L), fieldValue, fieldModScope(position, absindex(-2), scope));
 				}
 				catch(...)
 				{
@@ -311,6 +316,7 @@ void LuaStack::get(int position, JsonNode & value)
 			{
 				std::swap(value, asStruct);
 			}
+			value.setModScope(scope, false);
 		}
 		return;
 	default:
@@ -319,6 +325,144 @@ void LuaStack::get(int position, JsonNode & value)
 			throw LuaApiException(std::string("Unsupported Lua type for JsonNode: ") + actualType);
 		}
 	}
+	value.setModScope(inheritedScope, false);
+}
+
+static const char * const MOD_SCOPE_FIELD = "__vcmiScope";
+static const char * const LEAF_SCOPES_FIELD = "__vcmiLeafScopes";
+
+void LuaStack::setModScopeMetatable(const JsonNode & json)
+{
+	const std::string & scope = json.getModScope();
+	const auto isForeignString = [&scope](const JsonNode & child)
+	{
+		// json merge replaces strings as a whole, so a string in a table of one mod may come from another mod
+		return child.isString() && !child.getModScope().empty() && child.getModScope() != scope;
+	};
+
+	bool hasForeignStrings = json.isStruct()
+		? std::ranges::any_of(json.Struct(), [&](const auto & entry){ return isForeignString(entry.second); })
+		: std::ranges::any_of(json.Vector(), isForeignString);
+
+	if(!hasForeignStrings)
+	{
+		if(scope.empty())
+			return;
+
+		// most tables have no foreign strings, so they can share one metatable per mod
+		if(luaL_newmetatable(L, ("vcmi.modScope:" + scope).c_str()) != 0)
+		{
+			push(scope);
+			lua_setfield(L, -2, MOD_SCOPE_FIELD);
+		}
+		lua_setmetatable(L, -2);
+		return;
+	}
+
+	lua_newtable(L);
+	if(!scope.empty())
+	{
+		push(scope);
+		lua_setfield(L, -2, MOD_SCOPE_FIELD);
+	}
+
+	lua_newtable(L);
+	if(json.isStruct())
+	{
+		for(const auto & [key, child] : json.Struct())
+		{
+			if(!isForeignString(child))
+				continue;
+			push(key);
+			push(child.getModScope());
+			lua_rawset(L, -3);
+		}
+	}
+	else
+	{
+		for(size_t i = 0; i < json.Vector().size(); ++i)
+		{
+			if(!isForeignString(json.Vector()[i]))
+				continue;
+			pushInteger(i + 1);
+			push(json.Vector()[i].getModScope());
+			lua_rawset(L, -3);
+		}
+	}
+	lua_setfield(L, -2, LEAF_SCOPES_FIELD);
+	lua_setmetatable(L, -2);
+}
+
+std::string LuaStack::tableModScope(int tablePosition, const std::string & fallback)
+{
+	tablePosition = absindex(tablePosition);
+	std::string result = fallback;
+
+	if(lua_getmetatable(L, tablePosition) == 0)
+		return result;
+
+	lua_pushstring(L, MOD_SCOPE_FIELD);
+	lua_rawget(L, -2);
+	if(lua_type(L, -1) == LUA_TSTRING)
+		get(-1, result);
+	lua_pop(L, 2);
+	return result;
+}
+
+std::string LuaStack::fieldModScope(int tablePosition, int keyPosition, const std::string & tableScope)
+{
+	tablePosition = absindex(tablePosition);
+	keyPosition = absindex(keyPosition);
+	std::string result = tableScope;
+
+	if(lua_getmetatable(L, tablePosition) == 0)
+		return result;
+
+	lua_pushstring(L, LEAF_SCOPES_FIELD);
+	lua_rawget(L, -2);
+	if(lua_istable(L, -1))
+	{
+		lua_pushvalue(L, keyPosition);
+		lua_rawget(L, -2);
+		if(lua_type(L, -1) == LUA_TSTRING)
+			get(-1, result);
+		lua_pop(L, 1);
+	}
+	lua_pop(L, 2);
+	return result;
+}
+
+void LuaStack::copyModScope(int tablePosition, int metatablePosition)
+{
+	tablePosition = absindex(tablePosition);
+	metatablePosition = absindex(metatablePosition);
+
+	if(lua_getmetatable(L, tablePosition) == 0)
+		return;
+
+	for(const char * field : {MOD_SCOPE_FIELD, LEAF_SCOPES_FIELD})
+	{
+		lua_getfield(L, -1, field);
+		lua_setfield(L, metatablePosition, field);
+	}
+	lua_pop(L, 1);
+}
+
+std::string LuaStack::callerModScope()
+{
+	lua_Debug info;
+	for(int level = 0; lua_getstack(L, level, &info); ++level)
+	{
+		lua_getinfo(L, "S", &info);
+		if(std::string_view(info.what) == "C")
+			continue;
+
+		std::string_view source(info.source);
+		auto separator = source.find(':');
+		if(separator != std::string_view::npos)
+			return std::string(source.substr(0, separator));
+	}
+	throw LuaApiException("Unable to determine mod of the calling script!");
 }
 
 int LuaStack::retVoid()

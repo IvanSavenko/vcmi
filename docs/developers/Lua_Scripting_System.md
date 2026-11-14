@@ -61,6 +61,8 @@ return MyEffect
 
 When the engine calls a script function, it constructs a `self` table from the script's JSON parameters and sets its `__index` metamethod to point at the script table. This means `self` carries per-instance data while method lookups fall through to the shared class table.
 
+Identifiers in json are relative to the mod that defined them, so `LuaStack` keeps that mod across the Lua boundary. Each table created from json gets a metatable with `__vcmiScope` (the mod of the table) and, when json merging left strings of another mod in it, `__vcmiLeafScopes` (mod per key). Json read back from Lua takes the mod from these fields, inheriting it into nested values. Tables made by scripts get the mod of the calling Lua function, taken from its chunk name `mod:path`; modules loaded by `require` without explicit scope are named as `core` modules.
+
 The following global names are injected by `LuaContext` before the script runs:
 
 | Global | Type | Description |
