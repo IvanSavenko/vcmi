@@ -177,7 +177,7 @@ std::vector<TModID> ScenarioListEntry::findMapFormatMods() const
 	if(!option)
 		return result;
 
-	for(const auto & modID : LIBRARY->modh->getAllMods())
+	for(const auto & modID : LIBRARY->modh->getInstalledMods())
 	{
 		const JsonNode & modSettings = LIBRARY->modh->getModInfo(modID).getLocalValue("settings");
 		if(GameSettings::findValue(modSettings, *option)["supported"].Bool())
