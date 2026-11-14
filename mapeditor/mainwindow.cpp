@@ -41,6 +41,7 @@
 #include "../lib/modding/CModHandler.h"
 #include "../lib/modding/ModDescription.h"
 #include "../lib/modding/ModIncompatibility.h"
+#include "../lib/modding/ModManager.h"
 #include "../lib/modding/ModScope.h"
 #include "../lib/RoadHandler.h"
 #include "../lib/RiverHandler.h"
@@ -332,8 +333,9 @@ EditorMainWindow::EditorMainWindow(QWidget* parent) :
 
 	//init
 	initializeBaseFilesystem(extractionOptions.extractArchives);
+	ModManager mods;
 	auto library = std::make_unique<GameLibrary>();
-	library->initializeFilesystem();
+	library->initializeFilesystem(mods.createSnapshot());
 
 	// Initialize logging based on settings
 	logConfig->configure();
@@ -460,6 +462,7 @@ EditorMainWindow::EditorMainWindow(QWidget* parent) :
 	setTitle();
 
 	library->initializeLibrary();
+	mods.setValidatedChecksums(library->modh->getValidatedChecksums());
 	setGameLibrary(std::move(library));
 
 	Settings config = settings.write["session"]["editor"];
