@@ -68,6 +68,7 @@ set(test_SRCS
 		map/TinyH3MBuilderTest.cpp
 
 		modding/ModDescriptionTest.cpp
+		modding/ModSnapshotTest.cpp
 
 		quest/QuestTest.cpp
 		quest/QuestAssertions.cpp
