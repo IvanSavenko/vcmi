@@ -647,6 +647,7 @@ function Bonus:getParametersAsVector() end
 ---@field propagator any # Rule for propagating the bonus upwards for area effect (army-wide, player-wide, …).
 ---@field updater any # Rules for recalculation of bonus parameters (e.g. scales with stack count).
 ---@field propagationUpdater any # Updater applied to bonuses produced by this one's propagator.
+---@field sourceSecondaryID any # source secondary id of a bonus (for example mastery level of the spell)
 local BonusDescriptor = {}
 
 ---Which bonuses of a bearer a query is about, handed to `getBonuses`, `getBonusesValue` and `hasBonuses` as a plain table. Every field left out widens the answer, so `{}` asks for all of them.

@@ -121,3 +121,9 @@ Rules for recalculation of bonus parameters (e.g. scales with stack count).
 Updater applied to bonuses produced by this one's propagator.
 
 - type: `any`
+
+### sourceSecondaryID
+
+source secondary id of a bonus (for example mastery level of the spell)
+
+- type: `any`
