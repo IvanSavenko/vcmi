@@ -275,6 +275,10 @@ bool ModStateController::canEnableMod(QString modname)
 			return addError(modname, tr("Required mod %1 is missing").arg(modEntry));
 	}
 
+	const QString nonGameplayDependency = modList->findNonGameplayDependency(modname);
+	if(!nonGameplayDependency.isEmpty())
+		return addError(modname, tr("Mod changes gameplay but requires mod %1 that does not. Such mod can not be enabled").arg(nonGameplayDependency));
+
 	return true;
 }
 

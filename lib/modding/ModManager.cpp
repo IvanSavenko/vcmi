@@ -540,6 +540,25 @@ bool ModsStorage::isGameplayRoot(const TModID & rootID) const
 	return gameplayRoots.contains(rootID);
 }
 
+std::optional<TModID> ModsStorage::findNonGameplayDependency(const TModID & modID) const
+{
+	const auto & mod = getMod(modID);
+	if(!mod.affectsGameplay())
+		return std::nullopt;
+
+	// otherwise players with the same gameplay mods may load different gameplay content
+	for(const auto & dependency : mod.getDependencies())
+	{
+		const auto dependencyMod = mods.find(dependency);
+		if(dependencyMod == mods.end() || !dependencyMod->second.isInstalled())
+			continue;
+
+		if(!isGameplayRoot(dependency.substr(0, dependency.find('.'))))
+			return dependency;
+	}
+	return std::nullopt;
+}
+
 TModList ModsStorage::getAllMods() const
 {
 	TModList result;
@@ -631,6 +650,11 @@ TModList ModManager::getAllMods() const
 double ModManager::getInstalledModSizeMegabytes(const TModID & modName) const
 {
 	return modsState->getInstalledModSizeMegabytes(modName);
+}
+
+std::optional<TModID> ModManager::findNonGameplayDependency(const TModID & modID) const
+{
+	return modsStorage->findNonGameplayDependency(modID);
 }
 
 void ModManager::eraseMissingModsFromPreset()
@@ -908,6 +932,12 @@ void ModDependenciesResolver::tryAddMods(TModList modsToResolve, const ModsStora
 		for(const TModID & reverseConflict : resolvedModIDs)
 			if(vstd::contains(storage.getMod(reverseConflict).getConflicts(), mod.getID()))
 				return ModResolveStatus::BROKEN;
+
+		if(const auto dependency = storage.findNonGameplayDependency(mod.getID()))
+		{
+			logMod->error("Mod '%s' affects gameplay but depends on mod '%s' that does not. Mod will not be loaded", mod.getID(), *dependency);
+			return ModResolveStatus::BROKEN;
+		}
 
 		return ModResolveStatus::RESOLVED;
 	};

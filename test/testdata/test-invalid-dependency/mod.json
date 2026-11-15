@@ -1,0 +1,11 @@
+{
+	"name" : "VCMI test mod with invalid dependency",
+	"description" : "Test-only mod that affects gameplay and depends on a mod that does not",
+	"version" : "1.0",
+	"author" : "VCMI Team",
+	"contact" : "",
+	"modType" : "Mechanics",
+	"keepDisabled" : true,
+	"depends" : [ "test-interface" ],
+	"creatures" : [ ]
+}

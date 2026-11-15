@@ -45,6 +45,8 @@ public:
 	QMap<QString, bool> getModSettings(QString rootModName) const;
 	bool isModUpdateAvailable(QString modName) const;
 	bool isModVisible(QString modName) const;
+	/// Returns installed dependency that does not affect gameplay of a mod that affects gameplay, empty if none
+	QString findNonGameplayDependency(QString modName) const;
 
 	void doEnableMods(QStringList modList);
 	void doDisableMod(QString modname);

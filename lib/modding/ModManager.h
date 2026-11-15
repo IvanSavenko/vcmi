@@ -114,6 +114,9 @@ public:
 	/// Returns true if root mod or any of its submods affects gameplay
 	bool isGameplayRoot(const TModID & rootID) const;
 
+	/// Returns installed dependency that does not affect gameplay of a mod that affects gameplay, if any. Such mod is not loaded
+	std::optional<TModID> findNonGameplayDependency(const TModID & modID) const;
+
 	TModList getAllMods() const;
 };
 
@@ -168,6 +171,9 @@ public:
 	std::map<TModID, bool> getModSettings(const TModID & rootModID) const;
 	bool isModActive(const TModID & modID) const;
 	double getInstalledModSizeMegabytes(const TModID & modName) const;
+
+	/// Returns installed dependency that does not affect gameplay of a mod that affects gameplay, if any. Such mod can not be enabled
+	std::optional<TModID> findNonGameplayDependency(const TModID & modID) const;
 
 	/// Returns mod list for a game library, with currently active mods
 	ModSnapshot createSnapshot() const;

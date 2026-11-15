@@ -1,0 +1,9 @@
+{
+	"name" : "VCMI test interface mod",
+	"description" : "Test-only mod that does not affect gameplay",
+	"version" : "1.0",
+	"author" : "VCMI Team",
+	"contact" : "",
+	"modType" : "Interface",
+	"keepDisabled" : true
+}

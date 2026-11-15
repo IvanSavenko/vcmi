@@ -68,6 +68,12 @@ bool ModStateModel::isModExists(QString modName) const
 	return vstd::contains(modManager->getAllMods(), modName.toStdString());
 }
 
+QString ModStateModel::findNonGameplayDependency(QString modName) const
+{
+	const auto dependency = modManager->findNonGameplayDependency(modName.toStdString());
+	return dependency ? QString::fromStdString(*dependency) : QString();
+}
+
 bool ModStateModel::isModInstalled(QString modName) const
 {
 	return isModExists(modName) && getMod(modName).isInstalled();
