@@ -144,8 +144,19 @@ void ClientLibraries::switchLibrary(std::unique_ptr<const GameLibrary> library)
 		homeLibrary = std::move(previous);
 }
 
+void ClientLibraries::requestReturnToHomeLibrary()
+{
+	returnRequested = isSessionLibrary();
+}
+
+bool ClientLibraries::isReturnRequested() const
+{
+	return returnRequested;
+}
+
 void ClientLibraries::returnToHomeLibrary()
 {
+	returnRequested = false;
 	if(!homeLibrary)
 		return;
 

@@ -20,6 +20,8 @@ class ClientLibraries : boost::noncopyable
 	/// Library of the active preset while a session library is current, null while it is current itself
 	std::unique_ptr<const GameLibrary> homeLibrary;
 
+	std::atomic<bool> returnRequested = false;
+
 	std::thread worker;
 	std::unique_ptr<GameLibrary> loadedLibrary;
 	std::string loadingError;
@@ -42,4 +44,8 @@ public:
 
 	/// Switches back to library of the active preset without loading. Main thread, pregame only
 	void returnToHomeLibrary();
+
+	/// Requests return to library of the active preset once the main menu is the top window again, if a session library is current
+	void requestReturnToHomeLibrary();
+	bool isReturnRequested() const;
 };

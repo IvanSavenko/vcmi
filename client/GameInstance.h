@@ -47,6 +47,8 @@ class GameInstance final : boost::noncopyable, public IGameEngineUser
 	CPlayerInterface * interfaceInstance;
 
 	void pauseAutoSave();
+	/// Switches to library of the active preset, keeping the active tab of the main menu
+	void returnToHomeLibrary();
 
 public:
 	explicit GameInstance(std::unique_ptr<ModManager> modManager);
