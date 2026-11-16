@@ -67,6 +67,7 @@ set(test_SRCS
 		map/ScenarioMetadataTest.cpp
 		map/TinyH3MBuilderTest.cpp
 
+		modding/LibraryReloadTest.cpp
 		modding/ModDescriptionTest.cpp
 		modding/ModManagerTest.cpp
 		modding/ModSnapshotTest.cpp
