@@ -103,6 +103,41 @@ ScenarioListEntry::EStatus ScenarioListEntry::getStatus() const
 	return hasInactiveMods ? EStatus::MODS_INACTIVE : EStatus::COMPATIBLE;
 }
 
+JsonNode ScenarioListEntry::getRequiredMods() const
+{
+	JsonNode result = metadata["mods"];
+	result.Struct();
+
+	// disabled provider of the map format is listed under its full ID, for example hota.mapSupport
+	for(const auto & [modID, status] : mods)
+	{
+		if(status != ModVerificationStatus::DISABLED)
+			continue;
+
+		const std::string rootID = modID.substr(0, modID.find('.'));
+		JsonNode & entry = result[rootID];
+		if(entry.isNull())
+		{
+			entry["name"].String() = rootID;
+			entry["version"].String() = "";
+			entry["submods"].Vector();
+		}
+
+		if(modID == rootID)
+			continue;
+
+		JsonNode submod(modID.substr(rootID.size() + 1));
+		if(!vstd::contains(entry["submods"].Vector(), submod))
+			entry["submods"].Vector().push_back(submod);
+	}
+	return result;
+}
+
+bool ScenarioListEntry::isExactModList() const
+{
+	return type == EType::SAVE;
+}
+
 const JsonNode & ScenarioListEntry::getDescription() const
 {
 	return metadata[type == EType::CAMPAIGN ? "campaign" : "map"];

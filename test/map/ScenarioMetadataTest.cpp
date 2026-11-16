@@ -11,6 +11,7 @@
 
 #include "../../lib/GameLibrary.h"
 #include "../../lib/json/JsonNode.h"
+#include "../../lib/mapping/ScenarioListEntry.h"
 #include "../../lib/mapping/ScenarioMetadata.h"
 #include "../../lib/modding/CModHandler.h"
 #include "../../lib/texts/Languages.h"
@@ -93,6 +94,23 @@ TEST(ScenarioMetadataTest, modsAreGroupedByRootMod)
 	// mod list of a map may contain a submod without its root mod
 	EXPECT_EQ(result["orphan"]["name"].String(), "orphan");
 	EXPECT_EQ(result["orphan"]["submods"][0].String(), "submod");
+}
+
+TEST(ScenarioMetadataTest, requiredModsOfMapIncludeDisabledMapFormatProvider)
+{
+	ScenarioListEntry entry;
+	entry.type = ScenarioListEntry::EType::MAP;
+	entry.metadata["mods"] = makeMetadataMods("1.0", {});
+	entry.mods[testMod] = ModVerificationStatus::VERSION_MISMATCH;
+	entry.mods["provider.mapSupport"] = ModVerificationStatus::DISABLED;
+
+	const JsonNode result = entry.getRequiredMods();
+
+	EXPECT_FALSE(entry.isExactModList());
+	ASSERT_EQ(result.Struct().size(), 3);
+	EXPECT_EQ(result[testMod], entry.metadata["mods"][testMod]);
+	ASSERT_EQ(result["provider"]["submods"].Vector().size(), 1);
+	EXPECT_EQ(result["provider"]["submods"][0].String(), "mapSupport");
 }
 
 TEST(ScenarioMetadataTest, textUsesPreferredLanguage)

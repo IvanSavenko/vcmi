@@ -90,6 +90,11 @@ public:
 
 	EStatus getStatus() const;
 
+	/// Returns mods required to select the entry, as "mods" section of metadata: mods of metadata and disabled provider of the map format
+	JsonNode getRequiredMods() const;
+	/// Returns true if required mods are the complete list of gameplay mods (saves), false if they are a minimum (maps and campaigns)
+	bool isExactModList() const;
+
 	bool isCampaignSave() const;
 	bool isTutorialSave() const;
 	int getHumanPlayersInSave() const;
