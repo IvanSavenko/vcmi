@@ -568,11 +568,12 @@ void CServerHandler::setBattleOnlyModeStartInfo(std::shared_ptr<BattleOnlyModeSt
 	sendLobbyPack(lsbomsui);
 }
 
-void CServerHandler::selectScenario(const ScenarioSelection & selection, std::shared_ptr<CMapGenOptions> mapGenOpts) const
+void CServerHandler::selectScenario(const ScenarioSelection & selection, std::shared_ptr<CMapGenOptions> mapGenOpts, bool reloadMods) const
 {
 	LobbySetMap lsm;
 	lsm.selection = selection;
 	lsm.mapGenOpts = mapGenOpts;
+	lsm.reloadMods = reloadMods;
 	sendLobbyPack(lsm);
 }
 
@@ -734,9 +735,10 @@ void CServerHandler::sendStartGame(bool allowOnlyAI, bool verify) const
 	}
 }
 
-void CServerHandler::startScenarioAfterConnection(const ScenarioSelection & selection)
+void CServerHandler::startScenarioAfterConnection(const ScenarioSelection & selection, bool reloadMods)
 {
 	scenarioToStart = selection;
+	reloadModsForScenarioToStart = reloadMods;
 }
 
 void CServerHandler::installLobbyTexts()
@@ -1053,7 +1055,7 @@ void CServerHandler::debugStartTest(std::string filename, bool save)
 		resetStateForLobby(EStartMode::NEW_GAME, ESelectionScreen::newGame, EServerMode::LOCAL, {});
 		selection.type = ScenarioSelection::EType::MAP;
 	}
-	startScenarioAfterConnection(selection);
+	startScenarioAfterConnection(selection, true);
 
 	if(settings["session"]["donotstartserver"].Bool())
 		connectToServer(getLocalHostname(), getLocalPort());
