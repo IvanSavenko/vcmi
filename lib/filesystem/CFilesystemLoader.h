@@ -39,6 +39,7 @@ public:
 	bool removeResource(const ResourcePath & resourceName) override;
 	std::optional<boost::filesystem::path> getResourceName(const ResourcePath & resourceName) const override;
 	bool updateFilteredFiles(std::function<bool(const std::string &)> filter) override;
+	uint32_t getFileListVersion() const override;
 	std::unordered_set<ResourcePath> getFilteredFiles(std::function<bool(const ResourcePath &)> filter) const override;
 	std::string getFullFileURI(const ResourcePath& resourceName) const override;
 	std::time_t getLastWriteTime(const ResourcePath& resourceName) const override;
@@ -50,6 +51,7 @@ private:
 	// file list is rebuilt only when the game rescans a directory, while lookups happen from
 	// every thread that touches the filesystem - so readers must not exclude each other
 	mutable std::shared_mutex fileListGuard;
+	std::atomic<uint32_t> fileListVersion = 0;
 	std::string mountPoint;
 	
 	size_t recursiveDepth;

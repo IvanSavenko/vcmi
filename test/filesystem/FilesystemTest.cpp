@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 
+#include "../../lib/filesystem/AdapterLoaders.h"
 #include "../../lib/filesystem/CFilesystemLoader.h"
 #include "../../lib/filesystem/ResourcePath.h"
 
@@ -75,6 +76,32 @@ TEST_F(FilesystemTest, FindsFileWithRepeatedExtensionByItsName)
 
 	const ResourcePath storedName(ResourcePath("Test/example.h3m.h3m").getOriginalName(), EResType::MAP);
 	EXPECT_TRUE(loader.existsResource(storedName));
+}
+
+TEST_F(FilesystemTest, ListsSharingLoaderFindFileFoundByRescanOfAnotherList)
+{
+	auto shared = std::make_shared<CFilesystemLoader>("Test/", getDirectory());
+	const auto createList = [&shared]()
+	{
+		// enough children for the list to keep an index
+		auto list = std::make_unique<CFilesystemList>();
+		for(int i = 0; i < 10; ++i)
+			list->addLoader(std::make_shared<CFilesystemList>(), false);
+		list->addLoader(shared, false);
+		return list;
+	};
+	auto first = createList();
+	auto second = createList();
+
+	std::ofstream(getDirectory() / "example.txt") << "example";
+	const auto allMounts = [](const std::string &){ return true; };
+	const ResourcePath resource("Test/example.txt");
+
+	EXPECT_TRUE(first->updateFilteredFiles(allMounts));
+	EXPECT_TRUE(first->existsResource(resource));
+
+	EXPECT_TRUE(second->updateFilteredFiles(allMounts));
+	EXPECT_TRUE(second->existsResource(resource));
 }
 
 TEST(ResourcePathTest, KeepsExtensionOfDifferentType)

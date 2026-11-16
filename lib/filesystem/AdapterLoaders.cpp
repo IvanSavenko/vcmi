@@ -25,10 +25,13 @@ static constexpr size_t indexThreshold = 8;
 
 void CFilesystemList::indexLoader(size_t position)
 {
+	std::lock_guard lock(indexGuard);
+	// version is taken before the file list, so a change made meanwhile is indexed again later
+	indexedVersions.at(position) = loaders.at(position)->getFileListVersion();
+
 	if (loaders.size() <= indexThreshold)
 		return;
 
-	std::lock_guard lock(indexGuard);
 	// filter is used to visit the resources of the child without copying its file list
 	loaders.at(position)->getFilteredFiles([this, position](const ResourcePath & resource)
 	{
@@ -113,18 +116,35 @@ std::set<boost::filesystem::path> CFilesystemList::getResourceNames(const Resour
 	return paths;
 }
 
+bool CFilesystemList::indexChangedLoaders()
+{
+	std::vector<size_t> changedLoaders;
+	{
+		std::shared_lock lock(indexGuard);
+		for(size_t i = 0; i < loaders.size(); ++i)
+			if (loaders[i]->getFileListVersion() != indexedVersions[i])
+				changedLoaders.push_back(i);
+	}
+
+	for(size_t position : changedLoaders)
+		indexLoader(position);
+	return !changedLoaders.empty();
+}
+
 bool CFilesystemList::updateFilteredFiles(std::function<bool(const std::string &)> filter)
 {
-	bool changed = false;
-	for(size_t i = 0; i < loaders.size(); ++i)
-	{
-		if (loaders[i]->updateFilteredFiles(filter))
-		{
-			indexLoader(i);
-			changed = true;
-		}
-	}
-	return changed;
+	// a shared child reports a change only to the first list that rescans it
+	for(const auto & loader : loaders)
+		loader->updateFilteredFiles(filter);
+	return indexChangedLoaders();
+}
+
+uint32_t CFilesystemList::getFileListVersion() const
+{
+	uint32_t result = 0;
+	for(const auto & loader : loaders)
+		result += loader->getFileListVersion();
+	return result;
 }
 
 std::unordered_set<ResourcePath> CFilesystemList::getFilteredFiles(std::function<bool(const ResourcePath &)> filter) const
@@ -191,6 +211,10 @@ void CFilesystemList::addLoader(std::shared_ptr<ISimpleResourceLoader> loader, b
 		writeableLoaders.insert(loader.get());
 
 	loaders.push_back(std::move(loader));
+	{
+		std::lock_guard lock(indexGuard);
+		indexedVersions.push_back(0);
+	}
 
 	if (loaders.size() == indexThreshold + 1)
 		rebuildIndex();
@@ -204,6 +228,10 @@ bool CFilesystemList::removeLoader(ISimpleResourceLoader * loader)
 	{
 		if(loaderIterator->get() == loader)
 		{
+			{
+				std::lock_guard lock(indexGuard);
+				indexedVersions.erase(indexedVersions.begin() + (loaderIterator - loaders.begin()));
+			}
 			loaders.erase(loaderIterator);
 			writeableLoaders.erase(loader);
 			rebuildIndex();

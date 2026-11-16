@@ -76,6 +76,9 @@ public:
 	 */
 	virtual bool updateFilteredFiles(std::function<bool(const std::string &)> filter) = 0;
 
+	/// Returns number that changes whenever list of files of this loader or of its children changes
+	virtual uint32_t getFileListVersion() const = 0;
+
 	/**
 	 * Get list of files that match filter function
 	 *

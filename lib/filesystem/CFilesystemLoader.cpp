@@ -69,7 +69,14 @@ bool CFilesystemLoader::updateFilteredFiles(std::function<bool(const std::string
 	auto newFileList = listFiles(mountPoint, recursiveDepth, initial);
 	bool changed = newFileList != fileList;
 	fileList = std::move(newFileList);
+	if(changed)
+		++fileListVersion;
 	return changed;
+}
+
+uint32_t CFilesystemLoader::getFileListVersion() const
+{
+	return fileListVersion;
 }
 
 std::unordered_set<ResourcePath> CFilesystemLoader::getFilteredFiles(std::function<bool(const ResourcePath &)> filter) const
@@ -122,6 +129,7 @@ bool CFilesystemLoader::createResource(const std::string & requestedFilename, bo
 			return false;
 	}
 	fileList[resID] = filePath;
+	++fileListVersion;
 	return true;
 }
 
@@ -141,6 +149,7 @@ bool CFilesystemLoader::removeResource(const ResourcePath & resourceName)
 	}
 
 	fileList.erase(resource);
+	++fileListVersion;
 	return true;
 }
 
