@@ -155,6 +155,7 @@ Below a list of supported commands, with their arguments wrapped in `<>`
 - `save <filename>` - saves game in given file (at the moment doesn't work)
 - `mp` - on adventure map with a hero selected, shows heroes current movement points, max movement points on land and on water
 - `bonuses` - shows bonuses of currently selected adventure map object
+- `reloadmods` - in main menu, loads all game data again with the active mods; `reloadmods core` loads it without mods that affect gameplay. Leaving the next lobby or game returns to the active mods
 
 #### Extract commands
 

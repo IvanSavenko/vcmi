@@ -16,6 +16,7 @@
 #include "PlayerLocalState.h"
 #include "CServerHandler.h"
 #include "GameEngine.h"
+#include "ClientLibraries.h"
 #include "GameInstance.h"
 #include "battle/BattleFieldController.h"
 #include "battle/BattleInterface.h"
@@ -43,6 +44,8 @@
 #include "../lib/filesystem/Filesystem.h"
 #include "../lib/serializer/GameConnection.h"
 #include "../lib/VCMIDirs.h"
+#include "../lib/modding/ModManager.h"
+#include "../lib/modding/ModSnapshot.h"
 #include "../lib/texts/TextOperations.h"
 #include "../lib/ObstacleHandler.h"
 #include "../lib/logging/VisualLogger.h"
@@ -496,6 +499,37 @@ void ClientCommandManager::handleGenerateAssets()
 	printCommandMessage("All assets generated");
 }
 
+void ClientCommandManager::handleReloadModsCommand(std::istringstream & singleWordBuffer)
+{
+	std::string argument;
+	singleWordBuffer >> argument;
+
+	if(!ENGINE)
+	{
+		printCommandMessage("Mods can be reloaded only with game window", ELogLevel::ERROR);
+		return;
+	}
+
+	ENGINE->dispatchMainThread([argument]()
+	{
+		if(GAME->server().logicConnection || GAME->server().client)
+		{
+			logGlobal->error("Mods can be reloaded only in main menu");
+			return;
+		}
+
+		const ModManager & mods = GAME->libraries().mods();
+		JsonNode noRequiredMods;
+		noRequiredMods.Struct();
+		const ModSnapshot snapshot = argument == "core" ? mods.createSnapshot(noRequiredMods, true) : mods.createSnapshot();
+
+		GAME->libraries().reloadLibrary(snapshot, [](bool success)
+		{
+			GAME->server().showMainMenu();
+		});
+	});
+}
+
 void ClientCommandManager::printCommandMessage(const std::string &commandMessage, ELogLevel::ELogLevel messageType)
 {
 	switch(messageType)
@@ -617,6 +651,9 @@ void ClientCommandManager::processCommand(const std::string & message, bool call
 
 	else if(message=="generate assets")
 		handleGenerateAssets();
+
+	else if(commandName == "reloadmods")
+		handleReloadModsCommand(singleWordBuffer);
 
 	else
 	{
