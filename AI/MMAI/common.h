@@ -118,16 +118,6 @@ inline bool isMMAIAutoVerify()
 	return value;
 }
 
-inline bool isMMAILegacyValue()
-{
-	static const bool value = []
-	{
-		const char * envvar = std::getenv("MMAI_LEGACY_VALUE");
-		return envvar != nullptr && std::strcmp(envvar, "1") == 0;
-	}();
-	return value;
-}
-
 // Value is percentage of stack's HP
 inline int MMAIMoatfixTrigger()
 {
