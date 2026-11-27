@@ -198,6 +198,12 @@ These are fields that are present only in local mod.json file
 		"config/rumors.json"
 	],
 
+	// List of configuration files for battle actions of units
+	"battleActions" :
+	[
+		"config/battleActions.json"
+	],
+
 	// List of RMG templates defined in this mod
 	"templates" :
 	[

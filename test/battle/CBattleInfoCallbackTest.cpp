@@ -15,6 +15,9 @@
 #include "../../lib/battle/CUnitState.h"
 #include "../../lib/battle/actions/AutomaticActions.h"
 #include "../../lib/callback/CBattleCallback.h"
+#include "../../lib/GameLibrary.h"
+
+#include <vcmi/scripting/Service.h>
 
 #include <vstd/RNG.h>
 
@@ -22,6 +25,7 @@
 #include "mock/mock_battle_IBattleState.h"
 #include "mock/mock_battle_Unit.h"
 #include "mock/mock_scripting_Pool.h"
+#include "mock/mock_Environment.h"
 
 using namespace battle;
 using namespace testing;
@@ -206,6 +210,17 @@ public:
 	{
 		ON_CALL(battleMock, getUnitsIf(_)).WillByDefault(Invoke(&unitsFake, &UnitsFake::getUnitsIf));
 	}
+
+	/// Lets the battle run action type scripts, which collecting the options of a unit does
+	void enableScripts()
+	{
+		scriptPool = LIBRARY->scripts()->createPoolInstance(&scriptEnvironment);
+		ON_CALL(battleMock, getScriptContextPool()).WillByDefault(ReturnRef(*scriptPool));
+	}
+
+private:
+	NiceMock<EnvironmentMock> scriptEnvironment;
+	std::unique_ptr<scripting::Pool> scriptPool;
 };
 
 class AttackableHexesTest : public CBattleInfoCallbackTest
@@ -777,6 +792,7 @@ TEST_F(AttackableHexesTest, BerserkShooterAttacksAdjacentUnitItCanNotShootInMele
 	EXPECT_CALL(distant, unitId()).WillRepeatedly(Return(3));
 
 	startBattle();
+	enableScripts();
 	redirectUnitsToFake();
 	EXPECT_CALL(battleMock, getSidePlayer(Eq(BattleSide::ATTACKER))).WillRepeatedly(Return(PlayerColor(0)));
 	EXPECT_CALL(battleMock, getSidePlayer(Eq(BattleSide::DEFENDER))).WillRepeatedly(Return(PlayerColor(1)));
@@ -796,6 +812,7 @@ TEST_F(AttackableHexesTest, BerserkShooterShootsNearestAlly)
 	EXPECT_CALL(enemy, unitId()).WillRepeatedly(Return(3));
 
 	startBattle();
+	enableScripts();
 	redirectUnitsToFake();
 	EXPECT_CALL(battleMock, getSidePlayer(Eq(BattleSide::ATTACKER))).WillRepeatedly(Return(PlayerColor(0)));
 	EXPECT_CALL(battleMock, getSidePlayer(Eq(BattleSide::DEFENDER))).WillRepeatedly(Return(PlayerColor(1)));

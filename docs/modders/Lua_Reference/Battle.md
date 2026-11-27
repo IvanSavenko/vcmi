@@ -216,3 +216,44 @@ Returns the hex used by the tower shooter for the given wall section.
 - param `part`: [`WallPart`](WallPart.md) — Wall section whose tower-shooter hex is queried.
 
 - returns [`BattleHex`](BattleHex.md)
+
+### canUnitAct
+
+True if the unit exists, is alive and may act now.
+
+- param `unit`: [`Unit`](Unit.md) — Unit to check, or nil.
+- param `problem`: [`SpellProblem`](SpellProblem.md) — Receives the reason when the unit can not act.
+
+- returns `boolean`
+
+### getFirstAidHealValue
+
+Returns the health that first aid of the healer restores to the target.
+
+- param `healer`: [`Unit`](Unit.md) — Unit that applies first aid. The skills of the hero of its army raise the value.
+- param `target`: [`Unit`](Unit.md) — Unit that would be healed.
+
+- returns `integer`
+
+### canCastAt
+
+True if the unit can cast the spell at the target. Accepts units immune to the spell, on which the spell has no effect.
+
+- param `caster`: [`Unit`](Unit.md) — Unit that would cast the spell.
+- param `spell`: [`Spell`](Spell.md) — Spell to check.
+- param `mode`: [`SpellMode`](SpellMode.md) — Way the spell would be cast, from `ENUM.SpellMode`.
+- param `target`: `Destination[]` — Destinations the spell would be aimed at.
+- param `problem`: [`SpellProblem`](SpellProblem.md) — Receives the reason when the spell can not be cast, or nil.
+
+- returns `boolean`
+
+### isReceptive
+
+True if the spell cast by the unit would affect the given unit.
+
+- param `caster`: [`Unit`](Unit.md) — Unit that would cast the spell.
+- param `spell`: [`Spell`](Spell.md) — Spell to check.
+- param `mode`: [`SpellMode`](SpellMode.md) — Way the spell would be cast, from `ENUM.SpellMode`.
+- param `unit`: [`Unit`](Unit.md) — Unit that would be affected.
+
+- returns `boolean`

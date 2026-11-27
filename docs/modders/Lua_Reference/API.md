@@ -4,9 +4,14 @@ Auto-generated from C++ host bindings via `vcmiserver --export-lua-docs`. Do not
 
 ## Classes
 
+- [ActionContext](ActionContext.md)
+- [ActionOption](ActionOption.md)
+- [ActionPreview](ActionPreview.md)
 - [AdventureServer](AdventureServer.md)
 - [Artifact](Artifact.md)
 - [Battle](Battle.md)
+- [BattleAction](BattleAction.md)
+- [BattleActionEnvironment](BattleActionEnvironment.md)
 - [BattleHex](BattleHex.md)
 - [BattleHexArray](BattleHexArray.md)
 - [BattleServer](BattleServer.md)
@@ -60,3 +65,5 @@ Auto-generated from C++ host bindings via `vcmiserver --export-lua-docs`. Do not
 - [PlayerColor](PlayerColor.md)
 - [PlayerStatus](PlayerStatus.md)
 - [ComponentType](ComponentType.md)
+- [SpellMode](SpellMode.md)
+- [CombatEvent](CombatEvent.md)

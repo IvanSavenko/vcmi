@@ -50,6 +50,7 @@ public:
 	std::shared_ptr<ICombatEventScript> createCombatEventScript(const std::string & scriptId) const override;
 	std::shared_ptr<IDamageCalculatorScript> createDamageCalculatorScript(const std::string & scriptId) const override;
 	std::shared_ptr<spells::effects::Effect> createSpellEffect(const std::string & scriptId) const override;
+	std::shared_ptr<const BattleActionType> createBattleActionType(const std::string & scriptId, BattleActionID id, const ScriptedBattleActionConfig & config) const override;
 
 private:
 	LuaScriptStore & store;

@@ -38,6 +38,7 @@
 #include "../TerrainHandler.h"
 #include "../MapLayerHandler.h"
 #include "../entities/RumorTypeHandler.h"
+#include "../battle/actions/BattleActionTypeHandler.h"
 #include "../json/JsonUtils.h"
 #include "../mapObjectConstructors/CObjectClassesHandler.h"
 #include "../rmg/CRmgTemplateStorage.h"
@@ -289,6 +290,7 @@ void CContentHandler::init()
 	handlers.insert(std::make_pair("resources", ContentTypeHandler(context, context.lib.resourceTypeHandler.get(), "resources")));
 	handlers.insert(std::make_pair("mapLayers", ContentTypeHandler(context, context.lib.mapLayerHandler.get(), "mapLayer")));
 	handlers.insert(std::make_pair("rumors", ContentTypeHandler(context, context.lib.rumorHandler.get(), "rumor")));
+	handlers.insert(std::make_pair("battleActions", ContentTypeHandler(context, context.lib.battleActionTypeHandler.get(), "battleAction")));
 }
 
 std::vector<std::string> CContentHandler::getContentTypeNames() const

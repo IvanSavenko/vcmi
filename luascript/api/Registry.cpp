@@ -30,6 +30,8 @@
 #include "battle/UnitState.h"
 #include "battle/BattleHex.h"
 #include "battle/BattleHexArray.h"
+#include "battle/BattleActionEnvironment.h"
+#include "battle/BattleActionPayloads.h"
 #include "battle/Obstacle.h"
 #include "spells/Mechanics.h"
 #include "spells/Problem.h"
@@ -91,6 +93,7 @@ Registry::Registry()
 	registerPrivate<IBattleInfoCallbackProxy>();
 	registerPrivate<IGameInfoCallbackProxy>();
 	registerPrivate<ServerCallbackProxy>();
+	registerPrivate<BattleActionEnvironmentProxy>();
 	registerPrivate<AdventureServerProxy>();
 
 	registerPrivate<MapObjectProxy>();
@@ -104,6 +107,10 @@ Registry::Registry()
 	registerSerializable<BonusFilter>();
 	registerSerializable<SpellObstacleDescriptor>();
 	registerSerializable<TargetStepDescriptor>();
+	registerSerializable<ActionOptionPayload>();
+	registerSerializable<ActionContextPayload>();
+	registerSerializable<BattleActionPayload>();
+	registerSerializable<ActionPreviewDescriptor>();
 
 	// Aliases for C++ types that have no dedicated proxy but appear in binding signatures.
 	registerLuaName<CBattleInfoCallback>("Battle");
@@ -129,6 +136,8 @@ Registry::Registry()
 	registerLuaName<PrimarySkill>("PrimarySkill");
 	registerLuaName<PlayerColor>("PlayerColor");
 	registerLuaName<EPlayerStatus>("PlayerStatus");
+	registerLuaName<::spells::Mode>("SpellMode");
+	registerLuaName<CombatEventType>("CombatEvent");
 
 	// EWallState has no enum group of its own and is exposed as integer to Lua
 	registerLuaName<EWallState>("integer");

@@ -226,4 +226,19 @@ EnumGroup<BonusLimitEffect> Enums::exportBonusLimitEffect() const
 	}};
 }
 
+EnumGroup<spells::Mode> Enums::exportSpellMode() const
+{
+	return {{
+		{ "creatureActive",  spells::Mode::CREATURE_ACTIVE,   "Active spell of a unit, cast instead of its attack." },
+		{ "spellLikeAttack", spells::Mode::SPELL_LIKE_ATTACK, "Ability of a unit that works like a spell, such as first aid or a catapult shot." },
+	}};
+}
+
+EnumGroup<CombatEventType> Enums::exportCombatEvent() const
+{
+	return {{
+		{ "unitSpellcast", CombatEventType::UNIT_SPELLCAST, "A unit cast its active spell." },
+	}};
+}
+
 }

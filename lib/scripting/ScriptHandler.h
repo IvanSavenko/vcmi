@@ -24,6 +24,7 @@ class ScriptHandler final : public IHandlerBase, public ScriptService
 public:
 	const ScriptTypeDescription & getById(ScriptID scriptID) const override;
 	std::shared_ptr<spells::effects::Effect> createSpellEffect(ScriptID scriptID) const override;
+	std::shared_ptr<const BattleActionType> createBattleActionType(ScriptID scriptID, BattleActionID id, const ScriptedBattleActionConfig & config) const override;
 	const IDamageCalculatorScript * getDamageCalculator() const override;
 
 	void prepareParameters(ScriptID scriptID, JsonNode & parameters, IIdentifierResolver & resolver) const override;

@@ -97,3 +97,15 @@ Whether a player is still playing, has won, or has lost.
 Kinds of icons shown in message windows, used by Component `type`.
 
 - type: [`ComponentType`](ComponentType.md)
+
+### SpellMode
+
+Ways a spell is cast, used by BattleActionEnvironment `castSpell`.
+
+- type: [`SpellMode`](SpellMode.md)
+
+### CombatEvent
+
+Combat events, used by BattleActionEnvironment `fireCombatEvent`.
+
+- type: [`CombatEvent`](CombatEvent.md)

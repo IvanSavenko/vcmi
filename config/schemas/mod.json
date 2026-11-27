@@ -401,6 +401,10 @@
 			"description" : "List of configuration files for tavern rumors",
 			"$ref" : "#/definitions/fileListOrObject"
 		},
+		"battleActions" : {
+			"description" : "List of configuration files for battle actions",
+			"$ref" : "#/definitions/fileListOrObject"
+		},
 		"templates" : {
 			"description" : "List of configuration files for RMG templates",
 			"$ref" : "#/definitions/fileListOrObject"

@@ -1,0 +1,40 @@
+/*
+ * LuaBattleActionType.h, part of VCMI engine
+ *
+ * Authors: listed in file AUTHORS in main folder
+ *
+ * License: GNU General Public License v2.0 or later
+ * Full text of license available in license.txt file, in main folder
+ *
+ */
+#pragma once
+
+#include "../lib/battle/actions/ScriptedBattleActionType.h"
+
+namespace scripting
+{
+class LuaContext;
+class LuaScriptInstance;
+
+/// Battle action type that forwards its rules to the functions of a Lua script of the same name
+class LuaBattleActionType final : public ScriptedBattleActionType
+{
+	const LuaScriptInstance * script;
+
+	std::shared_ptr<LuaContext> contextOf(const CBattleInfoCallback & battle) const;
+
+protected:
+	bool isAvailable(const CBattleInfoCallback & battle, const battle::Unit & actor, const ActionOption & option) const override;
+
+public:
+	LuaBattleActionType(const LuaScriptInstance * script, BattleActionID id, ScriptedBattleActionConfig config);
+	~LuaBattleActionType() override;
+
+	int getPriority(const CBattleInfoCallback & battle, const ActionOption & option, const battle::Unit & actor, const battle::Unit * target) const override;
+	ActionPreview preview(const IGameInfoCallback & game, const CBattleInfoCallback & battle, const ActionOption & option, const ActionContext & context) const override;
+	std::optional<battle::Target> buildTarget(const CBattleInfoCallback & battle, const ActionOption & option, const ActionContext & context) const override;
+	bool validate(const IGameInfoCallback & game, const CBattleInfoCallback & battle, const BattleAction & action, spells::Problem & problem) const override;
+	void apply(IBattleActionEnvironment & env, const CBattleInfoCallback & battle, const BattleAction & action) const override;
+};
+
+}

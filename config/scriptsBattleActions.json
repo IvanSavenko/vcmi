@@ -1,0 +1,8 @@
+{
+	"healAction" : {
+		"implements" : "battleAction",
+		"script" : "battleAction/heal",
+		"patches" : [ ],
+		"schema" : { "properties" : {}, "additionalProperties" : false }
+	}
+}

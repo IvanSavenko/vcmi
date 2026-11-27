@@ -1,0 +1,56 @@
+{
+	"type" : "object",
+	"$schema" : "http://json-schema.org/draft-04/schema",
+	"title" : "VCMI battle action format",
+	"description" : "Format used to define battle actions of units in VCMI",
+	"required" : [ "script" ],
+	"additionalProperties" : false,
+	"properties" : {
+		"index" : {
+			"type" : "number",
+			"description" : "Fixed number of a built-in action. Reserved for the core mod"
+		},
+		"script" : {
+			"type" : "string",
+			"description" : "Identifier of the battleAction script with the rules of the action"
+		},
+		"priority" : {
+			"type" : "number",
+			"description" : "Order in which the client tries the actions of a unit for a hovered hex, lower first. Used when the script returns no priority of its own"
+		},
+		"button" : {
+			"type" : "object",
+			"additionalProperties" : false,
+			"required" : [ "order", "icon", "tooltip" ],
+			"description" : "Button of the unit action panel that selects the action",
+			"properties" : {
+				"order" : {
+					"type" : "number",
+					"description" : "Position of the button in the panel, lower first"
+				},
+				"icon" : {
+					"type" : "string",
+					"format" : "imageFile",
+					"description" : "Icon of the button"
+				},
+				"tooltip" : {
+					"type" : "string",
+					"description" : "Tooltip of the button, or identifier of existing text prefixed with '@'"
+				}
+			}
+		},
+		"turnStatus" : {
+			"type" : "string",
+			"enum" : [ "acted", "waiting", "defended", "keep" ],
+			"description" : "Turn status of the unit once the action starts. 'keep' leaves the status as it is. Default is 'acted'"
+		},
+		"usesUnitSpellcast" : {
+			"type" : "boolean",
+			"description" : "The action uses up the spellcasting of the unit for the turn"
+		},
+		"tacticsAction" : {
+			"type" : "boolean",
+			"description" : "The action is allowed during the tactics phase"
+		}
+	}
+}

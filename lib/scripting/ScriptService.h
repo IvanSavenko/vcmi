@@ -16,6 +16,8 @@
 
 class ICombatEventScript;
 class IDamageCalculatorScript;
+class BattleActionType;
+struct ScriptedBattleActionConfig;
 class JsonNode;
 class TextIdentifier;
 class IIdentifierResolver;
@@ -42,6 +44,7 @@ public:
 	virtual std::shared_ptr<ICombatEventScript> createCombatEventScript(const std::string & scriptId) const = 0;
 	virtual std::shared_ptr<IDamageCalculatorScript> createDamageCalculatorScript(const std::string & scriptId) const = 0;
 	virtual std::shared_ptr<spells::effects::Effect> createSpellEffect(const std::string & scriptId) const = 0;
+	virtual std::shared_ptr<const BattleActionType> createBattleActionType(const std::string & scriptId, BattleActionID id, const ScriptedBattleActionConfig & config) const = 0;
 };
 
 class ScriptService : boost::noncopyable
@@ -56,6 +59,9 @@ public:
 
 	/// Fresh spell effect instance - the caller initializes it with its own parameters.
 	virtual std::shared_ptr<spells::effects::Effect> createSpellEffect(ScriptID scriptID) const = 0;
+
+	/// Battle action type with the id, with its rules in the script. Throws if the scripting host can not provide one
+	virtual std::shared_ptr<const BattleActionType> createBattleActionType(ScriptID scriptID, BattleActionID id, const ScriptedBattleActionConfig & config) const = 0;
 
 	/// Validates the parameters of a single instance of this script against the schema it declares.
 	/// Strings listed in stringRegistrations stay as they are, since only library content can register strings

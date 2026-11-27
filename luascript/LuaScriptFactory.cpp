@@ -11,6 +11,7 @@
 
 #include "LuaScriptFactory.h"
 
+#include "LuaBattleActionType.h"
 #include "LuaCombatEventScript.h"
 #include "LuaDamageCalculatorScript.h"
 #include "LuaScriptInstance.h"
@@ -67,6 +68,11 @@ std::shared_ptr<IDamageCalculatorScript> LuaScriptFactory::createDamageCalculato
 std::shared_ptr<spells::effects::Effect> LuaScriptFactory::createSpellEffect(const std::string & scriptId) const
 {
 	return std::make_shared<spells::effects::LuaSpellEffect>(store.get(scriptId));
+}
+
+std::shared_ptr<const BattleActionType> LuaScriptFactory::createBattleActionType(const std::string & scriptId, BattleActionID id, const ScriptedBattleActionConfig & config) const
+{
+	return std::make_shared<LuaBattleActionType>(store.get(scriptId), id, config);
 }
 
 }

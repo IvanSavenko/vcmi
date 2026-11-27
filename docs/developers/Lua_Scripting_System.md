@@ -83,7 +83,8 @@ GameLibrary::initializeLibrary
         ├── LuaScriptFactory  (the script factory, registered with ScriptService)
         │     ├── createSpellEffect()             -> LuaSpellEffect
         │     ├── createCombatEventScript()       -> LuaCombatEventScript
-        │     └── createDamageCalculatorScript()  -> LuaDamageCalculatorScript
+        │     ├── createDamageCalculatorScript()  -> LuaDamageCalculatorScript
+        │     └── createBattleActionType()        -> LuaBattleActionType
         ├── createPoolInstance()
         │     └── LuaScriptPool  (owned by CGameState)
         │           └── LuaContext  (one per script, per thread)
@@ -242,7 +243,7 @@ Bindings shared by several proxies live in leaf-templated binding groups in `api
 
 ### LuaSpellEffect and LuaScriptFactory
 
-`LuaScriptFactory` is the single factory `ScriptService` knows. When `ScriptHandler` loads a script it calls `initialize(description)`, which stores the sources in `LuaScriptStore`. Adding a second language means replacing this factory, or teaching it to dispatch - a script itself declares only what it implements, never what it is written in. A script declaring `"implements" : "spellEffect"` is then wrapped into a `LuaSpellEffect` by `createSpellEffect`, once per spell that uses it; one declaring `"implements" : "combatEvent"` is wrapped once into a shared, stateless `LuaCombatEventScript`; one declaring `"implements" : "damageCalculator"` is wrapped into a `LuaDamageCalculatorScript`.
+`LuaScriptFactory` is the single factory `ScriptService` knows. When `ScriptHandler` loads a script it calls `initialize(description)`, which stores the sources in `LuaScriptStore`. Adding a second language means replacing this factory, or teaching it to dispatch - a script itself declares only what it implements, never what it is written in. A script declaring `"implements" : "spellEffect"` is then wrapped into a `LuaSpellEffect` by `createSpellEffect`, once per spell that uses it; one declaring `"implements" : "combatEvent"` is wrapped once into a shared, stateless `LuaCombatEventScript`; one declaring `"implements" : "damageCalculator"` is wrapped into a `LuaDamageCalculatorScript`; one declaring `"implements" : "battleAction"` is wrapped by `createBattleActionType` into a `LuaBattleActionType`, once per entry of the `battleActions` section that names it. `BattleActionTypeHandler` owns these types next to the built-in C++ ones.
 
 `LuaSpellEffect` implements the full `spells::effects::Effect` interface by resolving the active `LuaContext` from the current `Mechanics` object and delegating each virtual method call to the correspondingly named Lua function:
 

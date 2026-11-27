@@ -30,6 +30,13 @@
 #include "../../../lib/battle/CObstacleInstance.h"
 #include "../../../lib/BattleFieldHandler.h"
 #include "../../../lib/mapObjects/CGTownInstance.h"
+#include "../../../lib/battle/actions/BattleActionType.h"
+#include "../../../lib/spells/CSpell.h"
+#include "../../../lib/spells/ISpellMechanics.h"
+#include "../../../lib/spells/Problem.h"
+
+#include "../library/Spell.h"
+#include "../spells/Problem.h"
 
 namespace scripting::api
 {
@@ -161,6 +168,69 @@ void IBattleInfoCallbackProxy::registerMethods(MethodRegistrar & R)
 	R.function<&IBattleInfoCallbackProxy::getTowerShooterHex>("getTowerShooterHex",
 		{{"part", "Wall section whose tower-shooter hex is queried."}}, {},
 		"Returns the hex used by the tower shooter for the given wall section.");
+	R.function<&IBattleInfoCallbackProxy::canUnitAct>("canUnitAct",
+		{
+			{"unit",    "Unit to check, or nil."},
+			{"problem", "Receives the reason when the unit can not act."}
+		}, {},
+		"True if the unit exists, is alive and may act now.");
+	R.function<&IBattleInfoCallbackProxy::getFirstAidHealValue>("getFirstAidHealValue",
+		{
+			{"healer", "Unit that applies first aid. The skills of the hero of its army raise the value."},
+			{"target", "Unit that would be healed."}
+		}, {},
+		"Returns the health that first aid of the healer restores to the target.");
+	R.function<&IBattleInfoCallbackProxy::canCastAt>("canCastAt",
+		{
+			{"caster",  "Unit that would cast the spell."},
+			{"spell",   "Spell to check."},
+			{"mode",    "Way the spell would be cast, from `ENUM.SpellMode`."},
+			{"target",  "Destinations the spell would be aimed at."},
+			{"problem", "Receives the reason when the spell can not be cast, or nil."}
+		}, {},
+		"True if the unit can cast the spell at the target. Accepts units immune to the spell, on which the spell has no effect.");
+	R.function<&IBattleInfoCallbackProxy::isReceptive>("isReceptive",
+		{
+			{"caster", "Unit that would cast the spell."},
+			{"spell",  "Spell to check."},
+			{"mode",   "Way the spell would be cast, from `ENUM.SpellMode`."},
+			{"unit",   "Unit that would be affected."}
+		}, {},
+		"True if the spell cast by the unit would affect the given unit.");
+}
+
+bool IBattleInfoCallbackProxy::canUnitAct(const IBattleInfoCallback & object, const battle::Unit * unit, spells::Problem & problem)
+{
+	const auto & cb = dynamic_cast<const CBattleInfoCallback &>(object);
+	return BattleActionType::checkUnitCanAct(cb, unit, problem);
+}
+
+int64_t IBattleInfoCallbackProxy::getFirstAidHealValue(const IBattleInfoCallback & object, const battle::Unit & healer, const battle::Unit & target)
+{
+	const auto & cb = dynamic_cast<const CBattleInfoCallback &>(object);
+	return cb.getFirstAidHealValue(cb.battleGetOwnerHero(&healer), &target);
+}
+
+static std::unique_ptr<spells::Mechanics> getUnitSpellMechanics(const CBattleInfoCallback & battle, const battle::Unit & caster, const spells::Spell & spell, spells::Mode mode)
+{
+	const CSpell * spellObject = spell.getId().toSpell();
+	const spells::BattleCast cast(&battle, &caster, mode, spellObject);
+	return spellObject->battleMechanics(&cast);
+}
+
+bool IBattleInfoCallbackProxy::canCastAt(const IBattleInfoCallback & object, const battle::Unit & caster, const spells::Spell & spell, spells::Mode mode, const std::vector<battle::Destination> & target, spells::Problem * problem)
+{
+	const auto & cb = dynamic_cast<const CBattleInfoCallback &>(object);
+	const auto mechanics = getUnitSpellMechanics(cb, caster, spell, mode);
+	if(problem)
+		return mechanics->canBeCastAt(target, *problem);
+	return mechanics->canBeCastAt(target);
+}
+
+bool IBattleInfoCallbackProxy::isReceptive(const IBattleInfoCallback & object, const battle::Unit & caster, const spells::Spell & spell, spells::Mode mode, const battle::Unit & unit)
+{
+	const auto & cb = dynamic_cast<const CBattleInfoCallback &>(object);
+	return getUnitSpellMechanics(cb, caster, spell, mode)->isReceptive(&unit);
 }
 
 bool IBattleInfoCallbackProxy::isAccessibleForUnit(const IBattleInfoCallback & object, const battle::Unit & unit, BattleHex hex)

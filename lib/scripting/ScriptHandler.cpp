@@ -31,6 +31,8 @@ ScriptKind parseKind(const std::string & name)
 		return ScriptKind::COMBAT_EVENT;
 	if(name == "damageCalculator")
 		return ScriptKind::DAMAGE_CALCULATOR;
+	if(name == "battleAction")
+		return ScriptKind::BATTLE_ACTION;
 
 	return ScriptKind::INVALID;
 }
@@ -51,6 +53,17 @@ std::shared_ptr<spells::effects::Effect> ScriptHandler::createSpellEffect(Script
 		logMod->error("Scripting host can not provide spell effects, required by '%s'!", description.scriptId);
 
 	return effect;
+}
+
+std::shared_ptr<const BattleActionType> ScriptHandler::createBattleActionType(ScriptID scriptID, BattleActionID id, const ScriptedBattleActionConfig & config) const
+{
+	const ScriptTypeDescription & description = getById(scriptID);
+	auto type = factory->createBattleActionType(description.scriptId, id, config);
+
+	if(!type)
+		throw std::runtime_error("Scripting host can not provide battle action types, required by '" + description.scriptId + "'!");
+
+	return type;
 }
 
 const IDamageCalculatorScript * ScriptHandler::getDamageCalculator() const

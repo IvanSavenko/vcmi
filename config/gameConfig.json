@@ -106,7 +106,8 @@
 	"scripts" :
 	[
 		"config/scriptsSpells.json",
-		"config/scriptsCombat.json"
+		"config/scriptsCombat.json",
+		"config/scriptsBattleActions.json"
 	],
 	"skills" :
 	[
@@ -147,6 +148,10 @@
 	"rumors":
 	[
 		"config/rumors.json"
+	],
+	"battleActions":
+	[
+		"config/battleActions.json"
 	],
 
 	"settings":

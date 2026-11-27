@@ -1,0 +1,7 @@
+{
+	"heal" : {
+		"index" : 13,
+		"script" : "healAction",
+		"priority" : 12
+	}
+}

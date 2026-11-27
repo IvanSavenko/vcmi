@@ -18,6 +18,7 @@ Every script is declared in the `scripts` section of a mod. `implements` selects
 - [Spell Effect Scripts](Spell_Effect_Scripts.md) - `"implements" : "spellEffect"`, an effect of a spell, such as the built-in `core:damage` or `core:summon`
 - [Combat Event Scripts](Combat_Event_Scripts.md) - `"implements" : "combatEvent"`, a reaction to events happening to a unit in combat, such as Fire Shield or Death Stare
 - [Damage Calculator Script](Damage_Calculator_Script.md) - `"implements" : "damageCalculator"`, attack damage calculation. One instance handles the game, and mods change its rules with patches
+- [Battle Action Scripts](Battle_Action_Scripts.md) - `"implements" : "battleAction"`, the rules of a battle action of a unit, such as the built-in `core:heal`
 
 ## Script globals
 
@@ -42,7 +43,7 @@ Fields every script declares, whatever its type:
 - `patches` - sources applied over the base script in list order. Declare an empty list to allow other mods to append patches
 - `schema` - json schema for script parameters. Validation errors identify the entity with invalid parameters. Use an empty, closed schema when the script takes no parameters
 
-A `damageCalculator` script has no additional fields and is not shown to the player.
+A `damageCalculator` or `battleAction` script has no additional fields and is not shown to the player.
 
 Fields a `combatEvent` script declares on top of those:
 

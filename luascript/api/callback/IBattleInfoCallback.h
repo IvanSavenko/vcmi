@@ -12,6 +12,7 @@
 
 #include <vcmi/scripting/Service.h>
 #include "../../../lib/battle/IBattleInfoCallback.h"
+#include "../../../lib/battle/Destination.h"
 
 #include "../../LuaWrapper.h"
 #include "../MethodRegistrar.h"
@@ -20,6 +21,13 @@ struct CObstacleInstance;
 class CBattleInfoCallback;
 class CGTownInstance;
 class Creature;
+
+namespace spells
+{
+class Problem;
+class Spell;
+enum class Mode;
+}
 
 namespace scripting::api
 {
@@ -60,6 +68,10 @@ public:
 	static BattleHex wallPartToBattleHex(const IBattleInfoCallback & object, EWallPart part);
 	static EWallPart hexToWallPart(const IBattleInfoCallback & object, BattleHex hex);
 	static BattleHex getTowerShooterHex(const IBattleInfoCallback & object, EWallPart part);
+	static bool canUnitAct(const IBattleInfoCallback & object, const battle::Unit * unit, spells::Problem & problem);
+	static int64_t getFirstAidHealValue(const IBattleInfoCallback & object, const battle::Unit & healer, const battle::Unit & target);
+	static bool canCastAt(const IBattleInfoCallback & object, const battle::Unit & caster, const spells::Spell & spell, spells::Mode mode, const std::vector<battle::Destination> & target, spells::Problem * problem);
+	static bool isReceptive(const IBattleInfoCallback & object, const battle::Unit & caster, const spells::Spell & spell, spells::Mode mode, const battle::Unit & unit);
 };
 
 }

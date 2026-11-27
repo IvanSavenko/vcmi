@@ -7,6 +7,7 @@ set(lualib_SRCS
 		LuaModule.cpp
 		LuaScriptInstance.cpp
 		LuaContext.cpp
+		LuaBattleActionType.cpp
 		LuaScriptPool.cpp
 		LuaScriptFactory.cpp
 		LuaSpellEffect.cpp
@@ -21,6 +22,8 @@ set(lualib_SRCS
 		api/adventure/TownInstance.cpp
 		api/adventure/StackInstance.cpp
 
+		api/battle/BattleActionEnvironment.cpp
+		api/battle/BattleActionPayloads.cpp
 		api/battle/Unit.cpp
 		api/battle/UnitState.cpp
 		api/battle/BattleHexArray.cpp
@@ -63,6 +66,7 @@ set(lualib_HDRS
 		LuaReference.h
 		LuaMapEventDispatcher.h
 		LuaModule.h
+		LuaBattleActionType.h
 		LuaScriptInstance.h
 		LuaContext.h
 		LuaSpellEffect.h
@@ -80,6 +84,8 @@ set(lualib_HDRS
 		api/adventure/TownInstance.h
 		api/adventure/StackInstance.h
 
+		api/battle/BattleActionEnvironment.h
+		api/battle/BattleActionPayloads.h
 		api/battle/Unit.h
 		api/battle/UnitState.h
 		api/battle/BattleHexArray.h

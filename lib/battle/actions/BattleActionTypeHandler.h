@@ -9,19 +9,29 @@
  */
 #pragma once
 
-class BattleActionType;
-class LibraryLoadContext;
+#include "../../IHandlerBase.h"
 
-/// Registry of battle action types, with the identifiers that name them
-class DLL_LINKAGE BattleActionTypeHandler : boost::noncopyable
+class BattleActionType;
+
+/// Registry of battle action types, with the identifiers that name them. Loads the scripted types of the battleActions config section
+class DLL_LINKAGE BattleActionTypeHandler final : public IHandlerBase
 {
 	std::vector<const BattleActionType *> typesById;
 	/// in registration order, which is the order of collected options
 	std::vector<const BattleActionType *> types;
 	std::vector<std::string> jsonKeys;
+	std::vector<std::shared_ptr<const BattleActionType>> scriptedTypes;
+
+	void loadScriptedType(LibraryLoadContext & context, const std::string & scope, const std::string & name, const JsonNode & data, size_t index);
 
 public:
 	explicit BattleActionTypeHandler(LibraryLoadContext & context);
+	~BattleActionTypeHandler() override;
+
+	std::vector<JsonNode> loadLegacyData(LibraryLoadContext & context) override;
+	void loadObject(LibraryLoadContext & context, const std::string & scope, const std::string & name, const JsonNode & data) override;
+	void loadObject(LibraryLoadContext & context, const std::string & scope, const std::string & name, const JsonNode & data, size_t index) override;
+	void afterLoadFinalization(LibraryLoadContext & context) override;
 
 	/// Type with the id, or nullptr if no type has it
 	const BattleActionType * getById(int32_t id) const;

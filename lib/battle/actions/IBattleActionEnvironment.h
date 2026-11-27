@@ -12,6 +12,8 @@
 #include "../Destination.h"
 #include "../../constants/Enumerations.h"
 
+#include <vcmi/scripting/ApiTags.h>
+
 struct Bonus;
 class CSpell;
 class BattleHex;
@@ -43,7 +45,7 @@ struct UnitMoveResult
 };
 
 /// Server operations available to a battle action while it is applied, bound to the battle of the action
-class DLL_LINKAGE IBattleActionEnvironment
+class DLL_LINKAGE IBattleActionEnvironment : public scripting::ApiRawPointer<IBattleActionEnvironment>
 {
 public:
 	virtual ~IBattleActionEnvironment() = default;

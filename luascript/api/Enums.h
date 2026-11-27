@@ -62,6 +62,8 @@ class Enums : public scripting::ApiSerializable<Enums>
 	EnumGroup<PlayerColor> exportPlayerColor() const;
 	EnumGroup<EPlayerStatus> exportPlayerStatus() const;
 	EnumGroup<ComponentType> exportComponentType() const;
+	EnumGroup<spells::Mode> exportSpellMode() const;
+	EnumGroup<CombatEventType> exportCombatEvent() const;
 
 public:
 	static constexpr std::string_view luaName = "Enums";
@@ -89,6 +91,8 @@ public:
 		s("PlayerColor",      exportPlayerColor(),      "Player colours, plus the neutral owner used by unowned objects.");
 		s("PlayerStatus",     exportPlayerStatus(),     "Whether a player is still playing, has won, or has lost.");
 		s("ComponentType",    exportComponentType(),    "Kinds of icons shown in message windows, used by Component `type`.");
+		s("SpellMode",        exportSpellMode(),        "Ways a spell is cast, used by BattleActionEnvironment `castSpell`.");
+		s("CombatEvent",      exportCombatEvent(),      "Combat events, used by BattleActionEnvironment `fireCombatEvent`.");
 	}
 };
 
