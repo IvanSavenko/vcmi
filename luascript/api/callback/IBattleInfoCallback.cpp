@@ -167,6 +167,11 @@ void IBattleInfoCallbackProxy::registerMethods(MethodRegistrar & R)
 	R.function<&IBattleInfoCallbackProxy::getTowerShooterHex>("getTowerShooterHex",
 		{{"part", "Wall section whose tower-shooter hex is queried."}}, {},
 		"Returns the hex used by the tower shooter for the given wall section.");
+	R.function<&IBattleInfoCallbackProxy::getAttackableWallParts>("getAttackableWallParts", {},
+		"Returns the hexes of the wall sections that can be targeted by an attack.");
+	R.function<&IBattleInfoCallbackProxy::hasHero>("hasHero",
+		{{"side", "Battle side to inspect."}}, {},
+		"True if the given side has a hero.");
 	R.function<&IBattleInfoCallbackProxy::getFirstAidHealValue>("getFirstAidHealValue",
 		{
 			{"healer", "Unit that applies first aid. The skills of the hero of its army raise the value."},
@@ -190,6 +195,18 @@ void IBattleInfoCallbackProxy::registerMethods(MethodRegistrar & R)
 			{"unit",   "Unit that would be affected."}
 		}, {},
 		"True if the spell cast by the unit would affect the given unit.");
+}
+
+BattleHexArray IBattleInfoCallbackProxy::getAttackableWallParts(const IBattleInfoCallback & object)
+{
+	const auto & cb = dynamic_cast<const CBattleInfoCallback &>(object);
+	return cb.getAttackableWallParts();
+}
+
+bool IBattleInfoCallbackProxy::hasHero(const IBattleInfoCallback & object, BattleSide side)
+{
+	const auto & cb = dynamic_cast<const CBattleInfoCallback &>(object);
+	return cb.battleHasHero(side);
 }
 
 int64_t IBattleInfoCallbackProxy::getFirstAidHealValue(const IBattleInfoCallback & object, const battle::Unit & healer, const battle::Unit & target)

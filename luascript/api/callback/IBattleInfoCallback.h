@@ -68,6 +68,8 @@ public:
 	static BattleHex wallPartToBattleHex(const IBattleInfoCallback & object, EWallPart part);
 	static EWallPart hexToWallPart(const IBattleInfoCallback & object, BattleHex hex);
 	static BattleHex getTowerShooterHex(const IBattleInfoCallback & object, EWallPart part);
+	static BattleHexArray getAttackableWallParts(const IBattleInfoCallback & object);
+	static bool hasHero(const IBattleInfoCallback & object, BattleSide side);
 	static int64_t getFirstAidHealValue(const IBattleInfoCallback & object, const battle::Unit & healer, const battle::Unit & target);
 	static bool canCastAt(const IBattleInfoCallback & object, const battle::Unit & caster, const spells::Spell & spell, spells::Mode mode, const std::vector<battle::Destination> & target, spells::Problem * problem);
 	static bool isReceptive(const IBattleInfoCallback & object, const battle::Unit & caster, const spells::Spell & spell, spells::Mode mode, const battle::Unit & unit);

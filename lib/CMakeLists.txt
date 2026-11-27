@@ -76,7 +76,6 @@ set(lib_MAIN_SRCS
 	battle/actions/AutomaticActions.cpp
 	battle/actions/BattleActionType.cpp
 	battle/actions/BattleActionTypeHandler.cpp
-	battle/actions/CatapultAction.cpp
 	battle/actions/MeleeAttackActions.cpp
 	battle/actions/MoveAction.cpp
 	battle/actions/NoTargetActions.cpp
@@ -516,7 +515,6 @@ set(lib_MAIN_HEADERS
 	battle/actions/AutomaticActions.h
 	battle/actions/BattleActionType.h
 	battle/actions/BattleActionTypeHandler.h
-	battle/actions/CatapultAction.h
 	battle/actions/IBattleActionEnvironment.h
 	battle/actions/MeleeAttackActions.h
 	battle/actions/MoveAction.h

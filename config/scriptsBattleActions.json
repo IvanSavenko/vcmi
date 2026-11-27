@@ -1,7 +1,19 @@
 {
+	"catapultAction" : {
+		"implements" : "battleAction",
+		"script" : "battleAction/catapult",
+		"patches" : [ ],
+		"schema" : { "properties" : {}, "additionalProperties" : false }
+	},
 	"healAction" : {
 		"implements" : "battleAction",
 		"script" : "battleAction/heal",
+		"patches" : [ ],
+		"schema" : { "properties" : {}, "additionalProperties" : false }
+	},
+	"randomSpellAction" : {
+		"implements" : "battleAction",
+		"script" : "battleAction/randomSpell",
 		"patches" : [ ],
 		"schema" : { "properties" : {}, "additionalProperties" : false }
 	}

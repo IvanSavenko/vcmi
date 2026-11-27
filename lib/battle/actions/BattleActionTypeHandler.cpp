@@ -10,7 +10,6 @@
 #include "StdInc.h"
 #include "BattleActionTypeHandler.h"
 
-#include "CatapultAction.h"
 #include "MeleeAttackActions.h"
 #include "MoveAction.h"
 #include "NoTargetActions.h"
@@ -36,13 +35,11 @@ static const RetreatAction retreatAction(BattleActionID::RETREAT);
 static const SurrenderAction surrenderAction(BattleActionID::SURRENDER);
 static const MoveAction moveAction(BattleActionID::MOVE);
 static const RangedAttackAction rangedAttackAction(BattleActionID::RANGED_ATTACK);
-static const CatapultAction catapultAction(BattleActionID::CATAPULT);
 static const MeleeAttackAction meleeAttackAction(BattleActionID::MELEE_ATTACK);
 static const MeleeAttackNoReturnAction meleeAttackNoReturnAction(BattleActionID::MELEE_ATTACK_NO_RETURN);
 static const LongWeaponAttackAction longWeaponAttackAction(BattleActionID::LONG_WEAPON_ATTACK);
 static const HeroSpellAction heroSpellAction(BattleActionID::HERO_SPELL);
 static const UnitSpellAction unitSpellAction(BattleActionID::UNIT_SPELL);
-static const RandomSpellAction randomSpellAction(BattleActionID::RANDOM_SPELL);
 static const AdjacentSpellAction adjacentSpellAction(BattleActionID::ADJACENT_SPELL);
 
 struct BuiltInActionType
@@ -52,7 +49,7 @@ struct BuiltInActionType
 };
 
 /// Built-in types written in C++. The others are loaded from config/battleActions.json
-static const std::array<BuiltInActionType, 17> builtInTypes = {{
+static const std::array<BuiltInActionType, 15> builtInTypes = {{
 	{&skipTurnAction, "skipTurn"},
 	{&badMoraleAction, "badMorale"},
 	{&waitAction, "wait"},
@@ -62,13 +59,11 @@ static const std::array<BuiltInActionType, 17> builtInTypes = {{
 	{&surrenderAction, "surrender"},
 	{&moveAction, "move"},
 	{&rangedAttackAction, "rangedAttack"},
-	{&catapultAction, "catapult"},
 	{&meleeAttackAction, "meleeAttack"},
 	{&meleeAttackNoReturnAction, "meleeAttackNoReturn"},
 	{&longWeaponAttackAction, "longWeaponAttack"},
 	{&heroSpellAction, "heroSpell"},
 	{&unitSpellAction, "unitSpell"},
-	{&randomSpellAction, "randomSpell"},
 	{&adjacentSpellAction, "adjacentSpell"},
 }};
 

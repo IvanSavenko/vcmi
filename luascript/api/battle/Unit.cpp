@@ -97,6 +97,16 @@ void UnitProxy::registerMethods(MethodRegistrar & R)
 		"Returns the health left of the first creature in the unit stack.");
 	R.method<&Unit::isShooter>("isShooter", {},
 		"True if the stack can shoot in general, even if out of ammo. See canShoot to check if unit can shoot right now.");
+	R.method<&Unit::canShoot>("canShoot", {},
+		"True if the stack can shoot now: it is a shooter and has shots left.");
+	R.method<&Unit::canCast>("canCast", {},
+		"True if the stack can cast its active spell this turn.");
+	R.method<&Unit::getAbilitySpellLevel>("getAbilitySpellLevel",
+		{
+			{"abilityLevel", "Level that the ability of the unit gives the spell."},
+			{"spell",        "Spell cast by the ability."}
+		}, {},
+		"Returns the mastery level at which the unit casts the spell of its ability.");
 	R.method<&Unit::ableToRetaliate>("ableToRetaliate", {},
 		"True when the unit is alive and has an unused retaliation this round. Attacker-side "
 		"retaliation blocking is not considered.");

@@ -217,6 +217,20 @@ Returns the hex used by the tower shooter for the given wall section.
 
 - returns [`BattleHex`](BattleHex.md)
 
+### getAttackableWallParts
+
+Returns the hexes of the wall sections that can be targeted by an attack.
+
+- returns [`BattleHexArray`](BattleHexArray.md)
+
+### hasHero
+
+True if the given side has a hero.
+
+- param `side`: [`BattleSide`](BattleSide.md) — Battle side to inspect.
+
+- returns `boolean`
+
 ### getFirstAidHealValue
 
 Returns the health that first aid of the healer restores to the target.

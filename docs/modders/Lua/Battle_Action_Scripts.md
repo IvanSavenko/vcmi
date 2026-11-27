@@ -104,3 +104,32 @@ Returns true if the side may make the action. Otherwise, adds the reason to `pro
 Signature: `function Script:apply(env, battle, action)`
 
 Applies the action through `env`, a [BattleActionEnvironment](../Lua_Reference/BattleActionEnvironment.md). Runs only on the server. Default: does nothing.
+
+## Built-in actions
+
+### heal
+
+`core:heal`, script `battleAction/heal`, trigger `HEALER`. Casts the spell named by the subtype of the bonus at a wounded unit of the own side, such as the first aid of the First Aid Tent. Without a target, heals the unit that has lost the most health.
+
+### catapult
+
+`core:catapult`, script `battleAction/catapult`, trigger `CATAPULT`. Casts the spell named by the subtype of the bonus at a wall section, at the level given by the `CATAPULT_EXTRA_SHOTS` bonuses with the same subtype. Without a target, the spell picks the wall section.
+
+### randomSpell
+
+`core:randomSpell`, script `battleAction/randomSpell`, trigger `RANDOM_SPELLCASTER`. Casts a spell that is of use to the target at another living unit of the own side; the server picks the spell at random. The candidate spells come from `getCandidateSpells`. A mod adds a spell to them with a patch of the `core:randomSpellAction` script:
+
+```lua
+local Script = setmetatable({}, {__index = Base})
+Script.__index = Script
+
+function Script:getCandidateSpells()
+	local candidates = Base.getCandidateSpells(self)
+	table.insert(candidates, { spell = "mymod:inspiration" })
+	return candidates
+end
+
+return Script
+```
+
+A candidate is used when the target is not already under its effect, it can be cast at the target, and its optional `check(self, battle, caster, subject)` returns true.

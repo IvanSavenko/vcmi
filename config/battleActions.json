@@ -1,8 +1,21 @@
 {
+	"catapult" : {
+		"index" : 10,
+		"script" : "catapultAction",
+		"trigger" : { "type" : "CATAPULT" },
+		"priority" : 11
+	},
 	"heal" : {
 		"index" : 13,
 		"script" : "healAction",
 		"trigger" : { "type" : "HEALER" },
 		"priority" : 12
+	},
+	"randomSpell" : {
+		"index" : 17,
+		"script" : "randomSpellAction",
+		"trigger" : { "type" : "RANDOM_SPELLCASTER" },
+		"priority" : 2,
+		"usesUnitSpellcast" : true
 	}
 }

@@ -69,9 +69,9 @@ void BattleActionEnvironmentProxy::triggerObstaclesUnder(IBattleActionEnvironmen
 	object.triggerObstaclesUnder(unit);
 }
 
-int BattleActionEnvironmentProxy::rngInt(IBattleActionEnvironment & object, int low, int high)
+int64_t BattleActionEnvironmentProxy::rngInt(IBattleActionEnvironment & object, int64_t low, int64_t high)
 {
-	return object.getRandom().nextInt(low, high);
+	return object.getRandom().nextInt64(low, high);
 }
 
 }

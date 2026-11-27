@@ -9,6 +9,7 @@
 	"factions" : [ "config/towerFactions" ],
 	"creatures" : [ "config/towerCreature" ],
 	"spells" : [ "config/spells" ],
+	"battleActions" : [ "config/battleActions" ],
 
 	"belarusian" : {
 		"skipValidation" : true,

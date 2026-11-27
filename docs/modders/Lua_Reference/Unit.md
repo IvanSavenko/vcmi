@@ -212,6 +212,27 @@ True if the stack can shoot in general, even if out of ammo. See canShoot to che
 
 - returns `boolean`
 
+### canShoot
+
+True if the stack can shoot now: it is a shooter and has shots left.
+
+- returns `boolean`
+
+### canCast
+
+True if the stack can cast its active spell this turn.
+
+- returns `boolean`
+
+### getAbilitySpellLevel
+
+Returns the mastery level at which the unit casts the spell of its ability.
+
+- param `abilityLevel`: `integer` — Level that the ability of the unit gives the spell.
+- param `spell`: [`Spell`](Spell.md) — Spell cast by the ability.
+
+- returns `integer`
+
 ### ableToRetaliate
 
 True when the unit is alive and has an unused retaliation this round. Attacker-side retaliation blocking is not considered.

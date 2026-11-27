@@ -36,7 +36,7 @@ public:
 	static void castSpell(IBattleActionEnvironment & object, const battle::Unit & caster, const spells::Spell & spell, spells::Mode mode, int level, const std::vector<battle::Destination> & target);
 	static void fireCombatEvent(IBattleActionEnvironment & object, CombatEventType event, const battle::Unit & unit, const battle::Unit * other, const spells::Spell * spell);
 	static void triggerObstaclesUnder(IBattleActionEnvironment & object, const battle::Unit & unit);
-	static int rngInt(IBattleActionEnvironment & object, int low, int high);
+	static int64_t rngInt(IBattleActionEnvironment & object, int64_t low, int64_t high);
 };
 
 }

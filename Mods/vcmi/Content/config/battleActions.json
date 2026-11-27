@@ -1,0 +1,5 @@
+{
+	"core:randomSpell" : {
+		"button" : { "order" : 4, "icon" : "battle/actionGenie", "tooltip" : "@vcmi.battle.action.genie" }
+	}
+}

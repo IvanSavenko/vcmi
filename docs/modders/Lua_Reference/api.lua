@@ -398,6 +398,15 @@ function Battle:canCastAt(caster, spell, mode, target, problem) end
 ---@param spell Spell # Spell to check.
 ---@param mode SpellMode # Way the spell would be cast, from `ENUM.SpellMode`.
 ---@param unit Unit # Unit that would be affected.
+---Returns the hexes of the wall sections that can be targeted by an attack.
+---@return BattleHexArray
+function Battle:getAttackableWallParts() end
+
+---True if the given side has a hero.
+---@param side BattleSide # Battle side to inspect.
+---@return boolean
+function Battle:hasHero(side) end
+
 ---@return boolean
 function Battle:isReceptive(caster, spell, mode, unit) end
 
@@ -439,26 +448,6 @@ function BattleActionEnvironment:triggerObstaclesUnder(unit) end
 ---@return integer # Random integer in [low, high].
 function BattleActionEnvironment:rngInt(low, high) end
 
-function BattleHex:copyToNorthWest() end
-
----Returns the neighbouring hex one step north-east.
----@return BattleHex
-function BattleHex:copyToNorthEast() end
-
----Returns the neighbouring hex one step east.
----@return BattleHex
-function BattleHex:copyToEast() end
-
----Returns the neighbouring hex one step south-east.
----@return BattleHex
-function BattleHex:copyToSouthEast() end
-
----Returns the neighbouring hex one step south-west.
----@return BattleHex
-function BattleHex:copyToSouthWest() end
-
----Returns the neighbouring hex one step west.
----@return BattleHex
 ---Represents a single tile on the battlefield gridallows computing geometric relationships (distance, neighbours, line-of-sight) that don't rely on current state of a battlefield
 ---@class BattleHex
 local BattleHex = {}
@@ -499,6 +488,26 @@ function BattleHexArray:insert(hex) end
 
 ---Removes the given hex from the list (no-op if absent).
 ---@param hex BattleHex # Hex to remove.
+function BattleHex:copyToNorthWest() end
+
+---Returns the neighbouring hex one step north-east.
+---@return BattleHex
+function BattleHex:copyToNorthEast() end
+
+---Returns the neighbouring hex one step east.
+---@return BattleHex
+function BattleHex:copyToEast() end
+
+---Returns the neighbouring hex one step south-east.
+---@return BattleHex
+function BattleHex:copyToSouthEast() end
+
+---Returns the neighbouring hex one step south-west.
+---@return BattleHex
+function BattleHex:copyToSouthWest() end
+
+---Returns the neighbouring hex one step west.
+---@return BattleHex
 function BattleHexArray:erase(hex) end
 
 ---True if the list contains the given hex.
@@ -1989,6 +1998,20 @@ function Unit:getMaxHealth() end
 ---@param position BattleHex # Battlefield hex to test against the unit's footprint.
 ---@return boolean
 function Unit:coversPos(position) end
+---True if the stack can shoot now: it is a shooter and has shots left.
+---@return boolean
+function Unit:canShoot() end
+
+---True if the stack can cast its active spell this turn.
+---@return boolean
+function Unit:canCast() end
+
+---Returns the mastery level at which the unit casts the spell of its ability.
+---@param abilityLevel integer # Level that the ability of the unit gives the spell.
+---@param spell Spell # Spell cast by the ability.
+---@return integer
+function Unit:getAbilitySpellLevel(abilityLevel, spell) end
+
 
 ---Returns the Creature type of the units in this stack.
 ---@return Creature
