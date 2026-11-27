@@ -20,8 +20,9 @@
 namespace scripting::api
 {
 
-ActionOptionPayload::ActionOptionPayload(const ActionOption & option)
+ActionOptionPayload::ActionOptionPayload(const ActionOption & option, const BonusList & bonuses)
 	: spell(option.spell.hasValue() ? option.spell.toSpell() : nullptr)
+	, bonuses(bonuses)
 {
 }
 
@@ -34,11 +35,12 @@ ActionContextPayload::ActionContextPayload(const ActionContext & context, bool l
 {
 }
 
-BattleActionPayload::BattleActionPayload(const CBattleInfoCallback & battle, const BattleAction & action)
+BattleActionPayload::BattleActionPayload(const CBattleInfoCallback & battle, const BattleAction & action, const BonusList & bonuses)
 	: side(action.side)
 	, actor(battle.battleGetUnitByID(action.stackNumber))
 	, spell(action.spell.hasValue() ? action.spell.toSpell() : nullptr)
 	, target(action.getTarget(&battle))
+	, bonuses(bonuses)
 {
 }
 

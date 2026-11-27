@@ -10,6 +10,7 @@
 #pragma once
 #include "Destination.h"
 #include "../GameConstants.h"
+#include "../bonuses/BonusCustomTypes.h"
 
 class CBattleInfoCallback;
 
@@ -27,6 +28,8 @@ public:
 	BattleActionID actionType;
 
 	SpellID spell;
+	/// Subtype of the trigger bonuses that grant the action, if the option that made it has one
+	BonusSubtypeID subtype;
 
 	BattleAction();
 
@@ -83,6 +86,8 @@ public:
 			actionType = BattleActionID(legacyType);
 		}
 		h & spell;
+		if(h.hasFeature(Handler::Version::BATTLE_ACTION_ID))
+			h & subtype;
 		h & target;
 	}
 

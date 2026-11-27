@@ -217,15 +217,6 @@ Returns the hex used by the tower shooter for the given wall section.
 
 - returns [`BattleHex`](BattleHex.md)
 
-### canUnitAct
-
-True if the unit exists, is alive and may act now.
-
-- param `unit`: [`Unit`](Unit.md) — Unit to check, or nil.
-- param `problem`: [`SpellProblem`](SpellProblem.md) — Receives the reason when the unit can not act.
-
-- returns `boolean`
-
 ### getFirstAidHealValue
 
 Returns the health that first aid of the healer restores to the target.

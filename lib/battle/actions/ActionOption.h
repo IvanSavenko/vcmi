@@ -12,6 +12,7 @@
 #include "../BattleHexArray.h"
 #include "../BattleSide.h"
 #include "../Destination.h"
+#include "../../bonuses/BonusCustomTypes.h"
 #include "../../constants/EntityIdentifiers.h"
 #include "../../filesystem/ResourcePath.h"
 #include "../../texts/MetaString.h"
@@ -42,6 +43,8 @@ struct ActionOption
 	std::optional<UnitActionButton> button;
 	/// Spell cast by the option, if it casts one
 	SpellID spell = SpellID::NONE;
+	/// Subtype of the trigger bonuses that grant the option, for a type that has triggers
+	BonusSubtypeID subtype = BonusSubtypeID();
 };
 
 /// One way for the actor to reach the hovered hex: the side the hex is approached from, and the hex the actor acts from

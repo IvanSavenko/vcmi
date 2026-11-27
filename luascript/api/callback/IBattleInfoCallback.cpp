@@ -30,7 +30,6 @@
 #include "../../../lib/battle/CObstacleInstance.h"
 #include "../../../lib/BattleFieldHandler.h"
 #include "../../../lib/mapObjects/CGTownInstance.h"
-#include "../../../lib/battle/actions/BattleActionType.h"
 #include "../../../lib/spells/CSpell.h"
 #include "../../../lib/spells/ISpellMechanics.h"
 #include "../../../lib/spells/Problem.h"
@@ -168,12 +167,6 @@ void IBattleInfoCallbackProxy::registerMethods(MethodRegistrar & R)
 	R.function<&IBattleInfoCallbackProxy::getTowerShooterHex>("getTowerShooterHex",
 		{{"part", "Wall section whose tower-shooter hex is queried."}}, {},
 		"Returns the hex used by the tower shooter for the given wall section.");
-	R.function<&IBattleInfoCallbackProxy::canUnitAct>("canUnitAct",
-		{
-			{"unit",    "Unit to check, or nil."},
-			{"problem", "Receives the reason when the unit can not act."}
-		}, {},
-		"True if the unit exists, is alive and may act now.");
 	R.function<&IBattleInfoCallbackProxy::getFirstAidHealValue>("getFirstAidHealValue",
 		{
 			{"healer", "Unit that applies first aid. The skills of the hero of its army raise the value."},
@@ -197,12 +190,6 @@ void IBattleInfoCallbackProxy::registerMethods(MethodRegistrar & R)
 			{"unit",   "Unit that would be affected."}
 		}, {},
 		"True if the spell cast by the unit would affect the given unit.");
-}
-
-bool IBattleInfoCallbackProxy::canUnitAct(const IBattleInfoCallback & object, const battle::Unit * unit, spells::Problem & problem)
-{
-	const auto & cb = dynamic_cast<const CBattleInfoCallback &>(object);
-	return BattleActionType::checkUnitCanAct(cb, unit, problem);
 }
 
 int64_t IBattleInfoCallbackProxy::getFirstAidHealValue(const IBattleInfoCallback & object, const battle::Unit & healer, const battle::Unit & target)

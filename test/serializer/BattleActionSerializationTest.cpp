@@ -51,6 +51,7 @@ TEST(BattleActionSerializationTest, actionNamesItsTypeByIdentifier)
 	written.side = BattleSide::ATTACKER;
 	written.stackNumber = 3;
 	written.actionType = BattleActionID::ADJACENT_SPELL;
+	written.subtype = SpellID(SpellID::CURE);
 
 	CMemorySerializer serializer;
 	serializer.oser & written;
@@ -68,4 +69,5 @@ TEST(BattleActionSerializationTest, actionNamesItsTypeByIdentifier)
 	BattleAction read;
 	roundTrip.iser & read;
 	EXPECT_EQ(read.actionType, BattleActionID::ADJACENT_SPELL);
+	EXPECT_EQ(read.subtype, BonusSubtypeID(SpellID(SpellID::CURE)));
 }

@@ -12,12 +12,8 @@ local function addProblem(problem, textID)
 	end
 end
 
---- Spell of the HEALER bonus of the unit, or nil
-function Script:getHealerSpell(unit)
-	local bonuses = unit:getBonuses({ type = "HEALER" })
-	if bonuses:size() == 0 then
-		return nil
-	end
+--- Spell of the trigger bonuses of the option or action, or nil
+function Script:getHealerSpell(bonuses)
 	return LIBRARY:getSpellByName(bonuses:getBonus(1):getSubtype())
 end
 
@@ -58,7 +54,7 @@ function Script:findMostWounded(battle, healer, spell)
 end
 
 function Script:isAvailable(battle, unit, option)
-	return battle:getTacticDistance() == 0 and unit:hasBonuses({ type = "HEALER" })
+	return battle:getTacticDistance() == 0
 end
 
 function Script:preview(battle, option, context)
@@ -82,11 +78,7 @@ end
 
 function Script:validate(battle, action, problem)
 	local unit = action.actor
-	if not battle:canUnitAct(unit, problem) then
-		return false
-	end
-
-	local spell = self:getHealerSpell(unit)
+	local spell = self:getHealerSpell(action.bonuses)
 	if not spell then
 		addProblem(problem, "vcmi.battle.problem.cannotHeal")
 		return false
@@ -107,7 +99,7 @@ end
 
 function Script:apply(env, battle, action)
 	local unit = action.actor
-	local spell = self:getHealerSpell(unit)
+	local spell = self:getHealerSpell(action.bonuses)
 
 	if #action.target > 0 then
 		local destination = action.target[1]

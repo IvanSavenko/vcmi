@@ -381,6 +381,7 @@
 	"vcmi.battle.problem.healTargetNotHealable": "Heal target can not be healed.",
 	"vcmi.battle.problem.healTargetNotOwnSide": "Heal target is not a unit of the healer's side.",
 	"vcmi.battle.problem.healTargetNotUnit": "Heal target is not a unit.",
+	"vcmi.battle.problem.noActionAbility": "This unit has no ability for this action.",
 	"vcmi.battleOptions.animationsSpeed1.help": "Set animation speed to very slow.",
 	"vcmi.battleOptions.animationsSpeed1.hover": "Set animation speed to very slow.",
 	"vcmi.battleOptions.animationsSpeed5.help": "Set animation speed to very fast.",

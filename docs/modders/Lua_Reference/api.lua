@@ -14,6 +14,7 @@ local ActionContext = {}
 ---One way for a unit to use a battle action, offered to the player on the unit's turn. Passed to the functions of a battle action script.
 ---@class ActionOption
 ---@field spell Spell # Spell cast by the option, or nil.
+---@field bonuses BonusList # Trigger bonuses of the unit that grant the option, all with the same subtype. Empty for an action without a trigger.
 local ActionOption = {}
 
 ---Cursor and status bar text that the client shows for an option of a battle action on the hovered hex. Returned by the `preview` function of a battle action script.
@@ -377,32 +378,6 @@ function Battle:hexToWallPart(hex) end
 ---@return BattleHex
 function Battle:getTowerShooterHex(part) end
 
----Represents a single tile on the battlefield gridallows computing geometric relationships (distance, neighbours, line-of-sight) that don't rely on current state of a battlefield
----@class BattleHex
-local BattleHex = {}
-
----Returns true if this hex value identifies existing battlefield position.
----@return boolean
-function BattleHex:isValid() end
-
----Returns true if the hex is on the battlefield and is not located in the first or last column, which are reserved for back tile of war machines and are not accessible for regular movement. NOTE: does NOT checks whether hex is blocked by obstacles or units
----@return boolean
-function BattleHex:isAvailable() end
-
----Searches provided array for hex that is closest to current one. If multiple equidistant hexes are found, this function will prefer hex closest to specified battle side.
----@param side BattleSide # Tie-breaker side — closer to this side wins when several candidates are equidistant.
----@param hexes BattleHexArray # Candidate hexes to search through.
----@return BattleHex
-function BattleHex:getClosestTile(side, hexes) end
-
----Returns the neighbouring hex one step north-west.
----@return BattleHex
----True if the unit exists, is alive and may act now.
----@param unit Unit # Unit to check, or nil.
----@param problem SpellProblem # Receives the reason when the unit can not act.
----@return boolean
-function Battle:canUnitAct(unit, problem) end
-
 ---Returns the health that first aid of the healer restores to the target.
 ---@param healer Unit # Unit that applies first aid. The skills of the hero of its army raise the value.
 ---@param target Unit # Unit that would be healed.
@@ -429,7 +404,7 @@ function Battle:isReceptive(caster, spell, mode, unit) end
 ---Battle action made by a unit, as the script of its type receives it in `validate` and `apply`.
 ---@class BattleAction
 ---@field side BattleSide # Side making the action.
----@field actor Unit # Unit making the action, or nil if the battle has no such unit.
+---@field actor Unit # Unit making the action.
 ---@field spell Spell # Spell of the action, or nil.
 ---@field target Destination[] # Destinations of the action.
 local BattleAction = {}
@@ -452,6 +427,7 @@ function BattleActionEnvironment:castSpell(caster, spell, mode, level, target) e
 ---@param other Unit # Other unit of the event, or nil.
 ---@param spell Spell # Spell the event is about, or nil.
 function BattleActionEnvironment:fireCombatEvent(event, unit, other, spell) end
+---@field bonuses BonusList # Trigger bonuses of the unit that grant the action, all with the same subtype. Empty for an action without a trigger.
 
 ---Triggers the obstacles on the hexes the unit occupies.
 ---@param unit Unit # Unit whose hexes are checked.
@@ -482,6 +458,26 @@ function BattleHex:copyToSouthEast() end
 function BattleHex:copyToSouthWest() end
 
 ---Returns the neighbouring hex one step west.
+---@return BattleHex
+---Represents a single tile on the battlefield gridallows computing geometric relationships (distance, neighbours, line-of-sight) that don't rely on current state of a battlefield
+---@class BattleHex
+local BattleHex = {}
+
+---Returns true if this hex value identifies existing battlefield position.
+---@return boolean
+function BattleHex:isValid() end
+
+---Returns true if the hex is on the battlefield and is not located in the first or last column, which are reserved for back tile of war machines and are not accessible for regular movement. NOTE: does NOT checks whether hex is blocked by obstacles or units
+---@return boolean
+function BattleHex:isAvailable() end
+
+---Searches provided array for hex that is closest to current one. If multiple equidistant hexes are found, this function will prefer hex closest to specified battle side.
+---@param side BattleSide # Tie-breaker side — closer to this side wins when several candidates are equidistant.
+---@param hexes BattleHexArray # Candidate hexes to search through.
+---@return BattleHex
+function BattleHex:getClosestTile(side, hexes) end
+
+---Returns the neighbouring hex one step north-west.
 ---@return BattleHex
 function BattleHex:copyToWest() end
 

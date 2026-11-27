@@ -7,6 +7,7 @@ Declared with `"implements" : "battleAction"` in the [scripts](Script_Types.md) 
 An action entry in the `battleActions` section:
 
 - `script` - identifier of the `battleAction` script with the rules of the action
+- `trigger` - bonus types that grant the action, as `{ "type" : "HEALER" }` or `{ "type" : [ "TYPE_A", "TYPE_B" ] }`. A unit gets one option of the action per distinct subtype of these bonuses; bonuses with the same subtype, or with none, give one option. Without a trigger, the action is offered to every unit
 - `priority` - order in which the client tries the actions of a unit for a hovered hex, lower first. Used when the script returns no priority of its own
 - `button` - optional button of the unit action panel that selects the action, with `order` (position in the panel, lower first), `icon` and `tooltip`. A tooltip starting with `@` is the identifier of an existing text
 - `turnStatus` - turn status of the unit once the action starts: `acted` (default), `waiting`, `defended`, or `keep` to leave it as it is
@@ -17,6 +18,7 @@ An action entry in the `battleActions` section:
 "battleActions" : {
 	"heal" : {
 		"script" : "healAction",
+		"trigger" : { "type" : "HEALER" },
 		"priority" : 12
 	}
 },
@@ -32,6 +34,8 @@ An action entry in the `battleActions` section:
 
 Action and script identifiers are separate: `core:heal` is the action, `core:healAction` its script, and `core:heal` among scripts is a spell effect.
 
+A new action of a mod usually declares its own bonus type as its trigger, in the `bonuses` section of the mod, so that the creature window shows the ability with its description and icon.
+
 ## Writing a script
 
 Scripts are kept in `scripts/battleAction/`. A script derives from the base script `battleAction/unitAction`, which provides a default for every function, and overrides the functions it needs:
@@ -42,7 +46,7 @@ local Script = setmetatable({}, {__index = Base})
 Script.__index = Script
 
 function Script:isAvailable(battle, unit, option)
-	return unit:hasBonuses({ type = "HEALER" })
+	return battle:getTacticDistance() == 0
 end
 
 return Script
@@ -52,9 +56,14 @@ Call other functions of the script through `self`, never through `Base` or a loc
 
 The functions receive the battle as [Battle](../Lua_Reference/Battle.md), units as [Unit](../Lua_Reference/Unit.md), and the other data as tables: [ActionOption](../Lua_Reference/ActionOption.md), [ActionContext](../Lua_Reference/ActionContext.md) and [BattleAction](../Lua_Reference/BattleAction.md). Changing a table changes nothing in the game.
 
+## Trigger bonuses
+
+`option.bonuses` and `action.bonuses` are the trigger bonuses of the unit that grant the option or the action, all with the same subtype, as a [BonusList](../Lua_Reference/BonusList.md). A script reads the parameters of its ability from them: for example, first aid casts the spell named by the subtype. Only the action type and the subtype are sent over the network, and the server collects the bonuses again.
+
 ## Assumptions and guarantees
 
 - the game calls the functions in any order and any number of times: on the client for every hovered hex, on the server for every action, and in AI for estimates
+- `validate` is called only for a unit that exists, is alive, may act now and has the trigger bonuses of the action
 - `apply` is called only for an action that passed `validate`
 - the global state of the script is not kept between calls
 
@@ -64,7 +73,7 @@ The functions receive the battle as [Battle](../Lua_Reference/Battle.md), units 
 
 Signature: `function Script:isAvailable(battle, unit, option)`
 
-Returns true if the action offers the option to the unit on its turn. Default: true.
+Returns true if the action offers the option to the unit on its turn. Called only for the options that the trigger gives the unit. Default: true.
 
 ### getPriority
 

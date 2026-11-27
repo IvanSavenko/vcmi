@@ -10,7 +10,7 @@ Side making the action.
 
 ### actor
 
-Unit making the action, or nil if the battle has no such unit.
+Unit making the action.
 
 - type: [`Unit`](Unit.md)
 
@@ -25,3 +25,9 @@ Spell of the action, or nil.
 Destinations of the action.
 
 - type: `Destination[]`
+
+### bonuses
+
+Trigger bonuses of the unit that grant the action, all with the same subtype. Empty for an action without a trigger.
+
+- type: [`BonusList`](BonusList.md)

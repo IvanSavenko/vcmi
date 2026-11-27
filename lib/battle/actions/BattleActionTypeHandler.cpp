@@ -160,13 +160,13 @@ void BattleActionTypeHandler::loadObject(LibraryLoadContext & context, const std
 
 void BattleActionTypeHandler::loadScriptedType(LibraryLoadContext & context, const std::string & scope, const std::string & name, const JsonNode & data, size_t index)
 {
-	ScriptedBattleActionConfig config;
-	config.priority = data["priority"].Integer();
-	config.turnStatus = parseTurnStatus(data["turnStatus"].String());
-	config.usesUnitSpellcast = data["usesUnitSpellcast"].Bool();
-	config.tacticsAction = data["tacticsAction"].Bool();
+	auto config = std::make_shared<ScriptedBattleActionConfig>();
+	config->priority = data["priority"].Integer();
+	config->turnStatus = parseTurnStatus(data["turnStatus"].String());
+	config->usesUnitSpellcast = data["usesUnitSpellcast"].Bool();
+	config->tacticsAction = data["tacticsAction"].Bool();
 	if(!data["button"].isNull())
-		config.button = parseButton(context, scope, name, data["button"]);
+		config->button = parseButton(context, scope, name, data["button"]);
 
 	if(typesById.size() <= index)
 	{
@@ -176,26 +176,56 @@ void BattleActionTypeHandler::loadScriptedType(LibraryLoadContext & context, con
 	jsonKeys.at(index) = scope + ":" + name;
 	registerObject(context, scope, "battleAction", name, data, index);
 
-	context.resolver.requestIdentifier("script", data["script"], [this, &context, config, index](int32_t scriptIndex)
+	const size_t pendingIndex = pendingTypes.size();
+	pendingTypes.push_back({index, config, std::nullopt});
+
+	const JsonNode & triggerTypes = data["trigger"]["type"];
+	const auto requestTrigger = [&context, config](const JsonNode & typeNode)
+	{
+		context.resolver.requestIdentifier("bonus", typeNode, [config](int32_t bonusIndex)
+		{
+			config->triggers.push_back(static_cast<BonusType>(bonusIndex));
+		});
+	};
+	if(triggerTypes.isVector())
+	{
+		for(const auto & typeNode : triggerTypes.Vector())
+			requestTrigger(typeNode);
+	}
+	else if(!triggerTypes.isNull())
+	{
+		requestTrigger(triggerTypes);
+	}
+
+	context.resolver.requestIdentifier("script", data["script"], [this, &context, pendingIndex](int32_t scriptIndex)
 	{
 		const ScriptID scriptID(scriptIndex);
-		const ScriptService & scripts = *context.lib.scriptTypes();
-		const ScriptTypeDescription & script = scripts.getById(scriptID);
+		const ScriptTypeDescription & script = context.lib.scriptTypes()->getById(scriptID);
+		PendingType & pending = pendingTypes.at(pendingIndex);
 
 		if(script.kind != ScriptKind::BATTLE_ACTION)
 		{
-			logMod->error("Battle action '%s' uses script '%s', which is not a battle action script! The action will not be loaded.", jsonKeys.at(index), script.scriptId);
+			logMod->error("Battle action '%s' uses script '%s', which is not a battle action script! The action will not be loaded.", jsonKeys.at(pending.index), script.scriptId);
 			return;
 		}
 
-		auto type = scripts.createBattleActionType(scriptID, BattleActionID(static_cast<int32_t>(index)), config);
-		typesById.at(index) = type.get();
-		scriptedTypes.push_back(std::move(type));
+		pending.script = scriptID;
 	});
 }
 
 void BattleActionTypeHandler::afterLoadFinalization(LibraryLoadContext & context)
 {
+	for(const auto & pending : pendingTypes)
+	{
+		if(!pending.script)
+			continue;
+
+		auto type = context.lib.scriptTypes()->createBattleActionType(*pending.script, BattleActionID(static_cast<int32_t>(pending.index)), *pending.config);
+		typesById.at(pending.index) = type.get();
+		scriptedTypes.push_back(std::move(type));
+	}
+	pendingTypes.clear();
+
 	types.clear();
 
 	for(const auto id : builtInOptionOrder)

@@ -2,6 +2,7 @@
 	"heal" : {
 		"index" : 13,
 		"script" : "healAction",
+		"trigger" : { "type" : "HEALER" },
 		"priority" : 12
 	}
 }

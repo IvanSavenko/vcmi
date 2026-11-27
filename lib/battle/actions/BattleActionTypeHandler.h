@@ -10,8 +10,10 @@
 #pragma once
 
 #include "../../IHandlerBase.h"
+#include "../../constants/EntityIdentifiers.h"
 
 class BattleActionType;
+struct ScriptedBattleActionConfig;
 
 /// Registry of battle action types, with the identifiers that name them. Loads the scripted types of the battleActions config section
 class DLL_LINKAGE BattleActionTypeHandler final : public IHandlerBase
@@ -21,6 +23,15 @@ class DLL_LINKAGE BattleActionTypeHandler final : public IHandlerBase
 	std::vector<const BattleActionType *> types;
 	std::vector<std::string> jsonKeys;
 	std::vector<std::shared_ptr<const BattleActionType>> scriptedTypes;
+
+	/// Scripted type loaded from config, created once its identifiers are resolved
+	struct PendingType
+	{
+		size_t index;
+		std::shared_ptr<ScriptedBattleActionConfig> config;
+		std::optional<ScriptID> script;
+	};
+	std::vector<PendingType> pendingTypes;
 
 	void loadScriptedType(LibraryLoadContext & context, const std::string & scope, const std::string & name, const JsonNode & data, size_t index);
 

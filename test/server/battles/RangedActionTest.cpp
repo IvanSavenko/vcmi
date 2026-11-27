@@ -153,6 +153,23 @@ TEST_F(RangedActionTest, firstAidTentRefusesEnemyAndUnwoundedStacks)
 	EXPECT_FALSE(act(BattleAction::makeHeal(tent, unwounded)));
 }
 
+TEST_F(RangedActionTest, firstAidTentRefusesHealWithAbilityItDoesNotHave)
+{
+	startGame();
+	startBattle();
+
+	const CStack * tent = addStack(BattleSide::ATTACKER, CreatureID(CreatureID::FIRST_AID_TENT), BattleHex(2, 8), 1);
+	const CStack * patient = addStack(BattleSide::ATTACKER, CreatureID(pikeman), shooterHex, stackCount);
+
+	injure(patient, patient->getMaxHealth() / 2);
+	const auto woundedHealth = patient->getAvailableHealth();
+
+	BattleAction heal = BattleAction::makeHeal(tent, patient);
+	heal.subtype = SpellID(SpellID::CURE);
+	EXPECT_FALSE(act(heal));
+	EXPECT_EQ(patient->getAvailableHealth(), woundedHealth);
+}
+
 TEST_F(RangedActionTest, firstAidTentWithoutTargetHealsMostWoundedCreature)
 {
 	startGame();

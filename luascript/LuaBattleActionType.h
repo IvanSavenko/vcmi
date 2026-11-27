@@ -22,9 +22,12 @@ class LuaBattleActionType final : public ScriptedBattleActionType
 	const LuaScriptInstance * script;
 
 	std::shared_ptr<LuaContext> contextOf(const CBattleInfoCallback & battle) const;
+	/// Trigger bonuses of the option for the acting unit, empty without one
+	BonusList getOptionBonuses(const battle::Unit * actor, const ActionOption & option) const;
 
 protected:
-	bool isAvailable(const CBattleInfoCallback & battle, const battle::Unit & actor, const ActionOption & option) const override;
+	bool isAvailable(const CBattleInfoCallback & battle, const battle::Unit & actor, const ActionOption & option, const BonusList & bonuses) const override;
+	bool validateRules(const CBattleInfoCallback & battle, const BattleAction & action, const BonusList & bonuses, spells::Problem & problem) const override;
 
 public:
 	LuaBattleActionType(const LuaScriptInstance * script, BattleActionID id, ScriptedBattleActionConfig config);
@@ -33,7 +36,6 @@ public:
 	int getPriority(const CBattleInfoCallback & battle, const ActionOption & option, const battle::Unit & actor, const battle::Unit * target) const override;
 	ActionPreview preview(const IGameInfoCallback & game, const CBattleInfoCallback & battle, const ActionOption & option, const ActionContext & context) const override;
 	std::optional<battle::Target> buildTarget(const CBattleInfoCallback & battle, const ActionOption & option, const ActionContext & context) const override;
-	bool validate(const IGameInfoCallback & game, const CBattleInfoCallback & battle, const BattleAction & action, spells::Problem & problem) const override;
 	void apply(IBattleActionEnvironment & env, const CBattleInfoCallback & battle, const BattleAction & action) const override;
 };
 

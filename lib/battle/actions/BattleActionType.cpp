@@ -149,6 +149,7 @@ std::optional<BattleAction> BattleActionType::build(const CBattleInfoCallback & 
 	BattleAction action;
 	action.actionType = id;
 	action.spell = option.spell;
+	action.subtype = option.subtype;
 	action.setTarget(*target);
 
 	// the context of a hero option may name the active unit, which does not make the action

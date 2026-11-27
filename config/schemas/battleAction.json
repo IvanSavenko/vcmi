@@ -14,6 +14,21 @@
 			"type" : "string",
 			"description" : "Identifier of the battleAction script with the rules of the action"
 		},
+		"trigger" : {
+			"type" : "object",
+			"additionalProperties" : false,
+			"required" : [ "type" ],
+			"description" : "Bonus types that grant the action. The unit gets one option of the action per distinct subtype of these bonuses. Without a trigger, the action is offered to every unit",
+			"properties" : {
+				"type" : {
+					"description" : "Bonus type, or list of bonus types",
+					"anyOf" : [
+						{ "type" : "string" },
+						{ "type" : "array", "items" : { "type" : "string" } }
+					]
+				}
+			}
+		},
 		"priority" : {
 			"type" : "number",
 			"description" : "Order in which the client tries the actions of a unit for a hovered hex, lower first. Used when the script returns no priority of its own"

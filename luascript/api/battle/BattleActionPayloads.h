@@ -17,6 +17,7 @@
 #include "../../../lib/battle/BattleSide.h"
 #include "../../../lib/battle/Destination.h"
 #include "../../../lib/battle/Unit.h"
+#include "../../../lib/bonuses/BonusList.h"
 
 class BattleAction;
 class CBattleInfoCallback;
@@ -36,14 +37,16 @@ struct ActionOptionPayload final : ApiSerializable<ActionOptionPayload>
 		"Passed to the functions of a battle action script.";
 
 	const spells::Spell * spell = nullptr;
+	BonusList bonuses;
 
-	explicit ActionOptionPayload(const ActionOption & option);
+	ActionOptionPayload(const ActionOption & option, const BonusList & bonuses);
 	ActionOptionPayload() = default;
 
 	template<typename Serializer>
 	void serializeScript(Serializer & s)
 	{
 		s("spell", spell, "Spell cast by the option, or nil.");
+		s("bonuses", bonuses, "Trigger bonuses of the unit that grant the option, all with the same subtype. Empty for an action without a trigger.");
 	}
 };
 
@@ -85,17 +88,19 @@ struct BattleActionPayload final : ApiSerializable<BattleActionPayload>
 	const battle::Unit * actor = nullptr;
 	const spells::Spell * spell = nullptr;
 	std::vector<battle::Destination> target;
+	BonusList bonuses;
 
-	BattleActionPayload(const CBattleInfoCallback & battle, const BattleAction & action);
+	BattleActionPayload(const CBattleInfoCallback & battle, const BattleAction & action, const BonusList & bonuses);
 	BattleActionPayload() = default;
 
 	template<typename Serializer>
 	void serializeScript(Serializer & s)
 	{
 		s("side", side, "Side making the action.");
-		s("actor", actor, "Unit making the action, or nil if the battle has no such unit.");
+		s("actor", actor, "Unit making the action.");
 		s("spell", spell, "Spell of the action, or nil.");
 		s("target", target, "Destinations of the action.");
+		s("bonuses", bonuses, "Trigger bonuses of the unit that grant the action, all with the same subtype. Empty for an action without a trigger.");
 	}
 };
 
